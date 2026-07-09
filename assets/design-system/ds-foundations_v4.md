@@ -116,18 +116,29 @@ Sistema de colunas, margens e espaçamentos horizontais que define como elemento
 - Distribuição equilibrada, cards em múltiplas colunas
 
 **Desktop Base (1025–1440px)**
-- Sidebar fixa: 256px | 12 colunas | Margin: 40px | Gutter: 24px
-- Layouts complexos (dashboards, sistemas), sidebar sempre presente
+- 12 colunas | Margin: 40px | Gutter: 24px
+- Quando houver sidebar: fixa em 256px, subtraída da área de conteúdo
+- Layouts complexos (dashboards, sistemas) costumam usar sidebar — não é obrigatória
 
 **Widescreen (+1440px)**
-- Sidebar fixa: 256px | 12 colunas centralizadas | Margin: 280px | Gutter: 24px
+- 12 colunas centralizadas | Margin: 280px | Gutter: 24px
+- Quando houver sidebar: fixa em 256px
 - Conteúdo centralizado para melhor legibilidade
 
 ### Regras de uso
 - Sempre alinhar componentes às colunas do grid
-- Respeitar sidebar fixa nos breakpoints desktop e widescreen
+- Quando houver sidebar, mantê-la fixa em 256px; o conteúdo respeita essa área
 - Nunca esticar conteúdo até as bordas em widescreen
 - Não criar alinhamentos manuais fora das colunas
+
+### Navegação (casca definida por projeto)
+O tipo de casca de navegação é **escolha de cada projeto**, não uma regra do design system. Opções válidas:
+- **Sidebar** fixa (256px no desktop) — comum em sistemas/dashboards com muitas seções
+- **Navbar** no topo — comum em produtos com poucas seções
+- **Sidebar + navbar** combinadas
+- **Nenhuma das duas** — conteúdo em tela cheia
+
+No mobile, a navegação normalmente colapsa em **menu hambúrguer** ou **navegação inferior (bottom nav)** — o bottom nav aparece mais em apps do que em sites de fato responsivos.
 
 ---
 
