@@ -29,14 +29,14 @@ Antes de tudo, confirme o cenário — porque o começo muda tudo:
 
 Se não é projeto novo, encaminhe e encerre — não force o fluxo de setup.
 
-## Passo 1 — Preparar o terreno (scaffold + local)
+## Passo 1 — Terreno pronto? (delega pra `px-setup`)
 
-**Decidir:** onde o projeto vai viver e se o scaffold já existe.
-**Por que importa:** a cadeia PX escreve artefatos em `planning/<iniciativa>/` e a identidade em `src/index.css`. Sem o esqueleto, os próximos passos não têm onde gravar.
+**Decidir:** o terreno técnico (repo/branch/scaffold) já existe? Onde a cadeia PX vai gravar?
+**Por que importa:** a cadeia PX escreve artefatos em `planning/<iniciativa>/` e a identidade em `src/index.css`. Sem o esqueleto, os próximos passos não têm onde gravar. Mas a **mecânica de git/scaffold é da `px-setup`** — o `px-start` não repete comando de repositório.
 **Fazer:**
 - Confirme a raiz do projeto (o repo). Se ambíguo, pergunte antes de escrever qualquer coisa.
-- **Alvo de build** (`AskUserQuestion`): *App React do produto a partir do boilerplate (Recomendado)* × *Protótipo HTML descartável (via `agile-proto`, stack própria)*. Muda onde a identidade é aplicada e o que "pronto" significa.
-- Se for app do produto e o projeto ainda não existe, oriente o scaffold a partir do boilerplate (Vite + shadcn) e garanta a pasta `planning/`.
+- **Se o terreno ainda não está preparado** (sem sandbox nem repo do dev clonado) → encaminhe pra **`px-setup`**, que monta o sandbox a partir do boilerplate ou clona o repo do dev e cria a branch `ux/<projeto>`. Volte pra cá depois.
+- **Alvo de build** (`AskUserQuestion`): *App React do produto a partir do boilerplate (Recomendado)* × *Protótipo HTML descartável (via `agile-proto`, stack própria)*. Muda onde a identidade é aplicada e o que "pronto" significa. Essa decisão é de idealização e fica aqui.
 - Se for protótipo, aponte pro `agile-proto` como manual técnico — a decisão já vem registrada.
 
 ## Passo 2 — Orientar (a cadeia PX em 3 linhas)
@@ -76,6 +76,8 @@ Antes de encerrar, repita em 3–4 linhas: *"Então: projeto **X**, alvo **Y**, 
 ## Relação com o fluxo
 
 ```
-px-start  →  px-intake  →  px-kickoff  →  px-epic  →  px-request  →  px-story  →  handoff → dev
-^ você está aqui (a porta de entrada de todo projeto novo)
+px-setup (terreno)  →  px-start  →  px-intake  →  px-kickoff  →  px-epic  →  px-request  →  px-story  →  handoff → dev
+                       ^ você está aqui (a porta de entrada de todo projeto novo)
 ```
+
+> A `px-setup` prepara o terreno técnico (sandbox/clone/branch) e faz a entrega pro repo do dev; o `px-start` orienta e despacha a idealização. Se o terreno ainda não existe, passe pela `px-setup` antes.
