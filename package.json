@@ -1,6 +1,6 @@
 {
   "name": "@centralit/px-skills",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Cadeia de skills PX/UX da Central IT + docs de design system (instalador). Instala as skills negociais e suas dependências num repo de produto.",
   "type": "module",
   "bin": {

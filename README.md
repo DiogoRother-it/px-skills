@@ -6,7 +6,7 @@ traz só a stack de componentes; as skills não vêm com ela).
 
 ## O que instala
 
-- **7 skills** em `.claude/skills/`: `px-start`, `px-audit`, `px-intake`, `px-kickoff`, `px-epic`, `px-request`, `px-story`
+- **9 skills** em `.claude/skills/`: `px-setup`, `px-start`, `px-audit`, `px-intake`, `px-kickoff`, `px-epic`, `px-request`, `px-story`, `px-preview`
 - **Docs de design system** em `docs/design-system/` (foundations, components, patterns, engineering)
 - **Protocolo** em `docs/px-protocol.md` (Protocolo de Interação UX + Skill Prompting Conventions)
 - Um ponteiro pro protocolo no `CLAUDE.md` do repo (cria se não existir)
@@ -27,7 +27,7 @@ npx @centralit/px-skills
 ```
 
 Depois, abra o Claude Code nesse repo — as skills aparecem no menu `/`:
-`/px-start · /px-audit · /px-intake · /px-kickoff · /px-epic · /px-request · /px-story`
+`/px-setup · /px-start · /px-audit · /px-intake · /px-kickoff · /px-epic · /px-request · /px-story · /px-preview`
 
 ## Pré-requisito
 
