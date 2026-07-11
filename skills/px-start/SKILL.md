@@ -57,10 +57,22 @@ Uma frase por etapa é suficiente. O objetivo é a pessoa saber onde está e o q
 
 **Decidir:** qual é o próximo passo real deste projeto.
 **Por que importa:** é a função central do `px-start`. Rotear errado faz a pessoa pular a identidade ou detalhar tela cedo demais.
-**Perguntar (`AskUserQuestion`, recomendada marcada):**
+
+As três rotas e a diretriz de recomendação:
 - **O problema ainda está vago / não sei o tamanho** → **`px-intake`** (clareia e decide o caminho). *Recomendado quando há dúvida.*
 - **Já sei que é um projeto novo e quero definir a identidade agora** → **`px-kickoff`** (público-alvo + UI KIT).
 - **Já tenho a identidade e é um sistema (várias telas)** → **`px-epic`** (decompor em backlog de telas).
+
+**Como apresentar (nesta ordem de preferência):**
+
+1. **Roteador visual (nível 2.5) — preferido quando o ambiente tem a ferramenta de widget (`show_widget`).** Renderize `templates/roteamento-widget.md`: as rotas como cartões clicáveis (cada caminho com sua cor), com o `px-intake` marcado **Recomendado**; o grupo "Não é projeto novo?" com as portas de continuação (`px-audit` e branch+feature); e a saída **"Meu caso é outro"** pro estado de borda. O clique devolve a escolha ao chat via `sendPrompt`, como se o UX tivesse respondido por texto.
+2. **Fallback — `AskUserQuestion`** (recomendada marcada) com exatamente as mesmas opções, quando não houver `show_widget`. Mesma diretriz.
+
+Além das três rotas greenfield, o roteador também surfa os casos **não-greenfield** que o Passo 0 desviaria só em texto:
+- **Produto que já existe, vou reformar** → `px-audit` (porta brownfield).
+- **Projeto existe, quero um fluxo/funcionalidade novo** → prepara a branch `ux/` via `px-setup` e roteia pra `px-epic` (várias telas) ou `px-request` (uma tela), pulando `px-intake`/`px-kickoff` (identidade já definida).
+
+Ambos os caminhos respeitam as `Skill Prompting Conventions`: **no-pause mode** (converte a escolha em *Pergunta em aberto* e segue com a recomendação de maior confiança se o líder pediu pra não pausar) e o **gate de governança** — "Meu caso é outro"/qualquer opção fora do catálogo é marcada ⚠️ REQUER VALIDAÇÃO UX/PX e não avança sozinha (produto que já existe → `px-audit`).
 
 Registre a recomendação e confirme antes de disparar a próxima skill.
 
