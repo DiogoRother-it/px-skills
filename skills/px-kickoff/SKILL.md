@@ -138,6 +138,9 @@ Quando há artefato, os blocos B2–B9 abaixo viram **confirmação do que foi e
 - [ ] Premissas registradas (tudo que foi "não sei" + default)
 
 ## Encadeamento
+
+> Ao fechar, **atualize o checkpoint** `planning/<projeto>/PX-PROGRESS.md` (ver "Checkpoint de progresso" no `px-protocol.md`): marque o kickoff como feito (públicos + UI KIT aplicado ao `index.css`), registre o alvo de build e o próximo passo, e sincronize Premissas → *Decisões travadas* e pendências → *Perguntas em aberto*.
+
 Com a Definition of Ready completa, escolher o próximo passo pelo tamanho:
 - **Sistema/várias telas (iniciativa):** rodar `agile-epic` pra decompor em backlog de telas; depois `px-request` em cada uma.
 - **Uma tela só:** ir direto pro `px-request`.

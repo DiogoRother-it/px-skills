@@ -127,6 +127,8 @@ Eco final: um resumo de 4–6 linhas do problema e do caminho recomendado. O lí
 
 ## Encadeamento
 
+> Ao fechar, **atualize o checkpoint** `planning/<iniciativa>/PX-PROGRESS.md` (ver "Checkpoint de progresso" no `px-protocol.md`) antes de disparar a próxima skill: marque o intake como feito, registre o alvo de build e o caminho recomendado em *Próximo passo*, e sincronize Premissas → *Decisões travadas* e pendências → *Perguntas em aberto*.
+
 Ao fechar (e só com a Definition of Ready completa), ofereça o próximo passo conforme o Bloco 6:
 - Projeto novo → "Quer rodar o `px-kickoff` pra definir público-alvo e UI KIT?"
 - Iniciativa → "Quer rodar o `agile-epic` pra decompor em telas?"

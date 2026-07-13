@@ -196,6 +196,8 @@ Como [papel], quero [ação], para [benefício].
 
 ## Encadeamento
 
+> Ao fechar (qualquer modo), **atualize o checkpoint** `planning/<iniciativa>/PX-PROGRESS.md` (ver "Checkpoint de progresso" no `px-protocol.md`): no modo Decomposição, registre o backlog de telas e por qual começar em *Próximo passo*; no modo Consolidação, reflita o status real das telas (implementado/planejado/boundary). Sincronize Premissas → *Decisões travadas* e pendências → *Perguntas em aberto*.
+
 Modo Decomposição — ao fechar (com a DoR completa), ofereça (`AskUserQuestion`):
 - "Por qual tela começamos a `px-request`?" — recomende a primeira por dependência (a que não depende de nenhuma).
 - Cada tela do backlog roteia: **`px-request`** (spec) → **`px-story`** (história + BDD) → handoff → dev.

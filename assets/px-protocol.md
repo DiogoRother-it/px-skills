@@ -60,3 +60,41 @@ A IA nunca desenha a partir de um prompt vago. Interroga o propósito e ancora n
 ## Cadeia de skills PX
 
 `px-start` (projeto novo) **ou** `px-audit` (redesign de produto existente) → `px-intake` (problema vago) → `px-kickoff` (personas + UI KIT) → `px-epic` (se iniciativa) → `px-request` (por tela) → `px-story` (história + BDD) → handoff → dev valida com `ux-flows`/`ux-persona` + Playwright.
+
+## Checkpoint de progresso (PX-PROGRESS) — obrigatório
+
+A cadeia PX é longa e roda em várias sessões de chat. Quando o contexto de um chat é resumido/perdido, o que falta pra retomar não é "mandar continuar" — é **saber exatamente onde o trabalho parou**. Por isso, **toda skill da cadeia grava um checkpoint** ao concluir seu passo. Retomar então nunca precisa de skill dedicada: em um chat novo, basta *"leia o `PX-PROGRESS.md` da iniciativa e continue de onde parou"*.
+
+**Onde:** `planning/<iniciativa>/PX-PROGRESS.md` — um por iniciativa/produto, na raiz da pasta de planejamento (junto dos artefatos que a cadeia já grava). Versionado no Git; entra no PR do handoff sem custo. Para redesign, use o mesmo slug de produto do `px-audit` (`planning/<produto>/PX-PROGRESS.md`).
+
+**Quando gravar:** no fecho de cada skill, **depois** da Definition of Ready e do eco final, **antes** de disparar a próxima skill. Se o arquivo não existe, criar; se existe, **atualizar** (nunca duplicar) — marcar o passo concluído em *Feito*, mover o foco pra *Próximo passo*, e sincronizar *Decisões travadas* e *Perguntas em aberto*.
+
+**De onde vem o conteúdo (não inventar):** o estado real dos artefatos da iniciativa + as decisões já ecoadas na sessão. *Decisões travadas* espelha as Premissas confirmadas e os gates ⚠️ **REQUER VALIDAÇÃO UX/PX** já aprovados (com quem aprovou e quando); *Perguntas em aberto* espelha a lista de pendências com dono (no-pause mode). O checkpoint é o registro citável desse estado — é, na prática, o prompt de continuidade versionado (CLAUDE.md › regra 17).
+
+**Formato (seguir):**
+
+```markdown
+# PX-PROGRESS — <iniciativa>
+
+> Checkpoint da cadeia PX. Para retomar em um chat novo:
+> "Leia planning/<iniciativa>/PX-PROGRESS.md e continue de onde parou."
+
+**Etapa atual:** <skill · foco>
+**Última atualização:** <AAAA-MM-DD>
+**Alvo de build:** <App React (boilerplate) | Protótipo HTML>
+
+## Feito
+- [x] <skill> — <resultado em 1 linha + caminho do artefato>
+
+## Em andamento
+- [ ] <skill> — <foco atual>
+
+## Decisões de produto travadas
+- <decisão> (<Premissa confirmada | ⚠️ gate aprovado por <líder> em <data>>)
+
+## Próximo passo
+<skill + o que fazer>
+
+## Perguntas em aberto
+- <pendência> — dono: <nome>  (ou "nenhuma")
+```

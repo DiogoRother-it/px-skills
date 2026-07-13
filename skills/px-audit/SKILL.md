@@ -155,6 +155,8 @@ Slug kebab-case do **produto** (não do artefato). Cada `auditoria.md` começa c
 
 ## Encadeamento
 
+> Ao fechar, **atualize o checkpoint** `planning/<produto>/PX-PROGRESS.md` (ver "Checkpoint de progresso" no `px-protocol.md`): marque a auditoria como feita, registre o backlog de redesign priorizado e o próximo passo (`px-kickoff` se faltar identidade, senão `px-epic`), e sincronize Premissas → *Decisões travadas* e pendências (incluindo acesso ao produto, se faltou) → *Perguntas em aberto*.
+
 Ao fechar (com a DoR completa), roteie (`AskUserQuestion`, recomendada marcada):
 - **Produto sem identidade nos termos do DS** (sem públicos/UI KIT definidos) → **`px-kickoff`** primeiro (confirmar personas + gerar/atualizar o UI KIT), depois o abaixo.
 - **Identidade já ok** → **`px-epic`** (modo Decomposição) usando o backlog de redesign como entrada — cada tela sai com AS-IS→TO-BE.

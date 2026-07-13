@@ -101,6 +101,9 @@ Eco final: resumo de 5–8 linhas da história. O líder confirma. Só então es
 - Standalone: `planning/<projeto>/stories/<slug>.md`
 
 ## Encadeamento
+
+> Ao fechar, **atualize o checkpoint** `planning/<iniciativa>/PX-PROGRESS.md` (ver "Checkpoint de progresso" no `px-protocol.md`): marque a história desta tela como feita (com o caminho do artefato), aponte a próxima tela ou o handoff em *Próximo passo*, e sincronize Premissas → *Decisões travadas* e pendências → *Perguntas em aberto*.
+
 Com a Definition of Ready completa, oferecer:
 - "Quero gerar o flow do `ux-flows` pro dev validar como usuário?"
 - "Preparar o handoff → dev com o bloco de Definition of Done (Playwright + 99% de fidelidade)?"

@@ -166,6 +166,8 @@ Eco final: um resumo de 5–8 linhas do que será construído. O líder confirma
 
 ## Encadeamento
 
+> Ao fechar, **atualize o checkpoint** `planning/<iniciativa>/PX-PROGRESS.md` (ver "Checkpoint de progresso" no `px-protocol.md`): marque a spec desta tela como feita (com o caminho do artefato), aponte a `px-story` da mesma tela em *Próximo passo*, e sincronize a variação escolhida / gate ⚠️ aprovado → *Decisões travadas* e pendências → *Perguntas em aberto*.
+
 Ao fechar (e só com a Definition of Ready completa): "Quer transformar isto numa história com critérios de aceite, usabilidade e BDD via `px-story`?" — o `px-story` herda tudo isto pronto.
 
 ## Relação com o fluxo

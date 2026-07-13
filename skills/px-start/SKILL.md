@@ -80,6 +80,8 @@ Registre a recomendação e confirme antes de disparar a próxima skill.
 
 Antes de encerrar, repita em 3–4 linhas: *"Então: projeto **X**, alvo **Y**, terreno preparado em **Z**, próximo passo **`px-…`** — confirma?"*. Só então dispare a skill escolhida.
 
+> Ao confirmar o eco, **crie o checkpoint** `planning/<projeto>/PX-PROGRESS.md` (ver "Checkpoint de progresso" no `px-protocol.md`) já semeado com o alvo de build e o próximo passo roteado. É o `px-start` que abre o arquivo que as skills seguintes vão atualizar — assim, um chat novo sempre tem de onde retomar.
+
 ## Regras
 
 - **Não produz spec nem código.** O `px-start` prepara e despacha; quem gera artefato é a skill de destino.
