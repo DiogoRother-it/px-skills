@@ -4,6 +4,8 @@
 > ("Protocolo de Interação UX", "Skill Prompting Conventions"). Mantenha-o no repo do produto
 > (ou aponte o `CLAUDE.md`/`AGENTS.md` do projeto para ele) para as skills operarem sem buraco.
 
+> **Origem canônica.** As **regras de uso de componente** (`docs/design-system/*`) são canônicas no **centralit-boilerplate** (a biblioteca de componentes). As **skills** e este **protocolo** são canônicos no **px-skills**. Regra de componente nova nasce no boilerplate; a skill a absorve. Não inverta a direção ao editar.
+
 ## Hierarquia de documentos
 
 1. `docs/design-system/ds-foundations_v4.md` — tokens, escalas, princípios de base

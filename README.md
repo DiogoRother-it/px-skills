@@ -40,7 +40,20 @@ pacote — este aqui é só a camada de skills + protocolo, para o PX.
 - **Projeto novo do zero** → comece por `/px-start`
 - **Redesign de produto existente** → comece por `/px-audit` (analisa repo/URL ao vivo ou prints/PDF)
 
-## Manutenção
+## Manutenção — canonicidade dividida (não inverter a direção)
 
-As skills e os docs aqui são **cópias** das versões canônicas no repo `centralit-boilerplate`.
-Ao evoluir as skills/docs lá, ressincronize este pacote e suba a versão em `package.json`.
+Este pacote e o `centralit-boilerplate` são **acoplados**, mas cada um é canônico pra uma coisa:
+
+| Conteúdo | Fonte da verdade | Cópia |
+|---|---|---|
+| **Skills** (`skills/`) | **px-skills** (aqui) | boilerplate `docs/skills-draft/<skill>/` |
+| **Protocolo** (`assets/px-protocol.md`) | **px-skills** (aqui) | boilerplate `docs/px-protocol.md` |
+| **Docs de design-system** (`assets/design-system/`) | **centralit-boilerplate** (regras de uso de componente) | aqui, em `assets/design-system/` |
+
+O boilerplate é a **biblioteca de componentes + regras de uso**; o px-skills é a **biblioteca de habilidades do UX**. Algumas skills (ex: `px-request`) **absorvem** as regras de uso que vivem no boilerplate — por isso uma regra de componente nova nasce **no boilerplate** e a skill reflete.
+
+**Fluxo de edição:**
+- **Regra de componente** → edite no **boilerplate** (`docs/design-system/`) → propague a cópia pra cá (`assets/design-system/`).
+- **Skill ou protocolo** → edite **aqui** (`skills/`, `assets/px-protocol.md`) → propague pro boilerplate (`docs/skills-draft/`, `docs/px-protocol.md`).
+
+Ao sincronizar pro boilerplate, **nunca** `git add -A` (o working tree de lá costuma ter WIP do time) — stageie só os caminhos que você mudou. Suba a versão em `package.json` a cada evolução de skills.
