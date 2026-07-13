@@ -148,6 +148,6 @@ Também decidir aqui o **alvo de build** (protótipo via `agile-proto` × app Re
 
 ## Relação com o fluxo
 ```
-px-kickoff  →  px-request (por tela)  →  px-story  →  handoff → dev
+px-kickoff  →  px-request (por tela)  →  px-story  →  px-handoff → dev
    ^ você está aqui (uma vez por projeto)
 ```

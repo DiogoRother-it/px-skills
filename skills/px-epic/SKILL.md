@@ -96,6 +96,7 @@ Segue `Skill Prompting Conventions` do `CLAUDE.md`. Estruturada pra decisões en
 - "Tem tela que dá pra tocar em paralelo com outra?" — marca caminhos paralelos.
 - Proponha o **roadmap**: fases/marcos, caminho crítico, o que roda em paralelo.
 - **Diagrama** (`AskUserQuestion`): *Mermaid flowchart (Recomendado — trajetória com dependências, sem data fixa)* × *Mermaid gantt (só com cronograma real por time)*. Gantt sem data vira falsa precisão — default flowchart.
+- **Sprint-alvo (sugestão, opcional):** se o time já trabalha por sprint, você **pode** sugerir em qual sprint cada tela deve cair — mas como **agrupamento relativo** ("leva 1 / leva 2"), derivado da ordem de dependência, **não** como data cravada (a filosofia do épico é evitar falsa precisão). A decisão final de calendário é da `px-handoff`, no momento da entrega. Se sugerir, registre como Premissa pra a `px-handoff` confirmar ou ajustar.
 
 ## BLOCO 5 — Riscos e critério de aceite do épico
 **Decidir:** o que pode dar errado e como saber que a iniciativa inteira acabou.
@@ -200,13 +201,13 @@ Como [papel], quero [ação], para [benefício].
 
 Modo Decomposição — ao fechar (com a DoR completa), ofereça (`AskUserQuestion`):
 - "Por qual tela começamos a `px-request`?" — recomende a primeira por dependência (a que não depende de nenhuma).
-- Cada tela do backlog roteia: **`px-request`** (spec) → **`px-story`** (história + BDD) → handoff → dev.
+- Cada tela do backlog roteia: **`px-request`** (spec) → **`px-story`** (história + BDD) → px-handoff → dev.
 
 Modo Consolidação — ao fechar, ofereça atualizar o status conforme as telas forem implementadas, e semear os flows do `ux-flows` a partir dos BDD consolidados.
 
 ## Relação com o fluxo
 
 ```
-px-intake  →  px-kickoff  →  px-epic  →  px-request (por tela)  →  px-story  →  handoff → dev
+px-intake  →  px-kickoff  →  px-epic  →  px-request (por tela)  →  px-story  →  px-handoff → dev
                              ^ você está aqui (recorta a iniciativa em telas e ordena)
 ```

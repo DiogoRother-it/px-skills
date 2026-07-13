@@ -36,7 +36,7 @@ Se não é projeto novo, encaminhe e encerre — não force o fluxo de setup. Em
 **Por que importa:** a cadeia PX escreve artefatos em `planning/<iniciativa>/` e a identidade em `src/index.css`. Sem o esqueleto, os próximos passos não têm onde gravar. Mas a **mecânica de git/scaffold é da `px-setup`** — o `px-start` não repete comando de repositório.
 **Fazer:**
 - Confirme a raiz do projeto (o repo). Se ambíguo, pergunte antes de escrever qualquer coisa.
-- **Se o terreno ainda não está preparado** (sem sandbox nem repo do dev clonado) → encaminhe pra **`px-setup`**, que monta o sandbox a partir do boilerplate ou clona o repo do dev e cria a branch `ux/<projeto>`. Volte pra cá depois.
+- **Se o terreno ainda não está preparado** (sem sandbox nem repo do dev clonado) → encaminhe pra **`px-setup`**, que monta o sandbox a partir do boilerplate ou clona o repo do dev e cria a branch de trabalho. **A branch é por funcionalidade/fluxo** (`ux/<funcionalidade>`), não por projeto — um projeto tem várias. Num **repo real**, a branch nasce **desde o início** (assim que a funcionalidade tem nome); no **sandbox**, só na entrega. Quem executa isso é a `px-setup` — o `px-start` não repete comando de git.
 - **Alvo de build** (`AskUserQuestion`): *App React do produto a partir do boilerplate (Recomendado)* × *Protótipo HTML descartável (via `agile-proto`, stack própria)*. Muda onde a identidade é aplicada e o que "pronto" significa. Essa decisão é de idealização e fica aqui.
 - Se for protótipo, aponte pro `agile-proto` como manual técnico — a decisão já vem registrada.
 
@@ -48,7 +48,7 @@ Mostre o caminho pra quem está começando, sem enrolação:
 px-start (aqui)  →  px-intake (clareia o problema, se vago)
                  →  px-kickoff (público-alvo + UI KIT — a identidade do projeto)
                  →  px-epic (só se for iniciativa com várias telas)
-                 →  px-request (spec por tela)  →  px-story (história + BDD)  →  handoff → dev
+                 →  px-request (spec por tela)  →  px-story (história + BDD)  →  px-handoff → dev
 ```
 
 Uma frase por etapa é suficiente. O objetivo é a pessoa saber onde está e o que vem — não decorar o fluxo inteiro.
@@ -92,11 +92,11 @@ Antes de encerrar, repita em 3–4 linhas: *"Então: projeto **X**, alvo **Y**, 
 
 ```
 projeto novo (greenfield):
-  px-setup (terreno)  →  px-start  →  px-intake  →  px-kickoff  →  px-epic  →  px-request  →  px-story  →  handoff → dev
+  px-setup (terreno)  →  px-start  →  px-intake  →  px-kickoff  →  px-epic  →  px-request  →  px-story  →  px-handoff → dev
                          ^ você está aqui (a porta de entrada de todo projeto novo)
 
 produto existente (brownfield):
-  px-audit  →  [px-kickoff se faltar identidade]  →  px-epic  →  px-request  →  px-story  →  handoff → dev
+  px-audit  →  [px-kickoff se faltar identidade]  →  px-epic  →  px-request  →  px-story  →  px-handoff → dev
 ```
 
 > `px-start` (greenfield) e `px-audit` (brownfield) são o **par de portas de entrada**: um começa do zero, o outro começa do que já existe. Se cair aqui um produto que já existe pra reformar, despache pro `px-audit`.

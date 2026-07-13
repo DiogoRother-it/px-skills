@@ -83,4 +83,4 @@
 
 - [ ] Produto sem identidade no DS → `px-kickoff` (personas + UI KIT)
 - [ ] Identidade ok → `px-epic` (decompor o backlog de redesign)
-- Cada tela → `px-request` → `px-story` → handoff → dev
+- Cada tela → `px-request` → `px-story` → px-handoff → dev

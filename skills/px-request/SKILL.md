@@ -173,6 +173,6 @@ Ao fechar (e só com a Definition of Ready completa): "Quer transformar isto num
 ## Relação com o fluxo
 
 ```
-px-kickoff  →  px-request  →  px-story  →  handoff → dev
+px-kickoff  →  px-request  →  px-story  →  px-handoff → dev
                 ^ você está aqui (a cada tela/componente)
 ```

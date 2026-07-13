@@ -106,10 +106,10 @@ Eco final: resumo de 5–8 linhas da história. O líder confirma. Só então es
 
 Com a Definition of Ready completa, oferecer:
 - "Quero gerar o flow do `ux-flows` pro dev validar como usuário?"
-- "Preparar o handoff → dev com o bloco de Definition of Done (Playwright + 99% de fidelidade)?"
+- "Fechar o handoff → dev com a `px-handoff` (Definition of Done + sprint + flows)?" — quando o lote de telas da funcionalidade estiver pronto. A `px-handoff` consolida as histórias, carimba o sprint e despacha a entrega pra `px-setup` Passo 4.
 
 ## Relação com o fluxo
 ```
-px-kickoff  →  px-request  →  px-story  →  handoff → dev (ux-flows/ux-persona + Playwright)
+px-kickoff  →  px-request  →  px-story  →  px-handoff  →  px-setup P4 → dev (ux-flows/ux-persona + Playwright)
                               ^ você está aqui
 ```

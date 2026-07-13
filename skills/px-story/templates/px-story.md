@@ -63,6 +63,6 @@ Funcionalidade: <nome>
 
 ## Próximos passos
 - [ ] Gerar flow com `ux-flows`
-- [ ] Handoff → dev com Definition of Done (Playwright + 99% de fidelidade)
+- [ ] Fechar handoff com `px-handoff` (Definition of Done + sprint + flows) → `px-setup` P4 entrega
 
 <!-- Salvar em: planning/<iniciativa>/stories/<slug>.md -->

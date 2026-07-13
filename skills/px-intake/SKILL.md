@@ -137,6 +137,6 @@ Ao fechar (e só com a Definition of Ready completa), ofereça o próximo passo 
 ## Relação com o fluxo
 
 ```
-px-intake  →  px-kickoff  →  [agile-epic se iniciativa]  →  px-request  →  px-story  →  handoff → dev
+px-intake  →  px-kickoff  →  [agile-epic se iniciativa]  →  px-request  →  px-story  →  px-handoff → dev
 ^ você está aqui (porta de entrada: clareia o problema e roteia)
 ```

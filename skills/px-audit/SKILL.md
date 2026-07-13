@@ -160,12 +160,12 @@ Slug kebab-case do **produto** (não do artefato). Cada `auditoria.md` começa c
 Ao fechar (com a DoR completa), roteie (`AskUserQuestion`, recomendada marcada):
 - **Produto sem identidade nos termos do DS** (sem públicos/UI KIT definidos) → **`px-kickoff`** primeiro (confirmar personas + gerar/atualizar o UI KIT), depois o abaixo.
 - **Identidade já ok** → **`px-epic`** (modo Decomposição) usando o backlog de redesign como entrada — cada tela sai com AS-IS→TO-BE.
-- Cada tela do backlog roteia: **`px-request`** (spec do redesign, ancorando os componentes divergentes no DS) → **`px-story`** (história + BDD) → handoff → dev.
+- Cada tela do backlog roteia: **`px-request`** (spec do redesign, ancorando os componentes divergentes no DS) → **`px-story`** (história + BDD) → px-handoff → dev.
 
 ## Relação com o fluxo
 
 ```
-px-audit  →  [px-kickoff se faltar identidade]  →  px-epic  →  px-request  →  px-story  →  handoff → dev
+px-audit  →  [px-kickoff se faltar identidade]  →  px-epic  →  px-request  →  px-story  →  px-handoff → dev
 ^ você está aqui (a porta de entrada do REDESIGN de produto existente)
    usa ux-flows/ux-persona no diagnóstico (B4)
 ```

@@ -38,16 +38,18 @@ A IA nunca desenha a partir de um prompt vago. Interroga o propósito e ancora n
 - **Passo 1 — Ancorar na biblioteca:** consultar `ds-components_v4.md`. O pedido mapeia para uma família com variações. Reusar antes de criar.
 - **Passo 2 — Recomendar + perguntar:** recomendar a variação (justificar pelo "Quando usar"), listar alternativas, perguntar. Se o comando já nomeou a variação, confirmar em eco e seguir.
 - **Passo 3 — "Outro" (fora do catálogo) = gate:** marca **⚠️ REQUER VALIDAÇÃO UX/PX** e não avança sem aprovação do líder.
-- **Passo 4 — Estados + handoff:** cobrir a matriz de estados (default/loading/empty/error/disabled/read-only/…), mock data, e seguir o handoff → dev.
+- **Passo 4 — Estados + handoff:** cobrir a matriz de estados (default/loading/empty/error/disabled/read-only/…), mock data, e seguir o handoff → dev (fechado pela `px-handoff`).
 
 > Abrangência: vale para TODO componente, por mais trivial. Nenhum componente entra sem propósito (Passo 0) e estados (Passo 4).
 
 ## Handoff → dev (obrigatório)
 
-- Trabalhar em branch intermediária a partir da `main` (nunca commit direto; integração via PR).
+- O fechamento é a skill **`px-handoff`**: monta o pacote (escopo entregue, Definition of Done, flows/personas, fronteiras de integração e o **carimbo de sprint**) e despacha a mecânica de git pra `px-setup` Passo 4.
+- Trabalhar em branch **por funcionalidade/fluxo** (`ux/<funcionalidade>`) a partir da `main` — nunca commit direto; integração via Merge Request. Num repo real a branch nasce no início; no sandbox, na entrega.
+- **Sprint é carimbo de entrega, não de branch** — a branch atravessa sprints. O sprint vai no título do MR (`[Sprint NN] ux(<funcionalidade>): ...`) e no campo `Sprint` do `PX-PROGRESS`.
 - Validação visual completa via Playwright: todas as telas e todos os estados
   (default/loading/empty/error/disabled/read-only/hover/foco/responsivo), **meta de 99% de fidelidade**,
-  evidências anexadas ao PR.
+  evidências anexadas ao MR.
 
 ## Skill Prompting Conventions
 
@@ -59,7 +61,9 @@ A IA nunca desenha a partir de um prompt vago. Interroga o propósito e ancora n
 
 ## Cadeia de skills PX
 
-`px-start` (projeto novo) **ou** `px-audit` (redesign de produto existente) → `px-intake` (problema vago) → `px-kickoff` (personas + UI KIT) → `px-epic` (se iniciativa) → `px-request` (por tela) → `px-story` (história + BDD) → handoff → dev valida com `ux-flows`/`ux-persona` + Playwright.
+`px-start` (projeto novo) **ou** `px-audit` (redesign de produto existente) → `px-intake` (problema vago) → `px-kickoff` (personas + UI KIT) → `px-epic` (se iniciativa) → `px-request` (por tela) → `px-story` (história + BDD) → `px-handoff` (fecha: DoD + sprint + flows) → `px-setup` Passo 4 (branch `ux/<funcionalidade>` + Merge Request) → dev valida com `ux-flows`/`ux-persona` + Playwright.
+
+O terreno técnico (repo/branch/scaffold) e a mecânica de git são sempre da `px-setup`; a entrega **pro PO** (HTML standalone) é da `px-preview`. Nenhuma outra skill roda git.
 
 ## Checkpoint de progresso (PX-PROGRESS) — obrigatório
 
@@ -82,6 +86,8 @@ A cadeia PX é longa e roda em várias sessões de chat. Quando o contexto de um
 **Etapa atual:** <skill · foco>
 **Última atualização:** <AAAA-MM-DD>
 **Alvo de build:** <App React (boilerplate) | Protótipo HTML>
+**Branch:** ux/<funcionalidade>
+**Sprint:** <Sprint NN · AAAA-Www | a definir na px-handoff>
 
 ## Feito
 - [x] <skill> — <resultado em 1 linha + caminho do artefato>
