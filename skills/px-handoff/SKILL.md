@@ -26,6 +26,7 @@ Segue `Skill Prompting Conventions` do `CLAUDE.md`. Estruturada pra decisões en
 ## Pré-requisito (checar antes de montar)
 
 - As telas da funcionalidade já passaram pelo **`px-story`** (têm história + aceite + usabilidade + BDD *ready*). Se alguma ainda está só em `px-request`, avise que o handoff nasce incompleto e ofereça fechar a `px-story` faltante antes.
+- O **`px-preview` foi gerado** (HTML navegável das telas desta leva). Se não foi, **não avance** — ofereça rodar o `px-preview` agora antes de continuar. O navegável é o que elimina o "dev no escuro": sem ele, o MR chega com código mas sem referência visual e volta o problema da interpretação.
 - Existe o checkpoint `planning/<funcionalidade>/PX-PROGRESS.md` (a cadeia veio criando). Se não existir, crie agora (ver "Checkpoint de progresso" no `px-protocol.md`) — o handoff é o último a atualizá-lo.
 
 > **Nota de slug:** `<funcionalidade>` é o mesmo slug que a cadeia usa em `planning/<iniciativa>/` e na branch `ux/<funcionalidade>`. Um slug só governa planning, checkpoint e branch — não invente um nome novo aqui.
@@ -84,11 +85,12 @@ Segue `Skill Prompting Conventions` do `CLAUDE.md`. Estruturada pra decisões en
 **Fazer, nesta ordem:**
 1. Montar o `planning/<funcionalidade>/handoff.md` (template) e apresentar o resumo ao líder.
 2. **Atualizar o `PX-PROGRESS.md`**: marcar as histórias entregues como feitas, preencher o campo `Sprint`, e apontar a próxima leva (ou "cadeia concluída") em *Próximo passo*.
-3. **Despachar a entrega git pra `px-setup` Passo 3** — não rode git aqui. Passe pra ela: a funcionalidade (`ux/<funcionalidade>`), o título do MR com `[Sprint NN]`, e o `handoff.md` como corpo do MR. A `px-setup` empurra o trabalho do sandbox pro repo do dev e abre o MR.
+3. **Confirmar que o `px-preview` existe** — o arquivo HTML navegável gerado anteriormente vai **anexado ao MR** como referência visual obrigatória. Sem ele, não despacha.
+4. **Despachar a entrega git pra `px-setup` Passo 3** — não rode git aqui. Passe pra ela: a funcionalidade (`ux/<funcionalidade>`), o título do MR com `[Sprint NN]`, o `handoff.md` como corpo do MR, e o caminho do HTML do `px-preview` para anexar.
 
 ## Eco final
 
-Antes de despachar, repita em 4–6 linhas: *"Handoff da funcionalidade **X**: **N** histórias (código funcional + BDD), **Sprint NN · semana ISO**, DoD fechada, flows amarrados, **M** fronteiras de integração. O dev recebe a branch `ux/<funcionalidade>` e faz o nivelamento de stack. Vou atualizar o checkpoint e mandar a entrega pra `px-setup` — confirma?"*. Só então feche.
+Antes de despachar, repita em 4–6 linhas: *"Handoff da funcionalidade **X**: **N** histórias (código funcional + BDD), **Sprint NN · semana ISO**, DoD fechada, flows amarrados, **M** fronteiras de integração, navegável `px-preview` gerado. O dev recebe a branch `ux/<funcionalidade>` + o HTML de referência e faz o nivelamento de stack. Vou atualizar o checkpoint e mandar a entrega pra `px-setup` — confirma?"*. Só então feche.
 
 ## Onde salvar
 
@@ -108,6 +110,6 @@ px-request  →  px-story  →  px-handoff  →  px-setup (Passo 3: branch ux/<f
                             ^ você está aqui (fecha a cadeia: código + histórias + DoD + sprint + flows)
 ```
 
-> `px-handoff` é a entrega **pro dev** no nível de pacote (o que/como/quando + histórias); a `px-setup` Passo 3 é a mecânica de git dessa entrega; a `px-preview` é a entrega **pro PO** (HTML standalone). As três são complementares.
+> `px-handoff` é a entrega **pro dev** no nível de pacote (o que/como/quando + histórias); a `px-setup` Passo 3 é a mecânica de git dessa entrega; a `px-preview` gera o navegável que vai **obrigatoriamente anexado ao MR** — referência visual que elimina o "dev no escuro". As três são complementares e obrigatórias no fechamento.
 >
 > O dev **não reimplementa** — ele nivela. O código funcional do sandbox é o entregável; a adaptação à estrutura do projeto real é o nivelamento de stack, responsabilidade exclusiva do dev.
