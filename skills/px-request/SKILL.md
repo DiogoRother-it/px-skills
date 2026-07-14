@@ -34,7 +34,7 @@ Contexto inicial via slash: `$ARGUMENTS` (o pedido do líder). Se vazio, pergunt
 
 Conduza em pt-BR. O projeto já deve ter passado pelo `px-kickoff` (públicos-alvo + UI KIT). Se não passou, avise que o Bloco 2 depende disso e ofereça rodar `px-kickoff` antes.
 
-**Escopo — uma tela por vez.** Esta skill é por **tela/componente**. Se o pedido é um sistema inteiro (várias telas/modais), **pare**: isso é uma iniciativa — rode `agile-epic` primeiro pra decompor em telas, e então traga **cada tela** de volta pra cá. Não tente espremer um sistema numa `px-request` só.
+**Escopo — uma tela por vez.** Esta skill é por **tela/componente**. Se o pedido é um sistema inteiro (várias telas/modais), **pare**: isso é uma iniciativa — rode `px-epic` primeiro pra decompor em telas, e então traga **cada tela** de volta pra cá. Não tente espremer um sistema numa `px-request` só.
 
 ## Prompting
 
@@ -99,6 +99,9 @@ Segue `Skill Prompting Conventions` do `CLAUDE.md`. Estruturada para decisões e
 2. **Recomende** a variação, justificando pelo "Quando usar" do doc e pelo que foi levantado. Liste as alternativas com o trade-off de cada.
 3. Pergunte qual seguir (`AskUserQuestion`, recomendada marcada).
 4. **Gate "Outro":** se nada serve, proponha "Outro", marque **⚠️ REQUER VALIDAÇÃO UX/PX** e **pare** — não avança sem aprovação explícita do líder. Nunca invente componente em silêncio.
+
+**Componente de rastreabilidade disponível na biblioteca:**
+- **`internal-control`** — modal de controle interno com abas Atualizações, Backlog PX e Backlog Arquitetura. Visível só em homologação; em produção exibe apenas a Nota de Atualização. Já integrado à Navbar do boilerplate. Usar quando a tela precisar expor rastreabilidade de entrega — **não criar componente customizado** para esse fim.
 
 **Alertas obrigatórios ao ancorar a variação (dispare quando a família for a do caso):**
 - **Tabela → alerte sobre rolagem horizontal.** Ao recomendar qualquer variação de Table, avise o UX: *uma tabela idealmente não tem scroll horizontal*. Se as colunas levantadas no Bloco 4 sugerem que não cabem, a **sugestão é sempre reduzir colunas** — priorizar as essenciais e realocar o secundário (Table com Expansão, tooltip, ou Drawer de detalhe ao clicar na linha), nunca ativar `overflow-x`. Registre no artefato quais colunas são essenciais × secundárias. Ver Table família em `ds-components_v4.md`.
