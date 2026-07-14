@@ -37,8 +37,8 @@ Se não é projeto novo, encaminhe e encerre — não force o fluxo de setup. Em
 **Fazer:**
 - Confirme a raiz do projeto (o repo). Se ambíguo, pergunte antes de escrever qualquer coisa.
 - **Se o terreno ainda não está preparado** (sem sandbox) → encaminhe pra **`px-setup`**, que monta o sandbox a partir do boilerplate. O PX **sempre** trabalha no boilerplate — nunca no repo do dev. **A branch `ux/<funcionalidade>`** só nasce na entrega (quando o `px-handoff` despacha pra `px-setup` Passo 3) — nunca no início do trabalho. Quem executa isso é a `px-setup` — o `px-start` não repete comando de git.
-- **Alvo de build** (`AskUserQuestion`): *App React do produto a partir do boilerplate (Recomendado)* × *Protótipo HTML descartável (via `px-proto`, stack própria)*. Muda onde a identidade é aplicada e o que "pronto" significa. O boilerplate é o ambiente padrão; o `px-proto` é a exceção pra casos exploratórios muito iniciais. Essa decisão é de idealização e fica aqui.
-- Se for protótipo, aponte pro `px-proto` como manual técnico — a decisão já vem registrada.
+- **Alvo de build** (`AskUserQuestion`): *App React do produto a partir do boilerplate (Recomendado)* × *Rascunho HTML descartável (via `px-draw`, exploração inicial)*. Muda onde a identidade é aplicada e o que "pronto" significa. O boilerplate é o ambiente padrão; o `px-draw` é a exceção pra casos exploratórios muito iniciais. Essa decisão é de idealização e fica aqui.
+- Se for rascunho, aponte pro `px-draw` como referência — a decisão já vem registrada.
 
 ## Passo 2 — Orientar (a cadeia PX em 3 linhas)
 
