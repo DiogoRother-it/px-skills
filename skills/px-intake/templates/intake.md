@@ -27,8 +27,8 @@
 ## Tamanho e roteamento (B6)
 - Tamanho: <tela única | iniciativa (várias telas)>
 - Identidade do projeto já existe (público-alvo + UI KIT)? <sim | não → px-kickoff>
-- Alvo de build: <protótipo HTML (agile-proto) | app React do produto (boilerplate)>
-- **Próximo passo recomendado:** <px-kickoff | agile-epic → px-request | px-request>
+- Alvo de build: <protótipo HTML (px-proto) | app React do produto (boilerplate)>
+- **Próximo passo recomendado:** <px-kickoff | px-epic → px-request | px-request>
 
 ## Premissas registradas
 - [ ] <default assumido — pode ser sobrescrito>

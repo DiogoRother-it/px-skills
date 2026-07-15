@@ -45,7 +45,7 @@ História e cenários em pt-BR. Gherkin em português: `Funcionalidade / Cenári
 ## S2 — Granularidade
 **Decidir:** isto cabe em uma história ou precisa quebrar?
 **Por que importa:** história grande demais não fecha num ciclo e vira handoff impreciso.
-**Perguntar (estruturada):** "Isto é uma entrega única ou são várias?" — *Uma história (Recomendado se cabe num ciclo)* · *Quebrar em várias → chamar `agile-epic`.*
+**Perguntar (estruturada):** "Isto é uma entrega única ou são várias?" — *Uma história (Recomendado se cabe num ciclo)* · *Quebrar em várias → chamar `px-epic`.*
 
 ## S3 — Critérios de aceite (funcional)
 **Decidir:** o que precisa ser verdade pra dizer "funciona".

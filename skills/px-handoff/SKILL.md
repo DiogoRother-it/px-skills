@@ -1,6 +1,6 @@
 ---
 name: px-handoff
-description: Skill de FECHAMENTO da cadeia PX. Monta o pacote de handoff pro dev a partir das histórias já ready — consolida o que está sendo entregue, fecha a Definition of Done (Playwright + 99% de fidelidade), amarra os flows/personas do ux-flows/ux-persona, carimba a qual sprint/semana a entrega se refere, atualiza o PX-PROGRESS e executa a entrega git completa (branch ux/<funcionalidade> + push + Merge Request). Não desenha tela. Use ao fechar um lote de telas prontas pra levar pro dev — "fechar o handoff", "preparar a entrega pro dev", "empacotar pro desenvolvimento", "gerar a definition of done", "qual sprint essa entrega entra", "finalizar o fluxo".
+description: Skill de FECHAMENTO da cadeia PX. Monta o pacote de handoff pro dev a partir das histórias já ready — consolida o HTML do protótipo, o UI Kit do produto e as histórias de negócio (BDD + rastreabilidade componente→história). Não envia código-fonte, branches nem artefatos internos. Use ao fechar um lote de telas prontas pra levar pro dev — "fechar o handoff", "preparar a entrega pro dev", "empacotar pro desenvolvimento", "qual sprint essa entrega entra", "finalizar o fluxo".
 compatibility: claude-code
 metadata:
   audience: px-ux
@@ -29,6 +29,13 @@ Segue `Skill Prompting Conventions` do `CLAUDE.md`. Estruturada pra decisões en
 - O **`px-preview` foi gerado** (HTML navegável das telas desta leva). Se não foi, **não avance** — ofereça rodar o `px-preview` agora antes de continuar. O navegável é o que elimina o "dev no escuro": sem ele, o MR chega com código mas sem referência visual e volta o problema da interpretação.
 - Existe o checkpoint `planning/<funcionalidade>/PX-PROGRESS.md` (a cadeia veio criando). Se não existir, crie agora (ver "Checkpoint de progresso" no `px-protocol.md`) — o handoff é o último a atualizá-lo.
 
+**Perguntas obrigatórias antes de montar o pacote (`AskUserQuestion`):**
+> 1. "Esse projeto já aderiu de forma completa à biblioteca de componentes `@centralit`?"
+>    **Sim** → DoD interno inclui a obrigatoriedade de usar os componentes da biblioteca.
+>    **Não** → DoD interno registra que o dev adapta a referência visual conforme a stack do projeto.
+> 2. "Qual o caminho local do repo do dev onde o pacote será entregue?" (ex: `C:/projetos/citpeople` ou URL do repositório git remoto)
+>    — necessário para executar o push no BLOCO 6.
+
 > **Nota de slug:** `<funcionalidade>` é o mesmo slug que a cadeia usa em `planning/<iniciativa>/` e na branch `ux/<funcionalidade>`. Um slug só governa planning, checkpoint e branch — não invente um nome novo aqui.
 
 ---
@@ -54,18 +61,15 @@ Segue `Skill Prompting Conventions` do `CLAUDE.md`. Estruturada pra decisões en
 
 > A branch **não** carrega o sprint: `ux/<funcionalidade>` atravessa sprints. O sprint é carimbo de entrega (MR + PX-PROGRESS), não de branch.
 
-## BLOCO 3 — Definition of Done (como o dev sabe que ficou pronto)
-**Decidir:** o critério objetivo de "entregue" pra esta leva.
-**Por que importa:** sem DoD explícito, "pronto" é opinião. O protocolo fixa a régua; aqui você a instancia.
-**Fazer — montar a DoD (padrão da casa, ver `px-protocol.md` › Handoff → dev):**
-- [ ] Nivelamento de stack concluído: telas do sandbox integradas na estrutura do projeto real, sem perda de comportamento ou estado.
-- [ ] Todas as telas implementadas seguindo o UI KIT (tokens, sem hex/radius solto, grid de 8px).
-- [ ] Todos os estados de cada tela (default/loading/empty/error/disabled/read-only/hover/foco/responsivo).
-- [ ] Todos os breakpoints (Mobile/Tablet/Desktop/Widescreen).
-- [ ] Validação visual via **Playwright**, **meta de 99% de fidelidade**, evidências anexadas ao MR.
-- [ ] Os cenários **BDD** de cada história passam (feliz + vazio + erro + permissão + 1 regra de negócio).
-- [ ] Histórias de usuário (`px-story`) referenciadas no MR — são o contrato de aceite.
-- Adicione DoD específico da funcionalidade se houver (ex: integração X mockada e marcada).
+## BLOCO 3 — Definition of Done (checklist interna — não vai no pacote do dev)
+**Por que importa:** o dev recebe o HTML já com breakpoints, estados e comportamentos resolvidos. O DoD é a régua que o PX usa pra confirmar que o HTML está completo *antes* de fechar a entrega — não uma lista de tarefas pro dev.
+**Verificar antes de avançar pro BLOCO 4:**
+- [ ] HTML cobre todos os estados de cada tela (default/loading/empty/error/disabled/read-only/hover/foco/responsivo).
+- [ ] HTML cobre todos os breakpoints (Mobile/Tablet/Desktop/Widescreen).
+- [ ] UI Kit do produto incluído no pacote (cores de marca, tipografia, identidade).
+- [ ] Histórias de negócio com BDD completo (feliz + vazio + erro + permissão).
+- [ ] Rastreabilidade componente → história preenchida em cada história.
+- [ ] DoD específico da funcionalidade verificado: `<se houver>`
 
 ## BLOCO 4 — Validação pelo usuário (flows + personas)
 **Decidir:** como o dev valida a usabilidade percorrendo como usuário, não só rodando o código.
@@ -81,43 +85,81 @@ Segue `Skill Prompting Conventions` do `CLAUDE.md`. Estruturada pra decisões en
 - Consolide as `⚑ Boundary` das histórias/spec (ver `px-epic` › consolidação): cada dependência de API/low-code/storage/terceiro, com o que precisa ser substituído.
 - Sem dependência → "Nenhuma — opera sobre dados já mockados/carregados."
 
-## BLOCO 6 — Fechar: atualizar checkpoint e despachar a entrega
+## BLOCO 5b — Perguntas em aberto (confirmar com o PX antes de enviar)
+**Por que importa:** perguntas sem dono ou sem resposta não chegam pro dev como pendência solta — geram ruído e retorno desnecessário.
+**Fazer (`AskUserQuestion` para cada item levantado):**
+- Liste todas as pendências identificadas durante os blocos anteriores.
+- Para cada uma, pergunte ao PX: **"Isso já tem resposta ou dono confirmado?"**
+  - **Tem resposta** → resolve inline no documento antes de enviar.
+  - **Tem dono mas sem resposta** → entra no pacote com `dono: <nome>` explícito.
+  - **Sem dono e sem resposta** → **não envia**. Bloqueia a entrega até resolver ou descartar.
+- Se não houver nenhuma pendência → omitir a seção do template (`nenhuma`).
+
+## BLOCO 6 — Fechar: montar, confirmar e despachar
+
 **Fazer, nesta ordem:**
-1. Montar o `planning/<funcionalidade>/handoff.md` (template) e apresentar o resumo ao líder.
-2. **Atualizar o `PX-PROGRESS.md`**: marcar as histórias entregues como feitas, preencher o campo `Sprint`, e apontar a próxima leva (ou "cadeia concluída") em *Próximo passo*.
-3. **Confirmar que o `px-preview` existe** — o arquivo HTML navegável gerado anteriormente vai **anexado ao MR** como referência visual obrigatória. Sem ele, não avança.
-4. **Executar a entrega git** (a skill roda; o UX só confirma):
-   - Pedir a **URL do repo do dev** (se ainda não tiver) e clonar: `git clone <url> <pasta-dev>`.
-   - Criar a branch de entrega: `git checkout -b ux/<funcionalidade>`.
-   - **Copiar o trabalho do sandbox** pro repo do dev: telas (`src/pages/` ou `src/app/`) → pasta equivalente do projeto; `planning/` → `planning/`; `src/index.css` como referência de tokens (o dev migra pro formato da stack). **Não levar:** `node_modules`, `.git`, `src/components/ui/` (já existem no repo do dev via `@centralit/kit`).
-   - Mostrar ao líder o resumo dos arquivos que vão entrar — confirmar antes de commitar.
-   - Commitar e empurrar: `git add .` → `git commit -m "ux(<funcionalidade>): ..."` → `git push -u origin ux/<funcionalidade>`.
-   - Gerar o **link do Merge Request** (`ux/<funcionalidade>` → `main`). Título: `[Sprint NN] ux(<funcionalidade>): <resumo>`; corpo: o `handoff.md`; navegável do `px-preview` anexado.
+1. Montar o `planning/<funcionalidade>/handoff.md` (template) com tudo preenchido.
+2. Confirmar que o arquivo HTML do protótipo existe e cobre todas as telas desta leva.
+3. **Plantar rastreabilidade no HTML:** para cada história, localizar o elemento acionador (botão, link, campo, etc.) e adicionar `data-story="<ID>"` no elemento correspondente.
+4. Confirmar que o `ui-kit.md` desta funcionalidade está atualizado.
+5. Passar pelo **GATE** (barreira de saída abaixo) — só avança se tudo verde.
+6. Apresentar o eco final ao líder e aguardar aceite explícito.
+7. **Com aceite confirmado — executar o push para o repo do dev** (a skill roda; o PX só confirma):
+   - Montar a pasta de entrega com exatamente:
+     - `<funcionalidade>.html` — protótipo visual
+     - `ui-kit.md` — tokens e identidade do produto
+     - `handoff.md` — histórias, rastreabilidade, fronteiras, perguntas em aberto
+   - Mostrar a árvore dos 3 arquivos ao líder antes de commitar.
+   - Commitar e empurrar no repo do dev: `git add <arquivos>` → `git commit -m "ux(<funcionalidade>): handoff <Sprint NN>"` → `git push`.
+   - Confirmar o push com o hash do commit.
+
+## GATE — Barreira de saída (verificar antes do eco final)
+
+Rodar esta checklist completa antes de apresentar o eco ao líder. **Qualquer item com ✗ bloqueia a entrega** — resolver ou declarar como Pergunta em aberto com dono antes de prosseguir.
+
+**Pacote**
+- [ ] HTML do protótipo existe e cobre todas as telas desta leva
+- [ ] `data-story="<ID>"` plantado em cada elemento acionador no HTML
+- [ ] UI Kit do produto presente e atualizado
+- [ ] `handoff.md` preenchido sem campos `<placeholder>` vazios
+
+**Histórias**
+- [ ] Todas as histórias desta leva têm BDD completo (feliz + vazio + erro + permissão)
+- [ ] Toda história tem rastreabilidade: descrição em texto + anchor `data-story` no HTML
+- [ ] Nenhuma story técnica interna do PX incluída — apenas histórias de negócio
+
+**Perguntas em aberto**
+- [ ] Toda pendência tem dono confirmado — nenhuma solta sem nome
+
+**O que nunca deve sair**
+- [ ] Nenhum arquivo de código-fonte (`.tsx`, `.ts`, `.jsx`, `.js` de componente)
+- [ ] Nenhum arquivo de config (`vite.config`, `tsconfig`, `package.json`, `.env`)
+- [ ] Nenhum artefato interno (`PX-PROGRESS.md`, stories técnicas, planejamento interno)
+- [ ] Nenhuma branch ou referência a branch no documento
 
 ## Eco final
 
-Antes de executar a entrega, repita em 4–6 linhas: *"Handoff da funcionalidade **X**: **N** histórias (código funcional + BDD), **Sprint NN · semana ISO**, DoD fechada, flows amarrados, **M** fronteiras de integração, navegável `px-preview` gerado. O dev recebe a branch `ux/<funcionalidade>` + o HTML de referência e faz o nivelamento de stack. Vou atualizar o checkpoint e rodar a entrega git (branch + push + MR) — confirma?"*. Só então feche.
+Antes de fechar, repita em 3–4 linhas: *"Handoff da funcionalidade **X**: **N** histórias com BDD, HTML do protótipo gerado, UI Kit incluído, **M** fronteiras de integração declaradas. Perguntas em aberto: `<N ou nenhuma>`. O dev recebe o `handoff.md` + HTML + UI Kit como referência visual — confirma o envio?"*. Só então feche.
 
 ## Onde salvar
 
-`planning/<funcionalidade>/handoff.md` — o mesmo slug da branch e do planning.
+`planning/<funcionalidade>/handoff.md` — o mesmo slug do planning.
 
 ## Regras
 
 - **Não desenha tela.** Consolida o que `px-request`/`px-story` já produziram.
-- **Não inventa DoD nem boundary.** Puxa da spec/histórias; o que faltar vira Pergunta em aberto, não suposição.
-- **Sprint é carimbo de entrega**, não de branch. Vai no MR e no `PX-PROGRESS`, nunca no nome da branch.
-- **Nunca `git` na mão pro UX.** A skill executa os comandos; o UX só confirma.
-- **Nunca commit na `main`.** Sempre branch `ux/<funcionalidade>` + Merge Request.
+- **Não inventa boundary.** Puxa da spec/histórias; o que faltar vira Pergunta em aberto, não suposição.
+- **Não envia perguntas em aberto sem dono.** Bloqueia até ter dono confirmado ou descartar.
+- **Não inclui código-fonte, branches, config ou artefatos internos** (PX-PROGRESS, stories técnicas) no pacote do dev.
+- **Nunca executa o push sem aceite explícito do PX.** O eco final é a porta — sem confirmação, não roda git.
+- **O push vai direto pro repo do dev** — não pro boilerplate PX.
 
 ## Relação com o fluxo
 
 ```
-px-request  →  px-story  →  px-handoff  →  dev (nivela stack)
+px-request  →  px-story  →  px-handoff  →  dev (referência visual)
                             ^ você está aqui
-                            (fecha a cadeia: pacote + git + branch ux/<funcionalidade> + MR)
+                            (fecha a cadeia: HTML + UI Kit + histórias de negócio)
 ```
 
-> `px-handoff` fecha o ciclo completo: consolida o pacote (o que/como/quando + histórias + DoD) **e** executa a entrega git (branch + push + MR). A `px-preview` gera o navegável que vai **obrigatoriamente anexado ao MR** — referência visual que elimina o "dev no escuro". A `px-setup` só monta o sandbox no início; não participa da entrega.
->
-> O dev **não reimplementa** — ele nivela. O código funcional do sandbox é o entregável; a adaptação à estrutura do projeto real é o nivelamento de stack, responsabilidade exclusiva do dev.
+> `px-handoff` fecha o ciclo: consolida o pacote de referência visual (HTML + UI Kit) e as histórias de negócio (BDD + rastreabilidade) que o dev usa como especificação. O dev é responsável pela implementação na stack do projeto — o PX é referência, não código de produção.

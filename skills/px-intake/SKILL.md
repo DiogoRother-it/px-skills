@@ -1,6 +1,6 @@
 ---
 name: px-intake
-description: Entrevista de descoberta à prova de balas. Transforma um problema vago, uma ideia solta ou um "preciso de um sistema pra X" num documento de intake claro — e decide qual é o próximo passo da cadeia PX (px-kickoff, px-request ou decompor via agile-epic). Interroga UMA coisa de cada vez, explica por que cada resposta importa, dá exemplo e default recomendado, e devolve em eco. Feita para que até quem não é UX consiga registrar um problema sem deixar buraco. Use quando alguém traz uma ideia/necessidade sem escopo, quando o problema ainda não está maduro pro backlog, ou quando diz "tenho uma ideia", "preciso de um sistema pra", "por onde eu começo".
+description: Entrevista de descoberta à prova de balas. Transforma um problema vago, uma ideia solta ou um "preciso de um sistema pra X" num documento de intake claro — e decide qual é o próximo passo da cadeia PX (px-kickoff, px-request ou decompor via px-epic). Interroga UMA coisa de cada vez, explica por que cada resposta importa, dá exemplo e default recomendado, e devolve em eco. Feita para que até quem não é UX consiga registrar um problema sem deixar buraco. Use quando alguém traz uma ideia/necessidade sem escopo, quando o problema ainda não está maduro pro backlog, ou quando diz "tenho uma ideia", "preciso de um sistema pra", "por onde eu começo".
 compatibility: claude-code
 metadata:
   audience: px-ux
@@ -89,7 +89,7 @@ Segue `Skill Prompting Conventions` do `CLAUDE.md`. Estruturada pra decisões en
 **Por que importa:** mesmo provisório, delimitar cedo evita a ideia inchar sem controle. O que fica de fora hoje é tão importante quanto o que entra.
 **Perguntar:**
 - "No primeiro momento, o que PRECISA existir? E o que dá pra deixar pra depois, de propósito?" — *ex: inclui revogar acesso; não inclui relatório de auditoria (fase 2).*
-- Deixe claro que é provisório — pode mudar no `px-kickoff`/`agile-epic`.
+- Deixe claro que é provisório — pode mudar no `px-kickoff`/`px-epic`.
 
 ## BLOCO 6 — Tamanho, forma e próximo passo (o roteamento)
 **Decidir:** o tamanho do trabalho, o alvo de build, e qual skill vem depois. **Este é o coração do intake.**
@@ -101,10 +101,10 @@ Segue `Skill Prompting Conventions` do `CLAUDE.md`. Estruturada pra decisões en
    - Dependência de ordem entre partes (uma trava a outra).
    - Escopo maior do que cabe numa conversa só.
 2. **Identidade existe?** Se é **projeto novo** (sem público-alvo/UI KIT definidos) → o próximo passo é **`px-kickoff`**, sempre, antes de qualquer tela.
-3. **Alvo de build** (`AskUserQuestion`) — *Protótipo HTML (via `agile-proto`, valida fluxo sem tocar no produto)* × *App React do produto (a partir do boilerplate) (Recomendado se já vai virar produto)*. Muda o que "pronto" significa.
+3. **Alvo de build** (`AskUserQuestion`) — *Protótipo HTML (via `px-proto`, valida fluxo sem tocar no produto)* × *App React do produto (a partir do boilerplate) (Recomendado se já vai virar produto)*. Muda o que "pronto" significa.
 4. **Roteia** (`AskUserQuestion`, recomendada marcada):
    - Projeto novo → **`px-kickoff`** (setup de identidade), depois o abaixo.
-   - Iniciativa (várias telas) → **`agile-epic`** pra decompor em backlog de telas → cada tela no **`px-request`**.
+   - Iniciativa (várias telas) → **`px-epic`** pra decompor em backlog de telas → cada tela no **`px-request`**.
    - Tela/componente único e claro → direto pro **`px-request`**.
 - Registre a recomendação no intake e confirme com o líder. **Nunca pule pra implementação a partir do intake** — ele gera o próximo artefato, não código.
 
@@ -131,12 +131,12 @@ Eco final: um resumo de 4–6 linhas do problema e do caminho recomendado. O lí
 
 Ao fechar (e só com a Definition of Ready completa), ofereça o próximo passo conforme o Bloco 6:
 - Projeto novo → "Quer rodar o `px-kickoff` pra definir público-alvo e UI KIT?"
-- Iniciativa → "Quer rodar o `agile-epic` pra decompor em telas?"
+- Iniciativa → "Quer rodar o `px-epic` pra decompor em telas?"
 - Tela única → "Quer detalhar essa tela no `px-request`?"
 
 ## Relação com o fluxo
 
 ```
-px-intake  →  px-kickoff  →  [agile-epic se iniciativa]  →  px-request  →  px-story  →  px-handoff → dev
+px-intake  →  px-kickoff  →  [px-epic se iniciativa]  →  px-request  →  px-story  →  px-handoff → dev
 ^ você está aqui (porta de entrada: clareia o problema e roteia)
 ```

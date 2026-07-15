@@ -6,7 +6,7 @@ traz só a stack de componentes; as skills não vêm com ela).
 
 ## O que instala
 
-- **10 skills** em `.claude/skills/`: `px-setup`, `px-start`, `px-audit`, `px-intake`, `px-kickoff`, `px-epic`, `px-request`, `px-story`, `px-handoff`, `px-preview`
+- **11 skills** em `.claude/skills/`: `px-setup`, `px-start`, `px-audit`, `px-intake`, `px-kickoff`, `px-epic`, `px-proto`, `px-request`, `px-story`, `px-handoff`, `px-preview`
 - **Docs de design system** em `docs/design-system/` (foundations, components, patterns, engineering)
 - **Protocolo** em `docs/px-protocol.md` (Protocolo de Interação UX + Skill Prompting Conventions)
 - Um ponteiro pro protocolo no `CLAUDE.md` do repo (cria se não existir)
@@ -27,7 +27,7 @@ npx @centralit/px-skills
 ```
 
 Depois, abra o Claude Code nesse repo — as skills aparecem no menu `/`:
-`/px-setup · /px-start · /px-audit · /px-intake · /px-kickoff · /px-epic · /px-request · /px-story · /px-handoff · /px-preview`
+`/px-setup · /px-start · /px-audit · /px-intake · /px-kickoff · /px-epic · /px-proto · /px-request · /px-story · /px-handoff · /px-preview`
 
 ## Pré-requisito
 
@@ -39,6 +39,8 @@ pacote — este aqui é só a camada de skills + protocolo, para o PX.
 
 - **Projeto novo do zero** → comece por `/px-start`
 - **Redesign de produto existente** → comece por `/px-audit` (analisa repo/URL ao vivo ou prints/PDF)
+
+O **alvo de build** (decidido no `px-start`/`px-intake`/`px-kickoff`) escolhe o caminho de idealização: **app React do produto** (a partir do boilerplate) ou **protótipo HTML descartável** via `/px-proto` (stack própria só-CDN, valida o fluxo sem tocar no produto).
 
 ## Manutenção — canonicidade dividida (não inverter a direção)
 

@@ -75,6 +75,6 @@ if (existsSync(claudeMd)) {
 }
 
 log(`\n${c.g}Pronto.${c.x} Abra o Claude Code neste repo e as skills aparecem no menu \`/\`:`)
-log(`${c.d}  /px-setup · /px-start · /px-audit · /px-intake · /px-kickoff · /px-epic · /px-request · /px-story · /px-preview${c.x}`)
+log(`${c.d}  /px-setup · /px-start · /px-audit · /px-intake · /px-kickoff · /px-epic · /px-proto · /px-request · /px-story · /px-handoff · /px-preview${c.x}`)
 log(`\n${c.y}Pré-requisito de UI:${c.x} a biblioteca de componentes (src/components/ui + tokens) precisa`)
 log(`${c.d}  estar no repo — ela vem no bundle do design system, não neste pacote de skills.${c.x}\n`)
