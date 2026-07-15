@@ -1,12 +1,13 @@
-# Handoff → dev: <funcionalidade>
+# Handoff → dev: semana-<NN>
 
-**Funcionalidade/fluxo:** `<funcionalidade>`
-**Sprint:** `Sprint NN · <AAAA-Www>` · **Data:** `<AAAA-MM-DD>`
+**Semana:** `semana-<NN> · <AAAA-Www>` · **Data:** `<AAAA-MM-DD>`
 
 ## 1. Escopo desta entrega
-| História | Tela | Status | Entra nesta leva? |
+
+| Fluxo | História | Tela | Entra nesta leva? |
 |---|---|---|---|
-| `<ID>` | `<slug>` | ✅ ready | Sim |
+| `<fluxo-a>` | `<ID>` | `<slug>` | Sim |
+| `<fluxo-b>` | `<ID>` | `<slug>` | Sim |
 
 **Fica pra próxima leva (e por quê):**
 -
@@ -15,16 +16,18 @@
 
 | Arquivo | O que cobre |
 |---|---|
-| `<funcionalidade>.html` | `<telas/fluxos incluídos>` |
-| `planning/<funcionalidade>/ui-kit.md` | Tokens de cor, tipografia e identidade deste produto |
+| `<Produto>-Prototipo.html` | Todos os fluxos desta leva |
+| `ui-kit.md` | Tokens de cor, tipografia e identidade deste produto |
 
-> O HTML é a **referência visual e de comportamento**. O UI Kit define quais tokens aplicar (cores de marca, primária, etc.). Implementar usando a biblioteca `@centralit` — os componentes já carregam radius e espaçamento corretos; o UI Kit define os valores de cor.
+> O HTML é a **referência visual e de comportamento**. O UI Kit define quais tokens aplicar.
 
 ## 3. Histórias de negócio
 
-> Mesmas histórias do Agility. Uma seção por história.
+<!-- Uma seção por fluxo. Dentro de cada fluxo, uma subseção por história. -->
 
-### `<ID>` — <título da história>
+### Fluxo: `<fluxo-a>`
+
+#### `<ID>` — <título da história>
 
 **Como** `<persona>`, **quero** `<ação>` **para** `<objetivo>`.
 
@@ -38,10 +41,11 @@ Então <resultado esperado>
 **Regras de negócio:**
 - `<regra>`
 
-**Rastreabilidade na tela:** `<descrição do elemento — ex: "Botão 'Confirmar exclusão' no modal de exclusão de registro">` · anchor: `data-story="<ID>"`
+**Rastreabilidade na tela:** `<descrição do elemento>` · anchor: `data-story="<ID>"`
 
 ---
-<!-- repetir bloco acima para cada história desta leva -->
+<!-- repetir bloco de história para cada história do fluxo -->
+<!-- repetir bloco de fluxo para cada fluxo desta leva -->
 
 ## 4. Fronteiras de integração (mock → real)
 - ⚑ **Boundary:** `<dependência>` — `<o que precisa ser substituído>`
@@ -51,4 +55,4 @@ Então <resultado esperado>
 - `<pendência>` — dono: `<nome>` · aguardando: `<o que falta para resolver>`
 - (ou) Nenhuma.
 
-<!-- Salvar em: planning/<funcionalidade>/handoff.md -->
+<!-- Salvar em: ux/semana-<NN>/handoff.md -->

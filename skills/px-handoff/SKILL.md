@@ -104,13 +104,23 @@ Segue `Skill Prompting Conventions` do `CLAUDE.md`. Estruturada pra decisões en
 4. Confirmar que o `ui-kit.md` desta funcionalidade está atualizado.
 5. Passar pelo **GATE** (barreira de saída abaixo) — só avança se tudo verde.
 6. Apresentar o eco final ao líder e aguardar aceite explícito.
-7. **Com aceite confirmado — executar o push para o repo do dev** (a skill roda; o PX só confirma):
-   - Montar a pasta de entrega com exatamente:
-     - `<funcionalidade>.html` — protótipo visual
-     - `ui-kit.md` — tokens e identidade do produto
-     - `handoff.md` — histórias, rastreabilidade, fronteiras, perguntas em aberto
-   - Mostrar a árvore dos 3 arquivos ao líder antes de commitar.
-   - Commitar e empurrar no repo do dev: `git add <arquivos>` → `git commit -m "ux(<funcionalidade>): handoff <Sprint NN>"` → `git push`.
+7. **Com aceite confirmado — montar a estrutura e executar o push para o repo do dev** (a skill roda; o PX só confirma):
+   - Montar a pasta de entrega no repo do dev com a seguinte estrutura:
+     ```
+     ux/semana-<NN>/
+     ├── <Produto>-Prototipo.html
+     ├── ui-kit.md
+     ├── <fluxo-a>/
+     │   └── stories/
+     │       ├── <historia-1>.md
+     │       └── <historia-2>.md
+     └── <fluxo-b>/
+         └── stories/
+             └── <historia-3>.md
+     ```
+   - Uma pasta por fluxo. Cada fluxo com suas histórias em `stories/`. HTML e UI Kit na raiz da semana.
+   - Mostrar a árvore completa ao líder antes de commitar.
+   - Commitar e empurrar no repo do dev: `git add ux/semana-<NN>/` → `git commit -m "ux(semana-<NN>): handoff <resumo>"` → `git push`.
    - Confirmar o push com o hash do commit.
 
 ## GATE — Barreira de saída (verificar antes do eco final)
