@@ -33,9 +33,9 @@ História e cenários em pt-BR. Gherkin em português: `Funcionalidade / Cenári
 
 # Os blocos da entrevista
 
-## S0 — Ingerir o px-request (base de tudo)
-**Por que importa:** a história herda propósito, público, variação, dados, ações e estados já levantados — não reinventar.
-**Fazer:** ler o `px-request` de origem. Se não existir, **avisar que o ideal é rodar `px-request` antes** (senão a história nasce sem base) e oferecer coletar o mínimo aqui. Ecoar o que foi herdado: "Vou partir disto: propósito X, público Y, variação Z, estados A/B/C — certo?"
+## S0 — Ingerir o px-request e o px-proto aprovado (base de tudo)
+**Por que importa:** a história herda propósito, público, variação, dados, ações e estados já levantados — e a validação visual já feita. Não reinventar nada que o proto já resolveu.
+**Fazer:** ler o `px-request` de origem e verificar se existe o proto aprovado em `planning/<iniciativa>/protos/<slug>.html`. Se o proto **não existir ou não estiver aprovado**, **avisar que o `px-proto` é obrigatório antes da história** — a história deve partir de uma tela visualmente validada. Se nem o `px-request` existir, oferecer rodar `px-request` → `px-proto` antes. Ecoar o que foi herdado: "Vou partir disto: propósito X, público Y, variação Z, estados A/B/C (proto aprovado) — certo?"
 
 ## S1 — Narrativa
 **Decidir:** a frase "Como / quero / para", ancorada num público REAL do kickoff (não "usuário" genérico).
@@ -110,6 +110,6 @@ Com a Definition of Ready completa, oferecer:
 
 ## Relação com o fluxo
 ```
-px-kickoff  →  px-request  →  px-story  →  px-handoff  →  px-setup P4 → dev (ux-flows/ux-persona + Playwright)
-                              ^ você está aqui
+px-kickoff  →  px-request  →  px-proto (aprovado)  →  px-story  →  [px-preview opcional]  →  px-handoff  →  px-setup P4 → dev
+                                                        ^ você está aqui
 ```

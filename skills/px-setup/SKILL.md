@@ -68,8 +68,8 @@ Antes de executar, repita em 2–3 linhas: *"Então: projeto **X**, vou montar o
 
 ```
 px-setup (terreno)
-   └─ monta sandbox (boilerplate)  ──►  px-start  →  px-intake  →  px-kickoff  →  px-request  →  px-story  →  px-handoff
-                                                                                                               (fecha cadeia + git + MR)
+   └─ monta sandbox (boilerplate)  ──►  px-start  →  px-intake  →  px-kickoff  →  px-request  →  px-proto  →  px-story  →  px-handoff
+                                                                                                                            (fecha cadeia + git + MR)
 ```
 
 > O `px-start` delega o terreno técnico pra cá. Sem duplicação de comando de git entre as duas.

@@ -175,11 +175,11 @@ Eco final: um resumo de 5–8 linhas do que será construído. O líder confirma
 
 > Ao fechar, **atualize o checkpoint** `planning/<iniciativa>/PX-PROGRESS.md` (ver "Checkpoint de progresso" no `px-protocol.md`): marque a spec desta tela como feita (com o caminho do artefato), aponte a `px-story` da mesma tela em *Próximo passo*, e sincronize a variação escolhida / gate ⚠️ aprovado → *Decisões travadas* e pendências → *Perguntas em aberto*.
 
-Ao fechar (e só com a Definition of Ready completa): "Quer transformar isto numa história com critérios de aceite, usabilidade e BDD via `px-story`?" — o `px-story` herda tudo isto pronto.
+Ao fechar (e só com a Definition of Ready completa): "Quer gerar o protótipo visual desta tela via `px-proto`?" — o proto usa esta spec para renderizar a tela com os tokens reais do UI KIT. O PX valida visualmente, aprova, e só então vai para `px-story`.
 
 ## Relação com o fluxo
 
 ```
-px-kickoff  →  px-request  →  px-story  →  px-handoff → dev
-                ^ você está aqui (a cada tela/componente)
+px-kickoff  →  px-request  →  px-proto (validação visual)  →  px-story  →  px-handoff → dev
+               ^ você está aqui (a cada tela/componente)
 ```

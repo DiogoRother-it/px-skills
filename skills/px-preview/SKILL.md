@@ -96,9 +96,10 @@ Antes de executar, repita em 3–4 linhas: *"Stack detectada: **X**. Vou gerar *
 ## Relação com o fluxo
 
 ```
-px-setup → /px-start → px-intake → px-kickoff → px-request → px-story → [telas prontas]
-                                                                            │
-                                                                     px-preview  ──►  arquivo .html / link  ──►  PO revisa
+px-request → px-proto (proto validado pelo PX) → px-story → px-preview [OPCIONAL] → px-handoff → dev
+                                                                    │
+                                              app React construído, empacotado num HTML standalone
+                                              para revisão da equipe interna antes de fechar o handoff
 ```
 
-> `px-preview` é a entrega **pro PO** (revisão da idealização). A `px-setup` Passo 4 é a entrega **pro dev** (branch `ux/` + Merge Request). São complementares e não se substituem.
+> `px-preview` é **opcional** — usado quando a equipe interna quer revisar o conjunto de telas no app React antes de fechar o handoff para os devs. Requer o app funcionando (não é para discovery nem para validação visual do PX — isso é o `px-proto`). A `px-setup` Passo 4 é a entrega **pro dev** (branch `ux/` + Merge Request).

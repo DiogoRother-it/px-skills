@@ -65,11 +65,13 @@ A IA nunca desenha a partir de um prompt vago. Interroga o propósito e ancora n
 
 ## Cadeia de skills PX
 
-`px-start` (projeto novo) **ou** `px-audit` (redesign de produto existente) → `px-intake` (problema vago) → `px-kickoff` (personas + UI KIT) → `px-epic` (se iniciativa) → `px-request` (por tela) → `px-story` (história + BDD) → `px-handoff` (fecha: DoD + sprint + flows) → `px-setup` Passo 4 (branch `ux/<funcionalidade>` + Merge Request) → dev valida com `ux-flows`/`ux-persona` + Playwright.
+`px-start` (projeto novo) **ou** `px-audit` (redesign de produto existente) → `px-intake` (problema vago) → `px-kickoff` (personas + UI KIT) → `px-epic` (se iniciativa) → `px-request` (por tela) → **`px-proto`** (protótipo visual fiel → PX valida e aprova) → `px-story` (história + BDD) → [`px-preview` — opcional, revisão da equipe interna] → `px-handoff` (fecha: DoD + sprint + flows) → `px-setup` Passo 4 (branch `ux/<funcionalidade>` + Merge Request) → dev valida com `ux-flows`/`ux-persona` + Playwright.
 
-**Alvo de build.** Decidido no `px-start`/`px-intake`/`px-kickoff`, escolhe o caminho de idealização: **app React do produto** (boilerplate, o padrão que segue pra `px-request`) ou **protótipo HTML descartável** via `px-proto` (stack própria só-CDN, valida o fluxo sem tocar no produto; consome o UI KIT do `px-kickoff`). O proto não substitui a idealização real — quando o fluxo é aprovado e vira produto, cada tela dele volta pra `px-request`.
+**`px-proto` (obrigatório após cada `px-request`).** Gera um HTML standalone com os tokens reais do UI KIT e as variações exatas do catálogo de componentes. O PX revisa visualmente, itera ajustes na sessão e só aprova quando está correto. Nenhuma tela vira `px-story` sem passar pelo proto aprovado. Stack: React via CDN + Babel + Tailwind CDN. Não toca no boilerplate.
 
-O terreno técnico (repo/branch/scaffold) e a mecânica de git são sempre da `px-setup`; a entrega **pro PO** (HTML standalone do app React) é da `px-preview`. Nenhuma outra skill roda git.
+**`px-preview` (opcional, para revisão interna).** Empacota o app React do produto (boilerplate já construído) num HTML standalone para a equipe interna revisar o conjunto de telas antes de fechar o handoff para os devs. Posiciona-se depois do `px-story` e antes do `px-handoff`. Diferente do `px-proto`: requer o app funcionando; diferente do `px-handoff`: é revisão, não entrega.
+
+O terreno técnico (repo/branch/scaffold) e a mecânica de git são sempre da `px-setup`; nenhuma outra skill roda git.
 
 ## Checkpoint de progresso (PX-PROGRESS) — obrigatório
 
