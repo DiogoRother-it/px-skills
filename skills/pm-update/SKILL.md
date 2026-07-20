@@ -231,7 +231,7 @@ Gere um artifact HTML com o documento completo de contextualização. Deve conte
 1. **Cabeçalho**: nome do produto, data, badge "pm-update · output"
 2. **Seções**: uma por fase capturada (Estado atual · Tipo · Escopo · Motivação · Evidência · Impacto · Riscos · Sucesso · Estratégia · Stakeholders)
 3. **Knowledge Registry**: tabela com todas as entradas classificadas (Entrada · Valor · Classificação). Cada classificação com cor: Fato=verde · Hipótese=âmbar · Premissa=roxo · Risco=coral · Decisão=azul · Mapeamento=teal · Ação=índigo
-4. **Ações**: botão "Copiar como markdown" (copia texto estruturado para colar no Notion/Confluence) e botão "Entregar ao PX" (usa `sendPrompt` para retornar o contexto ao chat com a mensagem "Contexto pronto para handoff ao PX")
+4. **Ações**: botão "Copiar como markdown" · botão "Definir estratégia" com `sendPrompt("Contextualização concluída. Iniciando definição de estratégia com pm-strategy.")` — próximo passo natural · botão "Entregar ao PX" com `sendPrompt("Contexto pronto para handoff ao PX.")` — use quando o foco é só o design
 
 **UX:** Dark theme consistente com o restante da plataforma. Máximo 680px de largura. Tipografia clara, seções com separadores suaves.
 

@@ -240,4 +240,5 @@ Documento completo de discovery com todas as seções capturadas:
 
 **Ações**:
 - Botão "Copiar como markdown"
-- Botão "Entregar ao PX" com `sendPrompt("Contexto de discovery concluído. Pronto para handoff ao PX.")`
+- Botão "Definir estratégia da iniciativa" com `sendPrompt("Discovery concluído. Iniciando definição de estratégia e abordagem com pm-strategy.")` — próximo passo natural no fluxo
+- Botão "Entregar ao PX" com `sendPrompt("Contexto de discovery concluído. Pronto para handoff ao PX.")` — use se o PRD já existe e o foco é o design

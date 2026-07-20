@@ -263,4 +263,5 @@ Roadmap consolidado do ciclo, pronto para apresentação e handoff.
 
 **Ações:**
 - Botão "Copiar como markdown" — copia o documento estruturado para colar no Notion/Confluence/Jira.
-- Botão "Pronto para lançamento" — usa `sendPrompt("Roadmap priorizado. Avançando para planejamento de go-to-market.")` para iniciar pm-gtm.
+- Botão "Escrever o PRD" — usa `sendPrompt("Roadmap priorizado. Escopo definido. Iniciando escrita do PRD com pm-prd.")` — próximo passo natural
+- Botão "Ir para o GTM" — usa `sendPrompt("Roadmap priorizado. Avançando para planejamento de go-to-market.")` — use se o PRD já existe

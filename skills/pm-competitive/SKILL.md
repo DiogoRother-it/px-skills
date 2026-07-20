@@ -252,4 +252,5 @@ Relatório de inteligência competitiva completo:
 
 **Ações**:
 - Botão "Copiar como markdown"
-- Botão "Usar no pm-prd" com `sendPrompt("Análise competitiva concluída. Incorporando no PRD.")`
+- Botão "Usar na estratégia" com `sendPrompt("Análise competitiva concluída. Incorporando na definição de estratégia.")` — próximo passo natural
+- Botão "Usar no pm-prd" com `sendPrompt("Análise competitiva concluída. Incorporando no PRD.")` — use se a estratégia já está definida

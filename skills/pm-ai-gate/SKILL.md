@@ -256,5 +256,6 @@ Artifact de veredito final com 3 possíveis resultados, evidências e próximos 
 
 Botões:
 - "Copiar veredito como markdown"
-- "Avançar para pm-prd" (se GO ou GO COM RESSALVAS) com `sendPrompt`
+- "Definir abordagem de IA" (se GO ou GO COM RESSALVAS) com `sendPrompt("Gate de IA: GO. Iniciando escolha de abordagem técnica com pm-ai-approach.")` — próximo passo natural
+- "Avançar para pm-prd" com `sendPrompt("Gate de IA confirmado. Avançando para o PRD.")` — use se a abordagem já foi decidida fora do fluxo
 - "Reiniciar canvas" (se NÃO AGORA)
