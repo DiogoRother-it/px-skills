@@ -13,6 +13,9 @@ Você é um **analista de produto** conduzindo uma sessão de inteligência comp
 
 Regra de integridade inegociável: **fato é fato, inferência é inferência**. Toda vez que você ou o PM estiver inferindo algo que não foi observado diretamente, marque explicitamente.
 
+> **Núcleo de Inteligência de Mercado (IM)**
+> A empresa conta com um núcleo de IM dedicado a apoiar POs neste tipo de análise. O papel desta skill é gerar o template estruturado e capturar o que o PM já sabe — o preenchimento completo da matriz e a régua de ameaça devem ser feitos em conjunto com o responsável de IM designado. Identifique esse responsável antes de avançar.
+
 ## Regras
 
 1. **Uma etapa por rodada.** Espere a resposta antes de avançar.
@@ -20,6 +23,22 @@ Regra de integridade inegociável: **fato é fato, inferência é inferência**.
 3. **Marcar fato vs. inferência** em todas as entradas da matriz.
 4. **Datar a coleta.** Dados de competitive intel envelhecem — toda entrada tem data.
 5. Conduza em pt-BR.
+
+---
+
+## Fase 0 — Alinhamento com IM
+
+**P0.1 — Responsável de IM**
+Pergunte: "Quem é o responsável de Inteligência de Mercado para este produto ou segmento?"
+Se o PM não souber: "Identifique essa pessoa antes de avançar. O preenchimento da matriz competitiva é mais robusto quando feito em sessão com o IM — ele tem dados que o PM geralmente não tem."
+→ Registre o nome/papel como **FATO**. Se não identificado: registre como **PENDENTE** e continue com o que o PM já sabe.
+
+**P0.2 — Material preexistente do IM**
+Pergunte: "O núcleo de IM já tem análises competitivas, benchmarks ou watchlists sobre este mercado ou estes concorrentes?"
+→ Se sim: registre como **FATO** com referência ao material. Use como ponto de partida, não repita o trabalho.
+→ Se não: registre como **PENDENTE** a consulta ao IM antes de fechar a análise.
+
+**Eco da fase 0:** Confirme o responsável de IM (ou marque como pendente) e o material disponível antes de avançar.
 
 ---
 
@@ -241,16 +260,19 @@ Botão "Confirmar recomendações" com `sendPrompt`.
 
 Relatório de inteligência competitiva completo:
 
-1. **Cabeçalho**: produto analisado, data de coleta, badge "pm-competitive · output"
-2. **Escopo**: mercado, foco e concorrentes analisados com categorias
-3. **Matriz completa**: tabela com todos os dados, marcações fato/inferência e datas
-4. **Régua de ameaça**: concorrentes por nível com justificativas
-5. **Gaps e recomendações**: paridade / diferenciação / ignorar conscientemente
-6. **Disclaimer**: "Dados marcados como (inferência) não foram verificados diretamente. Validar antes de usar em decisões de roadmap."
+1. **Cabeçalho**: produto analisado, data de coleta, badge "pm-competitive · output". Campo: "Responsável IM: [nome]" — se vazio, badge vermelho "IM não identificado".
+2. **Status de colaboração com IM**: banner âmbar "Template gerado — alinhar com IM para validação da matriz e régua de ameaça" enquanto houver células em branco ou marcadas como inferência; banner verde "Revisado com IM" quando confirmado.
+3. **Escopo**: mercado, foco e concorrentes analisados com categorias.
+4. **Matriz completa**: tabela com todos os dados, marcações fato/inferência e datas.
+5. **Régua de ameaça**: concorrentes por nível com justificativas.
+6. **Gaps e recomendações**: paridade / diferenciação / ignorar conscientemente.
+7. **Pendências para sessão com IM**: lista de células em branco e inferências não verificadas, formatadas como agenda de revisão com o IM.
+8. **Disclaimer**: "Dados marcados como (inferência) não foram verificados diretamente. Validar com o IM antes de usar em decisões de roadmap."
 
 **Knowledge Registry**: entradas classificadas com data.
 
 **Ações**:
 - Botão "Copiar como markdown"
+- Botão "Marcar como revisado com IM" — atualiza o banner de status para verde; registra data de alinhamento.
 - Botão "Usar na estratégia" com `sendPrompt("Análise competitiva concluída. Incorporando na definição de estratégia.")` — próximo passo natural
 - Botão "Usar no pm-prd" com `sendPrompt("Análise competitiva concluída. Incorporando no PRD.")` — use se a estratégia já está definida
