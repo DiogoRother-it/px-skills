@@ -254,6 +254,8 @@ Artifact de veredito final com 3 possíveis resultados, evidências e próximos 
 - Lista de ressalvas (se houver)
 - Próximos passos recomendados
 
+**Knowledge Registry**: tabela com todas as entradas classificadas (Entrada · Valor · Classificação). Cores: Fato=verde · Hipótese=âmbar · Premissa=roxo · Risco=coral · Decisão=azul · Ação=índigo
+
 Botões:
 - "Copiar veredito como markdown"
 - "Definir abordagem de IA" (se GO ou GO COM RESSALVAS) com `sendPrompt("Gate de IA: GO. Iniciando escolha de abordagem técnica com pm-ai-approach.")` — próximo passo natural

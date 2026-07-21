@@ -240,5 +240,6 @@ Documento completo de discovery com todas as seções capturadas:
 
 **Ações**:
 - Botão "Copiar como markdown"
+- Botão "Mapear o mercado primeiro" com `sendPrompt("Discovery concluído. Antes de definir estratégia, quero mapear o mercado e a concorrência com pm-market.")` — recomendado para produto novo com incerteza de posicionamento ou tamanho de mercado
 - Botão "Definir estratégia da iniciativa" com `sendPrompt("Discovery concluído. Iniciando definição de estratégia e abordagem com pm-strategy.")` — próximo passo natural no fluxo
 - Botão "Entregar ao PX" com `sendPrompt("Contexto de discovery concluído. Pronto para handoff ao PX.")` — use se o PRD já existe e o foco é o design

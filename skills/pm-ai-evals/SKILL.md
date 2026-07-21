@@ -349,6 +349,8 @@ Gerada automaticamente: lista todos os itens registrados como PENDENTE durante a
 Se vazia: badge verde "Nenhuma pendência — evals completas."
 Se não vazia: badge vermelho "X pendências — resolver antes do início do desenvolvimento."
 
+**Knowledge Registry**: tabela com todas as entradas classificadas (Entrada · Valor · Classificação). Cores: Fato=verde · Hipótese=âmbar · Premissa=roxo · Risco=coral · Decisão=azul · Ação=índigo
+
 **Rodapé:**
 Botões: "Copiar como markdown" | "Avançar para pm-prd" com `sendPrompt`.
 

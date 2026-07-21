@@ -269,6 +269,8 @@ Lista com 3 itens fixos:
 2. Validar requisitos de dados com o time de engenharia
 3. Prototipar e testar a abordagem com casos reais antes do build completo
 
+**Knowledge Registry**: tabela com todas as entradas classificadas (Entrada · Valor · Classificação). Cores: Fato=verde · Hipótese=âmbar · Premissa=roxo · Risco=coral · Decisão=azul · Ação=índigo
+
 **Rodapé:**
 Dois botões: "Copiar como markdown" | "Avançar para pm-ai-evals" com `sendPrompt`.
 

@@ -238,7 +238,7 @@ Relatório de retrospectiva pós-lançamento completo. Contém:
 
 **Ações**:
 - Botão "Copiar como markdown" — copia o relatório estruturado para colar no Notion/Confluence
-- Botão "Iniciar novo ciclo" — usa `sendPrompt("Retrospectiva concluída. Iniciando novo ciclo de discovery com evidências atualizadas.")`
-- Botão "Avaliar encerramento do produto" — aparece **somente** se o diagnóstico for "Encerrar" — usa `sendPrompt("Sinais de encerramento identificados. Iniciando análise de sunset.")`
+- Botão "Iniciar novo ciclo" — usa `sendPrompt("Retrospectiva concluída. Knowledge Registry atualizado com evidências reais. Reiniciando com pm-context para o próximo ciclo.")` — retorna ao roteador principal com o contexto enriquecido
+- Botão "Avaliar encerramento do produto" — aparece **somente** se o diagnóstico for "Encerrar" — usa `sendPrompt("Sinais de encerramento identificados. Iniciando análise de sunset com pm-sunset.")`
 
 **UX:** Dark theme consistente. Máximo 680px de largura. Tipografia clara, seções com separadores suaves. Diagnóstico final destacado no topo com a cor correspondente (verde=Continuar · âmbar=Pivotar · coral=Encerrar).

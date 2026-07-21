@@ -232,5 +232,8 @@ Documento de OKR consolidado com hipótese central e critérios de sucesso/fraca
 
 **Ações:**
 - Botão "Copiar como markdown" — copia o documento para colar em Notion/Confluence.
+- Botão "Gate de viabilidade" — usa `sendPrompt("Objetivos definidos. Antes de escrever o PRD, quero passar pelo gate de viabilidade com pm-viability.")` — recomendado sempre; obrigatório se houver premissas abertas.
+- Botão "Priorizar roadmap" — usa `sendPrompt("Objetivos definidos. Quero priorizar o escopo antes de escrever o PRD com pm-roadmap.")` — use quando há múltiplos itens de backlog concorrentes.
+- Botão "A iniciativa usa IA?" — usa `sendPrompt("Objetivos definidos. A solução pode ter componente de IA — quero avaliar com pm-ai-gate antes de avançar.")` — aparece quando o contexto da sessão menciona IA, ML ou automação inteligente.
 - Botão "Próximo: prototipar a solução" — usa `sendPrompt("Objetivos definidos. Próximo: visualizar a solução antes de escrever o PRD.")` para sugerir pm-proto.
-- Botão "Próximo: escrever o PRD" — usa `sendPrompt("Objetivos definidos. Prontos para escrever o PRD.")` para invocar pm-prd.
+- Botão "Próximo: escrever o PRD" — usa `sendPrompt("Objetivos definidos. Prontos para escrever o PRD.")` para invocar pm-prd — use somente quando pm-viability e pm-roadmap já foram executados ou conscientemente pulados.

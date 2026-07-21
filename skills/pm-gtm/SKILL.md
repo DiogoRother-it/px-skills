@@ -344,7 +344,7 @@ Pergunte: "Quem precisa ser comunicado antes do lançamento público? (time inte
 
 Antes de gerar os artefatos finais, conduza o ritual de qualificação.
 
-**P5.1 — Ritual de qualificação** `[ARTIFACT]`
+**P8.1 — Ritual de qualificação** `[ARTIFACT]`
 
 Gere um artifact HTML com o red team consolidado. Veja o template no bloco `## ARTIFACT: red-team`.
 
@@ -359,7 +359,7 @@ Regras de qualificação:
 - Número deve ter origem — sem origem, é uma estimativa, não um dado
 - Citação de cliente deve ser real — caso com nome ou dados agregados verificáveis
 
-**Eco da fase 5:** Resuma as premissas que precisam ser validadas antes do lançamento. Confirme.
+**Eco da fase 8:** Resuma as premissas que precisam ser validadas antes do lançamento. Confirme.
 
 ---
 
