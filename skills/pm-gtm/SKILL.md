@@ -363,6 +363,72 @@ Regras de qualificação:
 
 ---
 
+## Fase 9 — Geração de Documentos GTM (.docx)
+
+Após a confirmação do red team final, ofereça ao PM a geração dos documentos Word do Kit GTM.
+
+**Pergunta:**
+> "Quer que eu gere os documentos GTM preenchidos em formato .docx agora? Cada artefato (A0–A5) sai como um arquivo Word separado com o conteúdo da nossa sessão."
+
+Se sim: use a **docx skill** para gerar cada arquivo a partir dos dados do Knowledge Registry da sessão, seguindo o mapeamento abaixo.
+
+### Mapeamento Knowledge Registry → documentos
+
+**A0 — ICP e Mensagem Central** (`A0_ICP_Mensagem_Central_PRODUTO.docx`)
+- Setor / Vertical → campo "Setor / Vertical"
+- Porte → campo "Porte da empresa"
+- Comprador econômico / Usuário final → campos correspondentes
+- Gatilho de compra → campo "Gatilho de compra"
+- Dor primária → campo "Dor primária"
+- Alternativas atuais → campo "Alternativas atuais"
+- Razão de escolha + badge FATO/PREMISSA → campo "Razão de escolha"
+- Anti-cliente (perfil, por que não serve, sinal de alerta) → seção 3
+- Todas as PREMISSAS do A0 → tabela de premissas
+
+**A1 — Posicionamento e Pitch** (`A1_Posicionamento_Pitch_PRODUTO.docx`)
+- Categoria → seção 1
+- Frase de posicionamento completa → seção 2
+- O que é / O que não é → tabela seção 3
+- 3 pilares de venda com prova e badge FATO/PREMISSA → tabela seção 4
+- PREMISSAS do A1 → tabela seção 5
+
+**A2 — Matriz de Oferta, Precificação e Objeções** (`A2_Matriz_Oferta_PRODUTO.docx`)
+- Tiers (nome, para quem, inclui, limite, preço, lógica de valor) → tabela seção 1
+- Desconto autorizado e condições → seção 2
+- 5 objeções com resposta, prova e responsável → tabela seção 3
+- PREMISSAS do A2 → tabela seção 4
+
+**A3 — Canal e Distribuição** (`A3_Canal_Distribuicao_PRODUTO.docx`)
+- Canal primário + justificativa → seção 1
+- 3 critérios de qualificação de lead → tabela seção 2
+- Mecanismo de descoberta / CTA / material → seção 3
+- Plano B → seção 4
+
+**A4 — Capacitação Comercial** (`A4_Capacitacao_Comercial_PRODUTO.docx`)
+- 5 bullets essenciais → seção 1
+- 3 perguntas do roteiro de descoberta com critério de avanço/descarte → tabela seção 2
+- Critério de deal qualificado / perdido → tabela seção 3
+- Materiais disponíveis com status e responsável → tabela seção 4
+
+**A5 — Plano de Lançamento** (`A5_Plano_Lancamento_PRODUTO.docx`)
+- Usar o template em branco `A5_Plano_de_Negocio_TEMPLATE_EM_BRANCO.docx` como base
+- Preencher: nome do produto, CAPEX, payback estimado, breakeven, retorno esperado, objetivos estratégicos
+
+### Templates em branco (fallback)
+
+Se o PM estiver no claude.ai web (sem acesso à docx skill), exibir no output final os links de download dos templates em branco diretamente do repositório:
+
+```
+https://raw.githubusercontent.com/DiogoRother-it/pm-skills/main/skills/pm-gtm/templates/A0_ICP_Mensagem_Central_TEMPLATE.docx
+https://raw.githubusercontent.com/DiogoRother-it/pm-skills/main/skills/pm-gtm/templates/A1_Posicionamento_Pitch_TEMPLATE.docx
+https://raw.githubusercontent.com/DiogoRother-it/pm-skills/main/skills/pm-gtm/templates/A2_Matriz_Oferta_Precificacao_TEMPLATE.docx
+https://raw.githubusercontent.com/DiogoRother-it/pm-skills/main/skills/pm-gtm/templates/A3_Canal_Distribuicao_TEMPLATE.docx
+https://raw.githubusercontent.com/DiogoRother-it/pm-skills/main/skills/pm-gtm/templates/A4_Capacitacao_Comercial_TEMPLATE.docx
+https://raw.githubusercontent.com/DiogoRother-it/pm-skills/main/skills/pm-gtm/templates/A5_Plano_de_Negocio_TEMPLATE_EM_BRANCO.docx
+```
+
+---
+
 ## Output Final `[ARTIFACT]`
 
 Ao concluir todas as fases, gere o artifact de output com os 5 artefatos GTM do Grupo 1. Veja o template no bloco `## ARTIFACT: output-final`.
@@ -695,5 +761,7 @@ Documento completo do Kit GTM — Grupo 1 (A0–A5) prontos para uso.
 **Ações:**
 - Botão "Copiar A0" / "Copiar A1" / "Copiar A2" / "Copiar A3" / "Copiar A4" / "Copiar A5"
 - Botão "Copiar Kit completo como markdown"
+- Botão "Gerar documentos GTM (.docx)" com `sendPrompt("Kit GTM aprovado. Gerar documentos Word A0–A5 preenchidos com o conteúdo da sessão.")` — aciona a Fase 9 acima
+- Botão "Baixar templates em branco" — exibe os 6 links de download do repositório (fallback para quem não está no Claude Code)
 - Botão "Iniciar retrospectiva pós-lançamento" com `sendPrompt("Kit GTM Grupo 1 concluído. Iniciando retrospectiva de produto após o lançamento.")` — aparece após lançamento
 - Nota: "Grupo 2 (A6–A9 — Tração) disponível após os primeiros resultados de lançamento."
