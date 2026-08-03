@@ -118,7 +118,7 @@ Segue `Skill Prompting Conventions` do `CLAUDE.md`. Estruturada pra decisões en
 **Decidir:** para cada tela prioritária, como os componentes atuais se mapeiam ao design system e o que fazer com cada um.
 **Por que importa:** é onde "adotar o DS" vira ação concreta — a versão de produto inteiro do "antes × depois de anatomia". Sem isso, o dev não sabe o que trocar.
 **Fazer, tela a tela (registrar na tabela do template):**
-- Liste os **componentes atuais** de cada tela. Para cada um:
+- Liste os **componentes atuais** de cada tela. **Componentes compostos** (toolbar, card com ações, form multi-campo, drawer com seções, nav) exigem inspeção de cada sub-elemento individualmente — não só do container. Para cada um (e para cada filho de compostos):
   - **Variação canônica do DS** correspondente (via árvore "Qual usar?" do `ds-components_v4.md`). *ex: tabela caseira → Data Table.*
   - **Divergência de anatomia** observada: fora do grid de 8px, cor em hex, radius solto, estrutura própria, estado faltando. *ex: botão com radius 6px e hex hardcoded.* Marque também as duas divergências de comportamento mais comuns: **tabela com rolagem horizontal** (deveria reduzir colunas) e **overlay empilhado** (modal sobre modal, popover abrindo modal/drawer — deveria ser switch; só Drawer→Modal é aceito). Ver `ds-components_v4.md`.
   - **Ação:** `AskUserQuestion` — *Reestilizar pro DS (Recomendado se o comportamento serve) · Trocar pela variação do DS · Compor com primitivas · Outro ⚠️ REQUER VALIDAÇÃO UX/PX*.
