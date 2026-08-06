@@ -68,6 +68,29 @@ Para cada dimensão, pergunte/proponha o critério desta tela:
 - **Autenticidade de dados** — "mostra dado real do usuário, nunca mock/lorem em produção?" *ex: após editar, a linha reflete o valor salvo.*
 Marque N/A com motivo qualquer dimensão que não se aplique — nunca some em silêncio.
 
+## S4b — Fluxo principal (passo a passo) — a espinha legível
+**Decidir:** a jornada em passos numerados que o humano (líder/PO/stakeholder) lê num relance pra confirmar o fluxo **antes** de mergulhar no BDD.
+**Por que importa:** o BDD é preciso mas verboso e orientado a teste. O passo a passo é o mapa de revisão rápida — pega fluxo errado cedo. É **complementar** ao BDD, nunca substituto.
+**Regras (evitar duplicar o BDD):**
+- **Um fluxo por público/caminho** — se a tela serve mais de um público (ex: Profissional × Recepção), monte um bloco numerado por público, com os passos extras de cada um.
+- **Derivado, não inventado:** os passos saem das **ações (B5)** + **navegação (B3)** do request. Não crie comportamento novo aqui.
+- **Caminho feliz numerado + principais desvios como sub-passos de uma linha** apontando pro cenário BDD (ex: `3a. Se a busca não achar → "Nenhum profissional encontrado" (ver BDD: busca vazia)`). O detalhe do desvio mora no BDD; aqui é só o mapa.
+- Último passo termina em **resultado observável** (o mesmo do `Então` do caminho feliz).
+**Formato:**
+```
+## Fluxo principal (passo a passo)
+
+### Fluxo — <Público A>
+1. <Ação> 
+2. <Ação>
+3. <Ação> → <resultado observável>
+   3a. <desvio em uma linha> (ver BDD: <cenário>)
+
+### Fluxo — <Público B>   (se houver)
+1. ...
+```
+**Fazer:** montar os passos a partir do request, mostrar ao líder e confirmar em eco antes de seguir pro BDD. Este bloco vem **antes** da seção BDD na história.
+
 ## S5 — BDD (cenários Gherkin, pt-BR)
 **Decidir:** os cenários executáveis que amarram aceite + usabilidade em comportamento observável.
 **Por que importa:** vira o roteiro do dev e do teste; é a prova viva de que a história foi cumprida.
@@ -91,6 +114,7 @@ Escreva os cenários, mostre, e confirme a cobertura acima antes de fechar.
 - [ ] Narrativa ancorada num público real (S1)
 - [ ] Critérios de aceite verificáveis, um por comportamento e por estado (S3)
 - [ ] Critérios de usabilidade por dimensão (S4), N/A justificado onde não se aplica
+- [ ] Fluxo principal em passos numerados, um por público (S4b)
 - [ ] BDD com cobertura: feliz + vazio + erro + permissão + regra de negócio (S5)
 - [ ] Rastreabilidade completa (S6)
 - [ ] Premissas registradas

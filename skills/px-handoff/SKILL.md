@@ -48,6 +48,7 @@ Segue `Skill Prompting Conventions` do `CLAUDE.md`. Estruturada pra decisões en
 **Fazer:**
 - Varrer as histórias com status *ready* que ainda não foram entregues (não aparecem em nenhuma `handoff-ux/semana-*/`). Apresentar a lista ao PX e confirmar quais entram nesta leva.
 - Marque o que **fica pra depois** (e por quê) — vira a próxima leva.
+- **Recorte dev-facing vs. interno:** aplicar o `templates/handoff-manifest.md`. Além de HTML + UI Kit + stories, entram também as **decisões de produto canônicas** (`decisoes/*.md`) e o **mapa de permissões/triggers** (`rbac-*.md`) quando existirem. Ficam de fora checkpoints (`PX-PROGRESS`), prompts de continuidade/contexto de chat, discovery/auditoria, épicos/requests e scratchpad. Se a iniciativa tiver muitos `.md` internos, gravar/atualizar `planning/<iniciativa>/HANDOFF-MANIFEST.md` a partir do template e confirmar o recorte com o PX.
 
 ## BLOCO 2 — Semana da entrega (o carimbo do "quando")
 **Decidir:** a qual semana ISO esta entrega se refere.
@@ -136,11 +137,15 @@ Rodar esta checklist completa antes de apresentar o eco ao líder. **Qualquer it
 **Perguntas em aberto**
 - [ ] Toda pendência tem dono confirmado — nenhuma solta sem nome
 
-**O que nunca deve sair**
+**O que nunca deve sair** (ver `templates/handoff-manifest.md`)
 - [ ] Nenhum arquivo de código-fonte (`.tsx`, `.ts`, `.jsx`, `.js` de componente)
 - [ ] Nenhum arquivo de config (`vite.config`, `tsconfig`, `package.json`, `.env`)
-- [ ] Nenhum artefato interno (stories técnicas, planejamento interno)
+- [ ] Nenhum artefato interno: checkpoint (`PX-PROGRESS`), prompt de continuidade/contexto de chat, discovery/auditoria, épicos, scratchpad, memória
 - [ ] Nenhuma referência a `planning/` no documento
+
+**O que deve entrar** (além do HTML unificado + UI Kit + stories)
+- [ ] Decisões de produto canônicas (`decisoes/*.md`) — regras que o dev implementa
+- [ ] Mapa de permissões/triggers (`rbac-*.md`) — quando o produto tem RBAC
 
 ## Eco final
 
