@@ -1,58 +1,48 @@
-# Handoff → dev: semana-<NN>
+# Handoff → dev: <label>
 
-**Semana:** `semana-<NN> · <AAAA-Www>` · **Data:** `<AAAA-MM-DD>`
+**Rótulo:** `<label>` (`semana-<NN> · <AAAA-Www>` ou `v<N>`) · **Data:** `<AAAA-MM-DD>` · **Repositório:** `<caminho/URL do repo do dev | sem repo oficial ainda — organizado localmente, push pendente>`
 
 ## 1. Escopo desta entrega
 
-| Fluxo | História | Tela | Entra nesta leva? |
+| Fluxo | História | Rota / referência | Entra? |
 |---|---|---|---|
-| `<fluxo-a>` | `<ID>` | `<slug>` | Sim |
-| `<fluxo-b>` | `<ID>` | `<slug>` | Sim |
+| `<fluxo-a>` | `<título>` | `<rota do proto>` | Sim |
+| `<fluxo-b>` | `<título>` | `<rota do proto>` | Sim |
 
 **Fica pra próxima leva (e por quê):**
 -
 
-## 2. Protótipo visual e UI Kit
+## 2. Referência visual e UI Kit
 
 | Arquivo | O que cobre |
 |---|---|
-| `<Produto>-Prototipo.html` | Todos os fluxos desta leva |
-| `ui-kit.md` | Tokens de cor, tipografia e identidade deste produto |
+| `prototipo/` | Referência visual navegável — HTML unificado single-file **ou** build do protótipo (ver `README.md`) |
+| `ui-kit.md` | Tokens de cor, tipografia, status e identidade do produto |
 
-> O HTML é a **referência visual e de comportamento**. O UI Kit define quais tokens aplicar.
+> Se o `prototipo/` é o build (não single-file), o **HTML unificado com `data-story`** fica como pendência (via `px-preview`). Registrar aqui.
 
-## 3. Histórias de negócio
+## 3. Histórias, regras de negócio e specs (por fluxo)
 
-<!-- Uma seção por fluxo. Dentro de cada fluxo, uma subseção por história. -->
+<!-- O pacote é self-contained: cada fluxo leva sua história, suas RNs e as specs que a história referencia. -->
 
-### Fluxo: `<fluxo-a>`
+| Fluxo | História | Regras de negócio | Specs referenciadas |
+|---|---|---|---|
+| `<fluxo-a>` | `stories/<historia>.md` | `regras-negocio.md` | `<spec>.md` (se houver) |
+| `<fluxo-b>` | `stories/<historia>.md` | `regras-negocio.md` | — |
 
-#### `<ID>` — <título da história>
-
-**Como** `<persona>`, **quero** `<ação>` **para** `<objetivo>`.
-
-**Critérios de aceite (BDD):**
-```
-Dado <contexto>
-Quando <ação>
-Então <resultado esperado>
-```
-
-**Regras de negócio:**
-- `<regra>`
-
-**Rastreabilidade na tela:** `<descrição do elemento>` · anchor: `data-story="<ID>"`
-
----
-<!-- repetir bloco de história para cada história do fluxo -->
-<!-- repetir bloco de fluxo para cada fluxo desta leva -->
+O BDD completo (feliz + vazio + erro + permissão) e os critérios de usabilidade estão nos arquivos `stories/`; as regras de negócio (RN) em `regras-negocio.md` de cada fluxo.
 
 ## 4. Fronteiras de integração (mock → real)
 - ⚑ **Boundary:** `<dependência>` — `<o que precisa ser substituído>`
 - (ou) Nenhuma — opera sobre dados já mockados/carregados.
 
+## 5. Definition of Done (resumo)
+- Biblioteca de componentes: `<@centralit obrigatória | dev adapta à stack>`.
+- Referência visual: `<HTML single-file com data-story | build em prototipo/ (single-file pendente)>`.
+- Pacote self-contained: 0 referência a caminho externo; RNs e specs referenciadas incluídas.
+
 ## Perguntas em aberto
-- `<pendência>` — dono: `<nome>` · aguardando: `<o que falta para resolver>`
+- `<pendência>` — dono: `<nome>` · aguardando: `<o que falta>`
 - (ou) Nenhuma.
 
-<!-- Salvar em: handoff-ux/semana-<NN>/handoff.md -->
+<!-- Salvar em: handoff-ux/<label>/handoff.md -->

@@ -23,11 +23,14 @@ ruído interno pro dev e infla a entrega. Este manifesto fixa o recorte, de form
 ### ✅ Dev-facing (entra no pacote)
 | Categoria | Exemplo de artefato | Papel |
 |---|---|---|
-| Protótipo HTML unificado | `<Produto>-Prototipo.html` (âncoras `#view-*`) | Referência de fidelidade (visual + comportamento) |
-| UI Kit / tokens | `ui-kit.md`, tokens do projeto | Valores reais de identidade |
+| Referência visual navegável | `prototipo/` — HTML unificado single-file (`#view-*`/`data-story`) **ou** build do protótipo | Referência de fidelidade (visual + comportamento) |
+| UI Kit / tokens | `ui-kit.md`, tokens reais do projeto | Valores reais de identidade |
 | Histórias de negócio | `stories/*.md` (CA + BDD + rastreabilidade) | **O contrato** do que fazer |
+| Regras de negócio por fluxo | `regras-negocio.md` (extraído do request, sanitizado) | A fonte das regras que os CA verificam |
+| Specs referenciadas por uma história | `<spec>.md` no fluxo (ex.: spec de aba/componente) | Detalhe que a história cita e o dev precisa |
 | Decisões de produto canônicas | `decisoes/*.md` (regras de fluxo, dados, dicionários de status/toasts) | Regras que o dev implementa |
 | Mapa de permissões / triggers | `rbac-*.md` (quando o produto tem RBAC) | Checks a plugar |
+| README do pacote | `README.md` | Como ver a referência visual e como está organizado |
 | Fronteiras de integração | consolidadas no `handoff.md` | Onde acaba o mock, começa o real |
 
 ### 🔒 Interno (nunca entra)
@@ -36,13 +39,14 @@ ruído interno pro dev e infla a entrega. Este manifesto fixa o recorte, de form
 | Checkpoint da cadeia PX | `PX-PROGRESS.md` | Estado de sessão, não contrato |
 | Prompt de continuidade / contexto de chat | `PROMPT-CONTINUIDADE-*.md`, `contexto-*.md` | Instrução para o próximo chat |
 | Discovery / auditoria | `audit/*.md`, `backlog-*.md` | Como chegamos aqui, não o quê construir |
-| Planejamento superado | `epics/*.md`, `requests/*.md` | Consolidado pelas stories (request = referência opcional de profundidade) |
+| Planejamento superado (como arquivo) | `epics/*.md`, `requests/*.md` | O arquivo fica de fora, mas seu **conteúdo essencial é extraído**: RNs → `regras-negocio.md`, specs referenciadas → `<spec>.md` no fluxo (sanitizados) |
 | Memória do assistente + scratchpad | `~/.claude/...`, arquivos temporários | Nunca sai |
 | Código-fonte e config | `.tsx/.ts/.js` de componente, `vite.config`, `package.json`, `.env` | O dev implementa na própria stack |
 
-> Alinhado ao GATE "O que nunca deve sair" do `SKILL.md`. Este manifesto **expande** o contrato:
-> além de HTML + UI Kit + stories, decisões canônicas e mapa de permissões também são dev-facing
-> quando existirem.
+> Alinhado ao GATE do `SKILL.md`. O pacote é **self-contained**: além de referência visual + UI Kit +
+> stories, entram as **regras de negócio por fluxo** e as **specs referenciadas** (extraídas do interno e
+> sanitizadas), o README, e — quando existirem — decisões canônicas e mapa de permissões. Nada no pacote
+> aponta para caminho fora dele.
 
 ---
 
