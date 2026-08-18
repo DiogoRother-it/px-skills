@@ -46,6 +46,9 @@ Segue `Skill Prompting Conventions` do `CLAUDE.md`. Estruturada pra decisões en
 > 2. "Já existe o repositório oficial do dev para receber a entrega?"
 >    **Sim** → peça o caminho local/URL; o push roda no BLOCO 6.
 >    **Não / ainda não** → organize o pacote **localmente** em `handoff-ux/<label>/` na raiz do projeto atual e **pule o push** (fica pendente para quando o repo existir). Registre isso no `handoff.md`.
+> 3. "Além do repo do dev, este projeto também mantém um repositório CENTRAL do PX (um monorepo/núcleo onde vivem produto, planning e docs de várias iniciativas)?"
+>    **Sim** → ao final deste handoff, ofereça rodar `px-sync` pra espelhar o estado completo de trabalho nesse repo central. **É um destino independente do handoff**: o pacote reduzido (aqui) vai pro dev; o espelho completo (`px-sync`) vai pro núcleo — um não substitui o outro, e não bloqueia o push do BLOCO 6.
+>    **Não** → seguir só com o destino dev; não oferecer `px-sync` no fechamento.
 
 ---
 
@@ -120,6 +123,7 @@ Segue `Skill Prompting Conventions` do `CLAUDE.md`. Estruturada pra decisões en
      git push origin ux/<label>
      ```
      Confirmar o push com o hash do commit.
+   - **Se a pergunta 3 confirmou repo central** → depois de despachar (ou mesmo sem repo do dev ainda), oferecer rodar `px-sync` pra espelhar o estado completo de trabalho no núcleo. Não é o mesmo push: `px-sync` sobe produto + `planning/` + `docs/` inteiros no `main` do repo central, fast-forward e gated — nunca dispare sem passar pelo próprio gate do `px-sync`.
 
 **Estrutura da pasta de entrega:**
 ```
@@ -174,7 +178,7 @@ handoff-ux/
 
 ## Eco final
 
-Antes de fechar, repita em 3–4 linhas: *"Handoff **<label>**: **N** histórias em **M** fluxos, cada fluxo com regras de negócio e specs referenciadas incluídas, referência visual = **<HTML single-file | build em prototipo/>**, UI Kit incluído, **X** fronteiras de integração. Pacote self-contained (0 referência morta). Perguntas em aberto: `<N ou nenhuma>`. **<Push via branch órfã `ux/<label>` no repo do dev | Sem repo ainda: organizado localmente, push pendente>** — confirma?"*. Só então feche.
+Antes de fechar, repita em 3–4 linhas: *"Handoff **<label>**: **N** histórias em **M** fluxos, cada fluxo com regras de negócio e specs referenciadas incluídas, referência visual = **<HTML single-file | build em prototipo/>**, UI Kit incluído, **X** fronteiras de integração. Pacote self-contained (0 referência morta). Perguntas em aberto: `<N ou nenhuma>`. **<Push via branch órfã `ux/<label>` no repo do dev | Sem repo ainda: organizado localmente, push pendente>**. **<Repo central: rodar px-sync em seguida | Sem repo central>** — confirma?"*. Só então feche.
 
 ## Onde salvar
 
@@ -195,9 +199,11 @@ Antes de fechar, repita em 3–4 linhas: *"Handoff **<label>**: **N** histórias
 ## Relação com o fluxo
 
 ```
-px-request  →  px-story  →  px-handoff  →  dev (referência visual)
+                            ┌─→ dev (referência visual)         [pacote reduzido, branch órfã]
+px-request → px-story → px-handoff ─┤
+                            └─→ px-sync → repo CENTRAL do PX     [espelho completo, main fast-forward]
                             ^ você está aqui
                             (fecha a cadeia: referência visual + UI Kit + histórias + RNs + specs, por fluxo, self-contained)
 ```
 
-> `px-handoff` fecha o ciclo: consolida um pacote **self-contained** de referência visual e o entrega (push quando há repo; organização local quando ainda não há). O dev implementa na stack do projeto — o PX é referência, não código de produção.
+> `px-handoff` fecha o ciclo: consolida um pacote **self-contained** de referência visual e o entrega (push quando há repo; organização local quando ainda não há). O dev implementa na stack do projeto — o PX é referência, não código de produção. Quando o projeto também mantém um repo central do PX, `px-handoff` pergunta isso logo no início (pergunta 3) e delega pro `px-sync` — são destinos e conteúdos diferentes, nenhum substitui o outro.

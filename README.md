@@ -6,7 +6,8 @@ traz só a stack de componentes; as skills não vêm com ela).
 
 ## O que instala
 
-- **11 skills** em `.claude/skills/`: `px-setup`, `px-start`, `px-audit`, `px-intake`, `px-kickoff`, `px-epic`, `px-proto`, `px-request`, `px-story`, `px-handoff`, `px-preview`
+- **12 skills de entrevista** (`px-*`) em `.claude/skills/`: `px-setup`, `px-start`, `px-audit`, `px-intake`, `px-kickoff`, `px-epic`, `px-proto`, `px-request`, `px-story`, `px-handoff`, `px-preview`, `px-sync`
+- **2 skills de execução** (`ux-*`): `ux-flows` (registra uma jornada real como flow executável) e `ux-persona` (percorre o flow simulando uma persona — sente e depois diagnostica pela rubrica de usabilidade). Diferente das `px-*`, não são entrevista: rodam sobre o produto ao vivo (repo local ou URL), dentro do `px-audit` ou depois do handoff, junto do Playwright do dev.
 - **Docs de design system** em `docs/design-system/` (foundations, components, patterns, engineering)
 - **Protocolo** em `docs/px-protocol.md` (Protocolo de Interação UX + Skill Prompting Conventions)
 - Um ponteiro pro protocolo no `CLAUDE.md` do repo (cria se não existir)
@@ -27,7 +28,8 @@ npx @centralit/px-skills
 ```
 
 Depois, abra o Claude Code nesse repo — as skills aparecem no menu `/`:
-`/px-setup · /px-start · /px-audit · /px-intake · /px-kickoff · /px-epic · /px-proto · /px-request · /px-story · /px-handoff · /px-preview`
+`/px-setup · /px-start · /px-audit · /px-intake · /px-kickoff · /px-epic · /px-proto · /px-request · /px-story · /px-handoff · /px-preview · /px-sync`
+`/ux-flows · /ux-persona`
 
 ## Pré-requisito
 

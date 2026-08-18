@@ -65,13 +65,15 @@ A IA nunca desenha a partir de um prompt vago. Interroga o propósito e ancora n
 
 ## Cadeia de skills PX
 
-`px-start` (projeto novo) **ou** `px-audit` (redesign de produto existente) → `px-intake` (problema vago) → `px-kickoff` (personas + UI KIT) → `px-epic` (se iniciativa) → `px-request` (por tela) → **`px-proto`** (protótipo visual fiel → PX valida e aprova) → `px-story` (história + BDD) → [`px-preview` — opcional, revisão da equipe interna] → `px-handoff` (fecha: DoD + sprint + flows) → `px-setup` Passo 4 (branch `ux/<funcionalidade>` + Merge Request) → dev valida com `ux-flows`/`ux-persona` + Playwright.
+`px-start` (projeto novo) **ou** `px-audit` (redesign de produto existente) → `px-intake` (problema vago) → `px-kickoff` (personas + UI KIT) → `px-epic` (se iniciativa) → `px-request` (por tela) → **`px-proto`** (protótipo visual fiel → PX valida e aprova) → `px-story` (história + BDD) → [`px-preview` — opcional, revisão da equipe interna] → `px-handoff` (fecha: DoD + sprint + flows), que despacha pra até dois destinos independentes: `px-setup` Passo 4 (branch `ux/<funcionalidade>` + Merge Request) → dev valida com `ux-flows`/`ux-persona` + Playwright; **e/ou** `px-sync` → repo central do PX (espelho completo, pra outro PX continuar idealizando).
 
 **`px-proto` (obrigatório após cada `px-request`).** Gera um HTML standalone com os tokens reais do UI KIT e as variações exatas do catálogo de componentes. O PX revisa visualmente, itera ajustes na sessão e só aprova quando está correto. Nenhuma tela vira `px-story` sem passar pelo proto aprovado. Stack: React via CDN + Babel + Tailwind CDN. Não toca no boilerplate.
 
 **`px-preview` (opcional, para revisão interna).** Empacota o app React do produto (boilerplate já construído) num HTML standalone para a equipe interna revisar o conjunto de telas antes de fechar o handoff para os devs. Posiciona-se depois do `px-story` e antes do `px-handoff`. Diferente do `px-proto`: requer o app funcionando; diferente do `px-handoff`: é revisão, não entrega.
 
-O terreno técnico (repo/branch/scaffold) e a mecânica de git são sempre da `px-setup`; nenhuma outra skill roda git.
+**`px-sync` (opcional, quando há repo central do PX).** Sobe o espelho completo de trabalho (produto + `planning/` + `docs/`) pro repo central, sempre `main` fast-forward e gated por aceite explícito. Independente do `px-handoff`: um entrega pro dev (pacote reduzido), o outro sincroniza o time de PX (espelho completo).
+
+O terreno técnico (repo/branch/scaffold) do produto é sempre da `px-setup`. `px-handoff` e `px-sync` também rodam git, mas só no próprio destino gated e sempre com aceite explícito antes do push (branch órfã pro dev; `main` fast-forward pro repo central) — nunca no terreno técnico que a `px-setup` já preparou.
 
 ## Checkpoint de progresso (PX-PROGRESS) — obrigatório
 
