@@ -26,6 +26,7 @@ Antes de tudo, confirme o cenário — porque o começo muda tudo:
 - **Projeto novo do zero** (sem repo/identidade ainda) → segue nesta skill.
 - **Produto que já existe e vou reformar** (redesign, aplicar o DS, auditar as telas atuais) → não é aqui: vá pro `px-audit`, a porta brownfield. Ele levanta o AS-IS, diagnostica a usabilidade e monta o backlog de redesign antes de qualquer tela nova.
 - **Projeto já existe, quero uma tela nova** (identidade já definida) → não é aqui: vá pro `px-request` (ou `px-epic` se for várias telas).
+- **Projeto já existe, quero ajustar algo em uma tela existente** (adicionar campo, trocar ícone, mudar label, ajustar paginação) → não é aqui: vá pro `px-change`, a faixa leve para alterações localizadas.
 - **Tenho só uma ideia/problema vago, nem sei o tamanho** → o próprio `px-start` te leva pro `px-intake` no Passo 3.
 
 Se não é projeto novo, encaminhe e encerre — não force o fluxo de setup. Em especial: **produto existente que precisa de redesign nunca deve cair no fluxo greenfield** — mande pro `px-audit`.
@@ -87,6 +88,7 @@ Antes de encerrar, repita em 3–4 linhas: *"Então: projeto **X**, alvo **Y**, 
 - **Não produz spec nem código.** O `px-start` prepara e despacha; quem gera artefato é a skill de destino.
 - **Nunca pula a identidade.** Um projeto novo não vai pra `px-request` sem ter passado por `px-kickoff` (público-alvo + UI KIT). Se a pessoa quiser pular, avise o risco e registre.
 - **Não é o onboarding do não-UX** (ainda). Se aparecer alguém sem repertório de UX, oriente que a trilha guiada pra não-UX é trabalho futuro; por ora, conduza você.
+- **Roteamento em projeto PX ativo:** qualquer mudança de UI dentro de um projeto com UI Kit definido entra pela cadeia PX — `px-request` para tela ou fluxo novo, `px-change` para ajuste localizado em tela que já existe. **Nunca** usar o pre-coding-pass global dentro de um projeto PX ativo: ele é agnóstico ao design system e não garante ancoragem nos tokens nem lint de copy. O pre-coding-pass global vale apenas para projetos fora do design system.
 
 ## Relação com o fluxo
 

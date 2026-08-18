@@ -61,7 +61,8 @@ Gere um arquivo HTML único, autocontido, sem dependências externas:
 - Layout via flexbox ou grid — nunca float, nunca position para layout.
 - Ícones como placeholder textual `[ícone]` — sem SVG externo, sem biblioteca.
 - Sem JavaScript, a menos que seja indispensável para mostrar um estado de transição simples.
-- Sem `text-transform: uppercase`, sem travessão (`—`/`–`), sem caixa alta completa em texto de interface.
+- **TRAVESSÃO:** proibido `—` (em dash) e `–` (en dash) em qualquer texto de interface visível. Usar ponto, vírgula, ponto-e-vírgula ou reescrever.
+- **CAIXA ALTA:** proibida caixa alta total em labels/títulos. Usar title case (ex: "Explorar Serviços", não "EXPLORAR SERVIÇOS"). Sem `text-transform: uppercase`.
 
 ## Passo 3 — Decidir o destino
 
@@ -76,7 +77,9 @@ Registre a decisão no eco final e, se houver um `PX-PROGRESS.md` para esta inic
 
 ## Eco final
 
-*"Rascunho de [X] pronto — [N] estados explorados. Decisão: [descartar / usar como referência]. Próximo passo: [`px-start` / `px-request`] — confirma?"*
+**Verificação antes de fechar:** releia todo texto do rascunho. Algum label, título ou mensagem tem `—`, `–` ou CAIXA ALTA TOTAL? Se sim, corrija antes de fechar.
+
+*"Rascunho de [X] pronto — [N] estados explorados. Copy revisada (sem travessão, sem caixa alta). Decisão: [descartar / usar como referência]. Próximo passo: [`px-start` / `px-request`] — confirma?"*
 
 ## Relação com o fluxo
 

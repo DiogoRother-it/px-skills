@@ -203,6 +203,7 @@ function EstadoError() {
 - **Switcher de estado obrigatório** — cobrir todos os estados do B7.
 - **Sem scroll horizontal** — colapsar colunas secundárias se necessário.
 - **Um overlay por vez** — drawer pode abrir modal; nunca empilhar overlay sobre overlay.
+- **Copy sem travessão nem caixa alta.** Todo texto novo ou alterado — labels, placeholders, mensagens de estado vazio/erro, títulos — deve respeitar: proibido `—` (em dash) e `–` (en dash); proibida caixa alta total em labels/títulos. Verificar antes de marcar o proto como aprovado.
 
 ---
 
@@ -245,7 +246,8 @@ Quando aprovado:
 
 1. Adicione no topo: `// Aprovado em: YYYY-MM-DD`
 2. Atualize `PX-PROGRESS.md` — proto aprovado, caminho `src/proto/<slug>.tsx`
-3. Eco:
+3. **Lint de copy:** rodar `npm run lint:travessao` e `npm run lint:caixa-alta` e confirmar que não há violação em texto novo. Copy nova de UI — onboarding, tooltip, empty/error, título — é o ponto de maior risco.
+4. Eco:
    > *"Proto de [tela] aprovado. Arquivo em `src/proto/<slug>.tsx` — referência visual pro dev. Rota `/proto/<slug>` pode ser removida após implementação. Próximo passo: `px-story` — quer seguir?"*
 
 ---

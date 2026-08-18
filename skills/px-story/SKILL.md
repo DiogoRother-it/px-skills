@@ -64,7 +64,7 @@ Para cada dimensão, pergunte/proponha o critério desta tela:
 - **Feedback** — "toda ação responde (sucesso/erro/loading)?" *ex: botão mostra loading; sucesso vira toast.*
 - **Fricção** — "mínimo de passos? nada redundante?" *ex: lote em 1 confirmação, não N.*
 - **Sem beco sem saída** — "erro e vazio oferecem próximo passo?" *ex: vazio tem CTA 'Convidar'.*
-- **Fidelidade** — "bate com o UI KIT/design (tokens, layout, copy)?" *ex: disabled = cinza real.*
+- **Fidelidade** — "bate com o UI KIT/design (tokens, layout, copy)?" *ex: disabled = cinza real. Copy sem travessão (— / –) e sem caixa alta total.*
 - **Autenticidade de dados** — "mostra dado real do usuário, nunca mock/lorem em produção?" *ex: após editar, a linha reflete o valor salvo.*
 Marque N/A com motivo qualquer dimensão que não se aplique — nunca some em silêncio.
 
@@ -118,6 +118,8 @@ Escreva os cenários, mostre, e confirme a cobertura acima antes de fechar.
 - [ ] BDD com cobertura: feliz + vazio + erro + permissão + regra de negócio (S5)
 - [ ] Rastreabilidade completa (S6)
 - [ ] Premissas registradas
+- [ ] Copy sem travessão (— / –) em critérios, BDD e textos de UI citados
+- [ ] Copy sem caixa alta total em critérios, BDD e textos de UI citados
 Eco final: resumo de 5–8 linhas da história. O líder confirma. Só então está *ready* pro handoff.
 
 ## Onde salvar

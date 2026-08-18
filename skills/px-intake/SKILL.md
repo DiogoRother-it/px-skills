@@ -47,6 +47,9 @@ Segue `Skill Prompting Conventions` do `CLAUDE.md`. Estruturada pra decisões en
 - O problema **já está claro e é uma tela só** → pule pro `px-request`.
 - É um **projeto novo** cuja identidade ainda não existe → o intake decide isso e encaminha pro `px-kickoff`.
 - Já foi decomposto em telas → cada tela vai pro `px-request`.
+- **Ajuste localizado em tela que já existe** (campo novo, botão, ícone, label) → `px-change`, a faixa leve que não exige a entrevista completa.
+
+> **Roteamento em projeto PX ativo:** qualquer mudança de UI dentro de um projeto com UI Kit definido entra pela cadeia PX — `px-request` para tela ou fluxo novo, `px-change` para ajuste localizado em tela que já existe. **Nunca** usar o pre-coding-pass global dentro de um projeto PX ativo: ele é agnóstico ao design system e não garante ancoragem nos tokens nem lint de copy. O pre-coding-pass global vale apenas para projetos fora do design system.
 
 ---
 

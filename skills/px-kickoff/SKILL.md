@@ -137,6 +137,7 @@ Quando há artefato, os blocos B2–B9 abaixo viram **confirmação do que foi e
 - [ ] UI KIT aprovado pelo líder e aplicado ao `index.css`
 - [ ] `uikit-<projeto>.html` gerado e conferido
 - [ ] Premissas registradas (tudo que foi "não sei" + default)
+- [ ] Copy do UI KIT (nomes, labels, exemplos de interface) sem travessão (— / –) e sem caixa alta total
 
 ## Encadeamento
 

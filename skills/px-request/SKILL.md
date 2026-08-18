@@ -34,7 +34,9 @@ Contexto inicial via slash: `$ARGUMENTS` (o pedido do líder). Se vazio, pergunt
 
 Conduza em pt-BR. O projeto já deve ter passado pelo `px-kickoff` (públicos-alvo + UI KIT). Se não passou, avise que o Bloco 2 depende disso e ofereça rodar `px-kickoff` antes.
 
-**Escopo — uma tela por vez.** Esta skill é por **tela/componente**. Se o pedido é um sistema inteiro (várias telas/modais), **pare**: isso é uma iniciativa — rode `px-epic` primeiro pra decompor em telas, e então traga **cada tela** de volta pra cá. Não tente espremer um sistema numa `px-request` só.
+**Escopo — uma tela por vez.** Esta skill é por **tela/componente**. Se o pedido é um sistema inteiro (várias telas/modais), **pare**: isso é uma iniciativa — rode `px-epic` primeiro pra decompor em telas, e então traga **cada tela** de volta pra cá. Não tente espremer um sistema numa `px-request` só. Para **ajustes localizados em tela que já existe** (campo novo, ícone, label, paginação), use `px-change` — a faixa leve que não exige esta entrevista completa.
+
+> **Roteamento em projeto PX ativo:** qualquer mudança de UI dentro de um projeto com UI Kit definido entra pela cadeia PX — `px-request` para tela ou fluxo novo, `px-change` para ajuste localizado em tela que já existe. **Nunca** usar o pre-coding-pass global dentro de um projeto PX ativo: ele é agnóstico ao design system e não garante ancoragem nos tokens nem lint de copy. O pre-coding-pass global vale apenas para projetos fora do design system.
 
 ## Prompting
 
@@ -121,11 +123,18 @@ Segue `Skill Prompting Conventions` do `CLAUDE.md`. Estruturada para decisões e
 
 ## BLOCO 8 — Copy / textos exatos (as palavras na tela)
 **Decidir:** o texto literal de títulos, labels, botões, mensagens.
-**Por que importa:** "coloca uma mensagem de erro" não é spec. O dev não deve inventar copy. Regras do DS: sem travessão, sem CAIXA ALTA total, tom orientado à ação.
+**Por que importa:** "coloca uma mensagem de erro" não é spec. O dev não deve inventar copy. Copy nova de UI é o ponto de maior risco para vazar travessão e caixa alta.
+
+**Constraints obrigatórias (proibições duras, não referências ao DS):**
+- **TRAVESSÃO:** proibido `—` (em dash) e `–` (en dash) em qualquer texto de interface visível — títulos, labels, eyebrows, tooltips, mensagens de empty/error, alt. Usar ponto, vírgula, ponto-e-vírgula ou reescrever. Hífen `-` em palavra composta (ex: "mercado-alvo") é permitido.
+- **CAIXA ALTA:** proibida caixa alta total em labels/eyebrows/títulos. Usar title case (ex: "Educação", não "EDUCAÇÃO"). Hierarquia por peso e letter-spacing, nunca por caixa alta.
+
 **Perguntar:**
 - "Qual o título da tela e dos blocos?"
 - "Texto exato de cada botão?" — *ex: "Convidar usuário", não "Novo".*
 - "Texto exato das mensagens de vazio, erro e sucesso?" — se o líder não tiver, **proponha** e registre como Premissa.
+
+**Verificação antes de fechar este bloco:** releia toda copy proposta. Algum texto tem `—`, `–` ou CAIXA ALTA TOTAL? Onboarding, tooltips e mensagens de estado são os pontos mais frequentes de vazamento — revisar obrigatoriamente antes de confirmar.
 
 ## BLOCO 9 — Regras de negócio e validações
 **Decidir:** o que é válido, o que é proibido, o que o sistema calcula ou impede.
@@ -164,6 +173,8 @@ Segue `Skill Prompting Conventions` do `CLAUDE.md`. Estruturada para decisões e
 - [ ] Responsivo + acessibilidade (B10)
 - [ ] Fora de escopo (B11)
 - [ ] Premissas registradas (tudo que foi "não sei" + default)
+- [ ] Copy sem travessão (— / –) (B8)
+- [ ] Copy sem caixa alta total (B8)
 
 Eco final: um resumo de 5–8 linhas do que será construído. O líder confirma. Só então o artefato está *ready*.
 
