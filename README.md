@@ -15,6 +15,10 @@ traz só a stack de componentes; as skills não vêm com ela).
 O pacote é **autossuficiente**: leva as skills e suas dependências de documentação juntas, então
 não quebra se rodado num repo que ainda não tem o design system.
 
+Toda atualização de skill é descrita no terminal ao instalar (seção "O que mudou") **e** fica
+registrada no [`CHANGELOG.md`](CHANGELOG.md) — o terminal mostra só a versão mais recente, o
+changelog guarda o histórico completo.
+
 ## Como instalar
 
 Rode **dentro do repositório do produto** (o diretório atual vira o destino):
@@ -50,14 +54,17 @@ Este pacote e o `centralit-boilerplate` são **acoplados**, mas cada um é canô
 
 | Conteúdo | Fonte da verdade | Cópia |
 |---|---|---|
-| **Skills** (`skills/`) | **px-skills** (aqui) | boilerplate `docs/skills-draft/<skill>/` |
+| **Skills** (`skills/`) | **px-skills** (aqui) | — nenhuma. O `px-setup` sempre instala fresco via `npx github:DiogoRother-it/px-skills`; não existe cópia local pra manter em dia. |
 | **Protocolo** (`assets/px-protocol.md`) | **px-skills** (aqui) | boilerplate `docs/px-protocol.md` |
 | **Docs de design-system** (`assets/design-system/`) | **centralit-boilerplate** (regras de uso de componente) | aqui, em `assets/design-system/` |
 
 O boilerplate é a **biblioteca de componentes + regras de uso**; o px-skills é a **biblioteca de habilidades do UX**. Algumas skills (ex: `px-request`) **absorvem** as regras de uso que vivem no boilerplate — por isso uma regra de componente nova nasce **no boilerplate** e a skill reflete.
 
+O sandbox do PX (`px-setup`) é o próprio boilerplate clonado — por isso `docs/design-system/` e `docs/px-protocol.md` precisam estar em dia **lá**: o instalador não sobrescreve o que já existe no destino. Skills não têm esse risco porque `.claude/skills/` é sempre reinstalado do zero a cada `npx`.
+
 **Fluxo de edição:**
 - **Regra de componente** → edite no **boilerplate** (`docs/design-system/`) → propague a cópia pra cá (`assets/design-system/`).
-- **Skill ou protocolo** → edite **aqui** (`skills/`, `assets/px-protocol.md`) → propague pro boilerplate (`docs/skills-draft/`, `docs/px-protocol.md`).
+- **Protocolo** → edite **aqui** (`assets/px-protocol.md`) → propague pro boilerplate (`docs/px-protocol.md`).
+- **Skill** → edite **aqui** (`skills/`) e suba a versão em `package.json` + o changelog do `install.mjs` (ver `CHANGELOG.md`) — não precisa propagar pra lugar nenhum, o próximo `npx` já leva a versão nova.
 
-Ao sincronizar pro boilerplate, **nunca** `git add -A` (o working tree de lá costuma ter WIP do time) — stageie só os caminhos que você mudou. Suba a versão em `package.json` a cada evolução de skills.
+Ao sincronizar pro boilerplate, **nunca** `git add -A` (o working tree de lá costuma ter WIP do time) — stageie só os caminhos que você mudou.
