@@ -3,6 +3,23 @@
 Todas as versões instaláveis via `npx github:DiogoRother-it/px-skills` / `npx @centralit/px-skills`.
 O instalador imprime só a versão mais recente no terminal — o histórico completo vive aqui.
 
+## 1.8.0 — 2026-08-19
+
+**O pipeline destruía o próprio artefato mais valioso no último passo.** A `px-proto` constrói o protótipo **dentro do boilerplate**, em `src/proto/*.tsx`, com os componentes e tokens reais. A `px-handoff` então entregava um **build compilado** como "referência visual" e o fonte ficava para trás. Um bundle é tão impossível de importar quanto HTML vanilla — ninguém faz `import` de `assets/index-abc123.js` — então o dev reduzia espaçamento, sombra e troca de estado a partir de screenshot, mesmo quando rodava exatamente a mesma biblioteca. Encontrado na v1 da Vitrine, cujo `src/proto/` tem ~6.900 linhas escritas contra `@/components/ui/*`, com os mesmos aliases do repo do dev, enquanto o pacote entregava só o `dist`.
+
+**`px-handoff` — a forma do pacote agora depende de uma pergunta explícita:**
+- Nova seção **"Forma do protótipo"**, decidida **antes** de montar o pacote: *o dev implementa na mesma stack em que o protótipo foi construído?*
+  - **Sim → entregar o FONTE** (`src/proto/**` + `index.css` com os tokens) como referência de implementação. O build vira **visualizador**, não artefato principal. O README documenta de onde vem cada import e que não há dependência nova. Anatomia visual passa a **N/A — o componente é a especificação**.
+  - **Não → referência visual + `anatomia-visual.md`** (o caminho da 1.7.0). É o caso de projeto que começou **antes de existir boilerplate** ou de produto legado: nenhum componente atravessa a fronteira, então o visual precisa virar documento. Com a franqueza registrada de que documentação reduz divergência mas não elimina.
+- Trava explícita: ⛔ **nunca entregar apenas o build quando o fonte serviria** — é o erro mais silencioso do passo, porque o pacote *parece* completo.
+- Nova seção **"Entregar o fonte NÃO é assumir o trabalho do dev"**, com a tabela de fronteira de propriedade (código de produção, arquitetura, integração, testes e manutenção seguem do dev; definição visual e de interação é do PX). Resolve a objeção política real de quem tem área de desenvolvimento própria: **protótipo é sobre propriedade, não sobre formato de arquivo**. Também nomeia o que de fato cruzaria a linha e nunca é necessário — publicar pacote versionado do qual o dev passe a depender, entregar o app de produção, ou commitar no código deles.
+- DoD ganhou os itens correspondentes, incluindo o registro da fronteira de propriedade no pacote.
+
+**`px-proto` — quem constrói agora sabe que o fonte será lido por outro time:**
+- Nota no topo: o fonte de `src/proto/` é o artefato que vai no handoff quando a stack é compartilhada. Escrever pensando em ser lido — nomes que se explicam, `// MOCK:` e `// INTEGRATION BOUNDARY:` nas fronteiras, nenhum truque que não se queira ver copiado. Reafirma que segue sendo protótipo, sem manutenção do PX.
+
+> **Nota de atribuição.** O protótipo do SmartCity é HTML vanilla porque **o boilerplate ainda não existia** quando aquele projeto começou — não foi desvio de convenção. É exatamente o cenário "stack diferente", e por isso a anatomia visual da 1.7.0 continua sendo a resposta correta **ali**. A partir de 1.8.0 o pacote deixa de tratar build compilado como padrão quando o fonte está disponível.
+
 ## 1.7.0 — 2026-08-19
 
 **Fecha a classe de gap que fez a UI divergir na entrega SmartCity semana-33.** O dev recebeu o protótipo como referência visual e reimplementou no boilerplate; o front saiu inconsistente. A auditoria mostrou que a maior parte não era falha do dev: eram regras corretas que existiam **só no JS/CSS do protótipo**, além de três documentos citados pelas specs que nunca entraram no pacote. Os patches abaixo atacam a causa, não o sintoma.

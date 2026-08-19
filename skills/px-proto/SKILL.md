@@ -13,6 +13,10 @@ Esta skill cria o protótipo da tela **dentro do boilerplate**, usando os compon
 
 **Por que no boilerplate:** componentes reais, tokens reais, HMR. Standalone HTML via CDN é uma aproximação — aqui é o mesmo stack do produto, só com mock data e diretório separado.
 
+> **Este fonte vai ser lido por outro time.** Quando o dev implementa na mesma stack, a `px-handoff` entrega **o fonte de `src/proto/`** como referência de implementação — não um build compilado. Escreva pensando nisso: nome de variável que se explica, `// MOCK:` e `// INTEGRATION BOUNDARY:` nas fronteiras, e nenhum truque que você não queira ver copiado. É o que permite fidelidade 1:1 sem ninguém redesenhar pixel a partir de screenshot.
+>
+> Continua sendo protótipo: `src/proto/` não é biblioteca, não é pacote, não é código de produção, e o PX não mantém. A fronteira de propriedade está registrada na `px-handoff`.
+
 **Por que obrigatório:** spec textual não substitui revisão visual. Erros de hierarquia, densidade, estados e copy só aparecem quando você vê a tela. Corrigir aqui é grátis; corrigir depois do dev é caro.
 
 **Público:** o líder UX/PX. Esta skill conversa pouco e entrega depressa — mas faz as perguntas certas antes de codar, não depois.

@@ -12,14 +12,46 @@ metadata:
 Esta skill **fecha** o ciclo de uma entrega: pega as histórias que já estão *ready* (saíram do `px-story`) e monta o **pacote de handoff** que o dev vai consumir — referência visual navegável, UI Kit, histórias de negócio, regras de negócio e specs referenciadas, organizadas por fluxo.
 
 **Contrato de entrega:** o dev recebe um pacote **self-contained** (nada aponta para fora dele):
-- **Referência visual navegável** — HTML unificado single-file (com âncoras `#view-*`/`data-story`) quando existir; senão, o **build do protótipo** em `prototipo/`.
+- **Referência de implementação ou referência visual** — depende de uma pergunta só; ver "Forma do protótipo" abaixo. **Decida isto antes de montar o pacote.**
 - **UI Kit** do produto (`ui-kit.md`, tokens reais).
 - **Histórias de negócio** por fluxo (`stories/`, BDD + CA + estados).
 - **Regras de negócio por fluxo** (`regras-negocio.md`) — as RNs NÃO podem ficar só no request interno.
 - **Specs referenciadas** por qualquer história (ex.: spec de aba/componente) — copiadas para dentro do fluxo.
 - **README.md** do pacote (como ver, como está organizado).
 
-O PX é referência visual — o dev implementa na stack do projeto. Ela **não desenha tela** (isso é `px-request`/`px-story`): fecha o ciclo, monta o pacote e (quando há repo do dev) executa o push.
+Ela **não desenha tela** (isso é `px-request`/`px-story`): fecha o ciclo, monta o pacote e (quando há repo do dev) executa o push.
+
+### Forma do protótipo — a pergunta que define o pacote
+
+> **O dev implementa na MESMA stack em que o protótipo foi construído?** (mesmo boilerplate, mesma biblioteca de componentes, mesmos aliases de import)
+
+**Sim → entregue o FONTE do protótipo.** Copie `src/proto/**` para `proto/` no pacote, junto com o `src/index.css` (tokens aplicados). O build compilado pode ir também, mas como **visualizador**, nunca como artefato principal.
+
+- **Por que:** a `px-proto` constrói o protótipo com os componentes reais e os mesmos aliases (`@/components/ui/...`). No repo do dev esses caminhos resolvem sem tradução. Entregar só o build obriga a rededuzir espaçamento, sombra, elevação e troca de estado a partir de screenshot — trabalho já feito uma vez, e a principal fonte de divergência visual.
+- **Documente no README** de onde vem cada import do proto (registry, boilerplate, interno ao pacote) e que **não há dependência nova a instalar**.
+- **Anatomia visual:** não se aplica. O componente **é** a especificação.
+
+**Não → entregue referência visual + anatomia.** HTML unificado single-file (com âncoras `#view-*`/`data-story`) ou o build em `prototipo/`, **mais** o `anatomia-visual.md` e o `mapa-de-consumo.md` (ver a seção da Definition of Done).
+
+- **Quando isto acontece:** protótipo em stack diferente da implementação (típico de projeto que começou **antes de existir boilerplate**, ou de produto legado). Aqui nenhum componente atravessa a fronteira — só imagem e texto — e o visual **precisa** virar documento.
+- Diga no pacote, com franqueza, que documentação **reduz** divergência mas não elimina; 1:1 estrutural só vem de componente compartilhado.
+
+> ⛔ **Nunca entregue apenas o build quando o fonte serviria.** Um bundle compilado é tão impossível de importar quanto HTML vanilla: ninguém faz `import` de `assets/index-abc123.js`. É o erro mais caro e mais silencioso deste passo, porque o pacote *parece* completo.
+
+### Entregar o fonte NÃO é assumir o trabalho do dev
+
+Preocupação legítima quando existe área de desenvolvimento própria: "se mandarmos código, estamos fazendo o front deles". **Protótipo é sobre propriedade, não sobre formato de arquivo.** Registre a fronteira no pacote, nestes termos:
+
+| Do dev | Do PX |
+|---|---|
+| Código de produção e arquitetura | Definição visual e de interação |
+| Integração (API, estado, persistência) | Fluxos, estados de UI, copy |
+| Testes, performance, build de produção | Aderência ao design system |
+| **Manutenção** | — |
+
+O fonte do proto remove **uma** etapa: redesenhar pixel a partir de imagem, que não é o valor que a engenharia entrega. Todo o resto continua do dev.
+
+**O que realmente cruzaria a linha** (e nunca é necessário): publicar pacote versionado que o dev passe a **depender**, entregar o app de produção com roteamento e integração, ou commitar dentro do código deles. Rotule sempre como protótipo — pasta `proto/`, sem SLA, sem manutenção nossa.
 
 **Público desta skill:** o líder UX/PX. Seja direto: monte o pacote a partir do que já existe, pergunte só o que muda a decisão, confirme e feche.
 
@@ -77,10 +109,13 @@ Segue `Skill Prompting Conventions` do `CLAUDE.md`. Estruturada pra decisões en
 ## BLOCO 3 — Definition of Done (checklist interna — não vai no pacote do dev)
 **Por que importa:** a régua que o PX usa pra confirmar que o pacote está completo *antes* de fechar.
 **Verificar antes de avançar pro BLOCO 4:**
-- [ ] Referência visual presente e navegável (HTML unificado single-file **ou** build em `prototipo/`).
+- [ ] **Forma do protótipo decidida** (mesma stack → fonte · stack diferente → visual + anatomia). Ver "Forma do protótipo".
+- [ ] **Mesma stack: `proto/` com o FONTE** (`src/proto/**` + `index.css` com os tokens) presente no pacote, e o README dizendo de onde vem cada import e que não há dependência nova.
+- [ ] Referência visual navegável presente (HTML unificado single-file **ou** build em `prototipo/`) — na mesma stack ela é **complemento** do fonte, não substituta.
 - [ ] Se HTML single-file: cobre todos os estados (default/loading/empty/error/disabled/read-only/hover/foco/responsivo) e breakpoints (Mobile/Tablet/Desktop/Widescreen). Se build: idem coberto pelo próprio app.
 - [ ] UI Kit do produto presente e atualizado (tokens reais de cor, tipografia, identidade).
-- [ ] **`anatomia-visual.md` presente** quando a entrega atravessa fronteira de tecnologia (ver abaixo).
+- [ ] **Fronteira de propriedade registrada** no pacote (o que é do dev × o que é do PX), rotulando o material como protótipo — sem SLA, sem manutenção do PX.
+- [ ] **`anatomia-visual.md` presente** quando a entrega atravessa fronteira de tecnologia (ver abaixo). Na mesma stack, marcar **N/A — o componente é a especificação**.
 - [ ] **`mapa-de-consumo.md` presente** quando o dev usa a mesma biblioteca de componentes que nós (ver abaixo).
 - [ ] Histórias com BDD completo (feliz + vazio + erro + permissão).
 - [ ] `regras-negocio.md` presente em cada fluxo (ou RNs inlined na história).
