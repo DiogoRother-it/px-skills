@@ -240,15 +240,41 @@ Cada ajuste é aplicado direto, sem perguntar. O PX vê e manda mais ou aprova.
 
 ---
 
+## Passo 8b — Registrar a anatomia do que foi construído (obrigatório antes de aprovar)
+
+**Por que importa:** o protótipo é entregue como **referência visual**, e o dev reimplementa na stack dele. Todo valor que você decidiu enquanto construía — altura, padding, sombra, espessura de anel, largura de drawer, se um componente é o default da lib ou um override — existe **só no seu código** até ser escrito. Se não for registrado agora, alguém terá que fazer engenharia reversa do CSS depois, sob pressão de entrega e sem o contexto da decisão. Foi exatamente o que custou a correção da entrega SmartCity semana-33.
+
+**Este é o momento barato de registrar.** A informação está na sua mão; depois ela vira arqueologia.
+
+**Fazer:** para cada componente/região do inventário do Passo 1, acrescentar (ou atualizar) uma entrada em `planning/<iniciativa>/anatomia-visual.md`:
+
+| Campo | O que registrar |
+|---|---|
+| **Região/componente** | header, moldura da tabela, linha, drawer, dropdown, card de KPI, chart… |
+| **Valores exatos** | altura, padding, gap, raio, sombra, fonte/peso, largura. Números, não adjetivos. |
+| **Origem** | **Boilerplate** (default da lib já correto — *não customizar*) × **Override do projeto** (identidade própria — *aplicar*) |
+| **Componente da lib** | qual componente/hook cobre a região (`Table variant="spaced"`, `sheet.tsx`, `useTableSort`…) |
+| **Intenção**, quando não for óbvia | *ex: "body do drawer em `--surface-soft` e footer em `--surface` separa conteúdo de ações — não uniformizar"* |
+
+**Registrar também, sempre que aplicável:**
+- **Bespoke sem equivalente na lib** — diga como foi composto e o que preservar se o dev trocar de abordagem (*ex: donut via `conic-gradient`; se usar lib de chart, manter anel de 20px e as cores do dicionário de status*).
+- **Gambiarra de protótipo que NÃO deve ser replicada** — workaround de contexto de empilhamento, delay artificial de skeleton, valor fora da escala de 8px. Diga explicitamente o que normalizar.
+- **Equivalência de biblioteca** quando a do proto difere da do dev (ícones, por exemplo): equivalência **semântica**, nunca cópia de glifo.
+
+> **Trava:** componente no inventário do Passo 1 sem entrada na anatomia **bloqueia a aprovação**. A `px-handoff` cobra a completude deste arquivo no DoD dela — se ficar para lá, já é tarde.
+>
+> **Dispensa:** se a entrega ao dev for de **componentes reais na mesma stack** dele, registre "N/A — entrega em componentes" e siga. Nesse caso o componente **é** a spec.
+
 ## Passo 9 — Aprovação e encerramento
 
 Quando aprovado:
 
 1. Adicione no topo: `// Aprovado em: YYYY-MM-DD`
-2. Atualize `PX-PROGRESS.md` — proto aprovado, caminho `src/proto/<slug>.tsx`
-3. **Lint de copy:** rodar `npm run lint:travessao` e `npm run lint:caixa-alta` e confirmar que não há violação em texto novo. Copy nova de UI — onboarding, tooltip, empty/error, título — é o ponto de maior risco.
-4. Eco:
-   > *"Proto de [tela] aprovado. Arquivo em `src/proto/<slug>.tsx` — referência visual pro dev. Rota `/proto/<slug>` pode ser removida após implementação. Próximo passo: `px-story` — quer seguir?"*
+2. Confirme que a anatomia do Passo 8b está completa para todos os componentes do inventário
+3. Atualize `PX-PROGRESS.md` — proto aprovado, caminho `src/proto/<slug>.tsx`
+4. **Lint de copy:** rodar `npm run lint:travessao` e `npm run lint:caixa-alta` e confirmar que não há violação em texto novo. Copy nova de UI — onboarding, tooltip, empty/error, título — é o ponto de maior risco.
+5. Eco:
+   > *"Proto de [tela] aprovado. Arquivo em `src/proto/<slug>.tsx` — referência visual pro dev. Anatomia registrada em `anatomia-visual.md` ([N] componentes). Rota `/proto/<slug>` pode ser removida após implementação. Próximo passo: `px-story` — quer seguir?"*
 
 ---
 

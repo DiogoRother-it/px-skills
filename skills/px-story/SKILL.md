@@ -55,6 +55,23 @@ História e cenários em pt-BR. Gherkin em português: `Funcionalidade / Cenári
 - Escreva cada um como afirmação testável — *ex: "Ao desativar um usuário, a linha passa a 'Inativo' e aparece um toast de confirmação."* Evite "deve funcionar bem".
 - Confirme cada critério com o líder (ou registre Premissa se ele deixar no default).
 
+### S3b — Varredura do proto: capturar o que só existe no código (obrigatório)
+
+**Por que importa:** o proto é onde regras nascem "na hora" — um limiar decidido enquanto se implementa, um botão que troca de variante, uma fórmula de campo derivado. Se a história não trouxer isso de volta para texto, a regra existe **só no código do protótipo** e morre no handoff: quem reimplementa lê a tela, e a tela mostra apenas um dos estados. Foi exatamente essa a causa das divergências da entrega SmartCity semana-33.
+
+**Fazer — inspecionar o JS/CSS do proto aprovado (não só a tela renderizada) e transformar em CA/RN:**
+
+- **Campos derivados** — todo valor exibido que não é campo cru do dado. Extrair a **fórmula**, a **formatação** e o **escopo** dos dados. Atenção ao caso mais traiçoeiro: no proto o valor costuma ser **mock estático** (ex: `espera:'38min'`), o que esconde a ausência de regra. Mock estático não é spec — se não há fórmula escrita, ela **não existe** e precisa ser definida agora.
+- **Valores de corte** — todo `if (x > N)` que muda cor, ícone, rótulo ou prioridade. Um por um, em tabela. Conferir se o mesmo conceito usa o **mesmo corte em todos os pontos** da tela: cortes divergentes entre lista e drawer são defeito do proto, e a história é o lugar de fixar o valor canônico.
+- **Variantes por estado** — tabela `estado → rótulo/variante/ícone`, incluindo o default (herdar do `BLOCO 9b` do request).
+- **Visibilidade condicional** — elemento oculto por papel/permissão/flag é regra com ID, não detalhe.
+- **Estrutura entre telas irmãs** — quando duas telas reusam o mesmo componente (ex: fila e histórico na mesma tabela), listar **explicitamente o conjunto de colunas de cada uma**; a diferença nunca é óbvia lendo o print.
+- **Números mágicos de mock** — delays artificiais de skeleton e afins: marcar como **artefato de mock, não requisito**, para não serem replicados em produção.
+
+**Trava:** cada item encontrado vira CA verificável **ou** RN com ID (`RN-…`) — se for regra transversal a várias telas, registrar num documento canônico de decisão e **citar o ID** na história, não duplicar. Se a varredura não achou nada, escreva **"N/A — nenhuma regra fora do texto do request"**. Não deixe implícito.
+
+**Divergência proto ↔ request:** se o proto contradiz o request (ex: o request tem um modelo de status revisado que o proto nunca implementou), **não silencie**: registre a divergência, aponte qual prevalece (regra: a spec aprovada vence o proto desatualizado) e leve como pendência ao líder.
+
 ## S4 — Critérios de usabilidade (rubrica ux-persona, dimensão por dimensão)
 **Decidir:** o critério concreto de CADA dimensão que o `ux-persona` avalia. Vá **uma dimensão por vez** — é aqui que "fácil de usar" vira algo checável.
 **Por que importa:** é o que separa "o código roda" de "a pessoa consegue". O dev valida isto no Playwright; o `ux-persona`, no walkthrough.

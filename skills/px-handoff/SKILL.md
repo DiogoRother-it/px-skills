@@ -80,11 +80,52 @@ Segue `Skill Prompting Conventions` do `CLAUDE.md`. Estruturada pra decisões en
 - [ ] Referência visual presente e navegável (HTML unificado single-file **ou** build em `prototipo/`).
 - [ ] Se HTML single-file: cobre todos os estados (default/loading/empty/error/disabled/read-only/hover/foco/responsivo) e breakpoints (Mobile/Tablet/Desktop/Widescreen). Se build: idem coberto pelo próprio app.
 - [ ] UI Kit do produto presente e atualizado (tokens reais de cor, tipografia, identidade).
+- [ ] **`anatomia-visual.md` presente** quando a entrega atravessa fronteira de tecnologia (ver abaixo).
+- [ ] **`mapa-de-consumo.md` presente** quando o dev usa a mesma biblioteca de componentes que nós (ver abaixo).
 - [ ] Histórias com BDD completo (feliz + vazio + erro + permissão).
 - [ ] `regras-negocio.md` presente em cada fluxo (ou RNs inlined na história).
 - [ ] Toda spec referenciada por uma história está incluída no pacote.
+- [ ] **Conferência de completude executada** — nenhuma decisão ou história citada ficou fora (ver abaixo).
 - [ ] Nomes de arquivo sem prefixos numéricos (`historia-nome.md`, não `01-...`).
 - [ ] Copy sem travessão (— / –) e sem caixa alta total em toda a referência visual e nos `.md`.
+
+### Anatomia visual — obrigatória quando o handoff cruza tecnologia
+
+**Quando aplica:** sempre que a referência visual entregue estiver em **tecnologia diferente** da que o dev implementa (caso típico: proto HTML/CSS/JS vanilla → dev em React/shadcn). Nesse cenário **nenhum componente atravessa** — só imagem e prosa — e o visual precisa de um artefato determinístico. Se a entrega for de componentes reais na mesma stack, registre "N/A — entrega em componentes" (o componente **é** a spec).
+
+**Por que importa:** o UI Kit diz *quais são os tokens*; a anatomia diz *onde cada token é aplicado, com qual valor, em qual componente da biblioteca*. Sem ela, o dev acerta a regra de negócio e erra o visual — foi o que aconteceu na entrega SmartCity semana-33.
+
+**Origem:** a anatomia é escrita **incrementalmente pela `px-proto`** (Passo 8b), componente a componente, no momento em que cada um é construído. Aqui você **consolida e valida completude**, não redige do zero. Se chegou vazia, o proto não cumpriu o Passo 8b — reconstituí-la agora custa engenharia reversa do CSS.
+
+**Conteúdo mínimo, região por região** (header, container, título, abas, toolbar, moldura de tabela, cabeçalho, linha, botões, chips, paginação, overlays, formulários, indicadores, ícones, espaçamento/motion):
+- **Valores exatos extraídos do CSS real** (altura, padding, raio, sombra, fonte/peso, gap) — nunca estimados.
+- **Coluna "Origem"** classificando cada item: **Boilerplate** (default já correto, não customizar) × **Override do projeto**.
+- **Mapa de-para de componente** — qual componente/hook da biblioteca cobre cada região.
+- **Equivalência de biblioteca** quando diferem (ex: Material Symbols → Lucide): semântica, não cópia de glifo.
+- **Desvios do proto a NÃO replicar** — valor fora da escala de 8px, corte numérico inconsistente, delay artificial de mock.
+- **Checklist de fidelidade** no fim, item por item verificável.
+
+### Mapa de consumo — quando dev e PX usam a mesma biblioteca
+
+**Quando aplica:** o dev tem acesso à mesma biblioteca de componentes que nós (ex: ambos no `centralit-boilerplate`). Aí a pergunta que trava a implementação não é "qual o valor", é **"isto já existe ou eu preciso construir?"**.
+
+**Fazer:** cruzar as regiões da tela com o inventário real da biblioteca e classificar cada uma:
+
+| Marca | Significado | Instrução ao dev |
+|---|---|---|
+| 🟢 **DIRETO** | Existe e o default já bate | Importar e usar. **Não customizar** |
+| 🟡 **DIRETO + OVERRIDE** | Existe, mas a identidade exige ajuste | Importar + aplicar **só** o override da anatomia |
+| 🔴 **COMPOR** | Não existe na biblioteca | Único caso que autoriza construir |
+
+Incluir também: **fluxo de decisão** ("está 🟢 ou 🟡? então existe, não reescreva") e a **lista de componentes da biblioteca disponíveis e ainda não usados**, para não reinventarem o que está à mão.
+
+> **Por que importa:** sem esse mapa o dev reconstrói do zero coisas que a lib já entrega (tabela, paginação, ordenação, drawer, toast, skeleton, multiselect, date picker) e ao mesmo tempo assume como padrão da lib o que é identidade nossa. Os dois erros aconteceram na semana-33.
+
+### Conferência de completude do pacote (trava)
+
+**Por que importa:** na semana-33, três artefatos citados pelas specs (duas decisões e uma história) **não entraram no pacote**. Regra documentada que não é entregue equivale a regra inexistente — e o defeito reaparece como se fosse falha do dev.
+
+**Fazer:** comparar a lista de `decisoes/` e `stories/` da **origem** (planning) com a do **pacote**, arquivo por arquivo. Cada ausência precisa de justificativa explícita. Divergência não justificada **bloqueia** a entrega.
 
 ## BLOCO 4 — Fronteiras de integração (onde acaba o mock, começa o real)
 **Fazer:**

@@ -145,6 +145,32 @@ Segue `Skill Prompting Conventions` do `CLAUDE.md`. Estruturada para decisões e
 - "Algo é calculado/derivado automaticamente?"
 - Registre cada regra com um ID (ex: `RN-01`) — o `px-story` e o dev vão citar.
 
+> **Trava — "sim, é calculado" não é resposta suficiente.** Toda regra derivada precisa da **fórmula escrita** e do **escopo dos dados**, não do reconhecimento de que existe. Registrar *"a prioridade é calculada a partir dos sinais vitais"* é o mesmo que não registrar nada: quem implementa não tem como adivinhar o valor de corte. Para cada item, extraia:
+> - **Fórmula literal** — *ex: `espera = agora − chegada`, em minutos completos, recalculada a cada render (não é campo persistido).*
+> - **Formatação exata** — *ex: `< 60min` → "Xmin"; `≥ 60min` → "Xh Ymin".*
+> - **Escopo/filtro dos dados** — *ex: a fila ativa contém apenas o dia corrente.*
+> - **Todo valor de corte (threshold), um por um** — *ex: PAS ≥ 180 → crítico; ≥ 140 → atenção.* Tabela, não prosa.
+>
+> Se o líder não souber o valor, **não deixe em aberto genérico**: proponha um default numérico concreto e registre como Premissa a validar. Regra derivada sem número é a causa nº 1 de divergência no handoff.
+
+## BLOCO 9b — Estado do dado → variante de UI (obrigatório)
+**Decidir:** onde o valor de um campo **troca o componente, o rótulo, o ícone ou a cor**.
+**Por que importa:** esta é a classe de regra que mais se perde no handoff, porque não é visível olhando um print — a tela só mostra **um** dos estados. Quem reimplementa lendo a imagem produz um botão fixo onde deveria haver dois. É regra de negócio, não detalhe de implementação.
+**Perguntar / extrair — para cada campo de status, flag ou faixa numérica:**
+- "Quando o valor muda, **o que muda na tela**?" — componente, rótulo, ícone, cor, habilitado/desabilitado, visível/oculto.
+- "Qual o **valor exato** que dispara cada variante?"
+- Registrar em **tabela** `estado → variante`, com uma linha por estado e o caso default. *ex:*
+
+| Estado | Rótulo | Variante | Ícone |
+|---|---|---|---|
+| `em-atendimento` | "Acompanhar" | sólido, tokens `ok` | `monitor_heart` |
+| demais | "Ver detalhes" | `ghost` | `info` |
+
+- Cobrir também: **visibilidade por papel/permissão** (elemento que não aparece para certo perfil é regra, com ID), **faixas numéricas que colorem** (ex: espera > 30min → crítico), e **conjuntos de coluna diferentes** quando duas telas reusam o mesmo componente de tabela.
+- Cada linha da tabela recebe ID (`RN-UI-01`…) e vira critério de aceite no `px-story`.
+
+> Se nenhuma variante depende de estado nesta tela, escreva **"N/A — nenhum elemento troca por estado do dado"**. Não deixe o bloco em branco.
+
 ## BLOCO 10 — Responsividade e acessibilidade
 **Decidir:** comportamento nos breakpoints e mínimos de acessibilidade.
 **Por que importa:** a validação do dev (Playwright, 99% de fidelidade) cobre todos os breakpoints — precisa estar especificado, não improvisado.

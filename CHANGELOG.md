@@ -3,6 +3,26 @@
 Todas as versões instaláveis via `npx github:DiogoRother-it/px-skills` / `npx @centralit/px-skills`.
 O instalador imprime só a versão mais recente no terminal — o histórico completo vive aqui.
 
+## 1.7.0 — 2026-08-19
+
+**Fecha a classe de gap que fez a UI divergir na entrega SmartCity semana-33.** O dev recebeu o protótipo como referência visual e reimplementou no boilerplate; o front saiu inconsistente. A auditoria mostrou que a maior parte não era falha do dev: eram regras corretas que existiam **só no JS/CSS do protótipo**, além de três documentos citados pelas specs que nunca entraram no pacote. Os patches abaixo atacam a causa, não o sintoma.
+
+**`px-request` — a spec passa a exigir o número, não o reconhecimento:**
+- `BLOCO 9` ganha trava: *"sim, é calculado"* deixa de ser resposta suficiente. Toda regra derivada exige fórmula literal, formatação exata, escopo dos dados e **todo threshold, um por um, em tabela**. Antes, um `RN` do tipo "a prioridade é calculada a partir dos sinais vitais" passava pelo bloco sem nunca registrar os valores de corte — e quem implementa não tem como adivinhar um número.
+- `BLOCO 9b` novo — **estado do dado → variante de UI**, obrigatório. Cobre a classe de regra que mais se perde no handoff, porque não é visível num print: a tela mostra só um dos estados. Exige tabela `estado → rótulo/variante/ícone`, mais visibilidade por papel, faixas numéricas que colorem, e conjuntos de coluna distintos quando duas telas reusam o mesmo componente.
+
+**`px-story` — a história passa a trazer de volta o que o proto decidiu:**
+- `S3b` novo — **varredura do JS/CSS do proto aprovado** (não só da tela renderizada). Trata **mock estático como ausência de regra** (`espera:'38min'` esconde que nunca houve fórmula), obriga conferir se o mesmo conceito usa o mesmo corte em todos os pontos da tela, e manda marcar números mágicos de mock como artefato, não requisito. Também obriga registrar divergência proto ↔ request em vez de silenciar, com a regra de precedência: a spec aprovada vence o proto desatualizado.
+
+**`px-proto` — registra a anatomia no momento barato:**
+- `Passo 8b` novo, obrigatório antes de aprovar: cada componente do inventário do Passo 1 ganha entrada em `anatomia-visual.md` com valores exatos e a coluna **Origem** (default da lib × override do projeto). Registra também bespoke sem equivalente, gambiarra de protótipo que não deve ser replicada, e equivalência de biblioteca. A informação está na mão de quem constrói; depois vira arqueologia de CSS.
+
+**`px-handoff` — consolida, cobra e confere:**
+- DoD exige `anatomia-visual.md` quando a entrega **atravessa fronteira de tecnologia**, e `mapa-de-consumo.md` quando **dev e PX usam a mesma biblioteca** — este classifica cada região em 🟢 consumir direto (não customizar) · 🟡 consumir + override · 🔴 compor, e lista os componentes da lib disponíveis e não usados. Sem ele o dev reconstrói do zero o que a lib entrega (tabela, paginação, drawer, toast, skeleton, date picker) e ao mesmo tempo assume como padrão da lib o que é identidade nossa.
+- **Conferência de completude** virou trava: comparar `decisoes/` e `stories/` da origem com o pacote, arquivo por arquivo. Ausência sem justificativa bloqueia a entrega. Regra documentada que não é entregue equivale a regra inexistente.
+
+**Divisão de responsabilidade:** a `px-proto` **escreve** a anatomia, a `px-handoff` **cobra**. Não foi criada skill nova — uma skill que rodasse só no fim teria que fazer engenharia reversa de todo o CSS, exatamente o trabalho caro que esta versão elimina.
+
 ## 1.6.0 — 2026-08-18
 
 **Duas skills novas de execução** (`ux-*`, não são entrevista — rodam sobre o produto ao vivo):
