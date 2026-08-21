@@ -3,6 +3,21 @@
 Todas as versões instaláveis via `npx github:DiogoRother-it/px-skills` / `npx @centralit/px-skills`.
 O instalador imprime só a versão mais recente no terminal — o histórico completo vive aqui.
 
+## 1.8.1 — 2026-08-21
+
+**A 1.8.0 abriu o caminho do fonte e esqueceu de desarmar as travas que o proibiam.** O corpo da `px-handoff` passou a mandar entregar `src/proto/**` quando a stack do dev é a mesma, mas a `description` da skill continuava anunciando *"não envia código-fonte"*, o item da DoD continuava exigindo *"nenhum código-fonte (`.tsx`/`.ts`/`.jsx`/`.js` de componente)"* e o `handoff-manifest.md` mantinha código de componente em **🔒 Interno (nunca entra)**. Na prática as travas ganhavam: a `description` enquadra a skill inteira e a DoD é o portão de saída, então o caminho do fonte existia no texto e não acontecia na execução.
+
+**`px-handoff` — os três pontos alinhados ao caminho do fonte:**
+- **`description`** reescrita: descreve os dois caminhos (fonte quando a stack é a mesma, referência visual quando não é) em vez de proibir fonte. O que ela nega agora é **config de build** e artefato interno.
+- **DoD, bloco "Pacote"** ganhou um item por caminho: **FONTE** (`proto/` + `index.css` com os tokens, build como visualizador) e **REFERÊNCIA VISUAL** (single-file ou build + `anatomia-visual.md` + `mapa-de-consumo.md`). Antes só existia o segundo, o que reprovava silenciosamente todo pacote de stack compartilhada.
+- **DoD, bloco "O que nunca deve sair"** separado em duas ideias que estavam colapsadas numa: **config de build** (`vite.config`, `tsconfig`, `package.json`, `.env`) nunca sai; **código de componente** só não sai fora do caminho do fonte. E em nenhum dos dois casos sai `src/components/ui/**`, que vem do registry `@centralit` versionado, porque cópia no pacote duplica biblioteca.
+- **`handoff-manifest.md`**: a linha "Código-fonte e config" virou duas, "Config de build" e "Biblioteca de componentes", cada uma com o motivo real.
+- **Item do `grep` de referência morta** deixou explícito que procura *referência de import* a `src/proto`, não os arquivos copiados para `proto/` — que devem estar lá.
+
+**Instalador** — o banner anunciava a v1.6.0 desde que o pacote foi para a 1.8.0. Agora imprime a versão corrente e, para quem vem da 1.6.x, aponta a 1.8.0 como a mudança grande.
+
+---
+
 ## 1.8.0 — 2026-08-19
 
 **O pipeline destruía o próprio artefato mais valioso no último passo.** A `px-proto` constrói o protótipo **dentro do boilerplate**, em `src/proto/*.tsx`, com os componentes e tokens reais. A `px-handoff` então entregava um **build compilado** como "referência visual" e o fonte ficava para trás. Um bundle é tão impossível de importar quanto HTML vanilla — ninguém faz `import` de `assets/index-abc123.js` — então o dev reduzia espaçamento, sombra e troca de estado a partir de screenshot, mesmo quando rodava exatamente a mesma biblioteca. Encontrado na v1 da Vitrine, cujo `src/proto/` tem ~6.900 linhas escritas contra `@/components/ui/*`, com os mesmos aliases do repo do dev, enquanto o pacote entregava só o `dist`.
