@@ -17,7 +17,8 @@ Esta skill **fecha** o ciclo de uma entrega: pega as histórias que já estão *
 - **Histórias de negócio** por fluxo (`stories/`, BDD + CA + estados).
 - **Regras de negócio por fluxo** (`regras-negocio.md`) — as RNs NÃO podem ficar só no request interno.
 - **Specs referenciadas** por qualquer história (ex.: spec de aba/componente) — copiadas para dentro do fluxo.
-- **README.md** do pacote (como ver, como está organizado).
+- **README.md** do pacote (como ver, como está organizado), com a tabela **preservar versus reescrever**.
+- **No caminho do fonte:** `mapa-de-telas.md` (visão geral + rastreabilidade) e `pre-requisitos.md` (o que o app do dev precisa ter).
 
 Ela **não desenha tela** (isso é `px-request`/`px-story`): fecha o ciclo, monta o pacote e (quando há repo do dev) executa o push.
 
@@ -25,10 +26,21 @@ Ela **não desenha tela** (isso é `px-request`/`px-story`): fecha o ciclo, mont
 
 > **O dev implementa na MESMA stack em que o protótipo foi construído?** (mesmo boilerplate, mesma biblioteca de componentes, mesmos aliases de import)
 
-**Sim → entregue o FONTE do protótipo.** Copie `src/proto/**` para `proto/` no pacote, junto com o `src/index.css` (tokens aplicados). O build compilado pode ir também, mas como **visualizador**, nunca como artefato principal.
+**Sim → entregue o FONTE do protótipo.** Copie `src/proto/**` para `proto/` no pacote, junto com o `src/index.css` (tokens aplicados).
+
+> ⛔ **O build compilado NÃO entra no pacote quando há fonte.** Ele continua existindo para visualizar e para o PO revisar, mas **publicado** (`px-preview`), com o link no `README.md` do pacote. Bundle é o artefato mais pesado e mais irreversível que a gente coloca no repo do dev, e no caminho do fonte ele não acrescenta nada: o `proto/` roda. Se não houver onde publicar ainda, registre como pendência no `handoff.md` — nunca como arquivo no pacote.
 
 - **Por que:** a `px-proto` constrói o protótipo com os componentes reais e os mesmos aliases (`@/components/ui/...`). No repo do dev esses caminhos resolvem sem tradução. Entregar só o build obriga a rededuzir espaçamento, sombra, elevação e troca de estado a partir de screenshot — trabalho já feito uma vez, e a principal fonte de divergência visual.
 - **Documente no README** de onde vem cada import do proto (registry, boilerplate, interno ao pacote) e que **não há dependência nova a instalar**.
+- **`mapa-de-telas.md` (obrigatório neste caminho):** uma linha por tela, com `Tela | Rota | Arquivo em proto/ | Histórias`. Resolve três coisas de uma vez: dá a visão geral que um repo não dá de graça, aponta onde cada tela vive, e carrega a rastreabilidade história ↔ componente **em arquivo separado** em vez de escondida dentro de marcação.
+- **`pre-requisitos.md` (obrigatório neste caminho):** o que precisa existir no app do dev para o `proto/` renderizar igual. Cada item é conferível, e o que falta aparece antes de virar retrabalho:
+  1. Mesma major do framework e do Tailwind do protótipo
+  2. O arquivo de tokens do pacote presente no CSS do app (não uma cópia antiga)
+  3. Fonte carregada no HTML (o token `--font-sans` viaja, o arquivo da fonte não)
+  4. Plugin de animação, se o proto usa classes de entrada/saída
+  5. Alias de import resolvendo (`@/` ou o equivalente do projeto)
+  6. Mesma estratégia de dark mode (variante por classe ou por preferência do sistema)
+  7. Nenhuma classe utilitária montada por concatenação de string — o Tailwind só compila o que enxerga
 - **Anatomia visual:** não se aplica. O componente **é** a especificação.
 
 **Não → entregue referência visual + anatomia.** HTML unificado single-file (com âncoras `#view-*`/`data-story`) ou o build em `prototipo/`, **mais** o `anatomia-visual.md` e o `mapa-de-consumo.md` (ver a seção da Definition of Done).
@@ -52,6 +64,24 @@ Preocupação legítima quando existe área de desenvolvimento própria: "se man
 O fonte do proto remove **uma** etapa: redesenhar pixel a partir de imagem, que não é o valor que a engenharia entrega. Todo o resto continua do dev.
 
 **O que realmente cruzaria a linha** (e nunca é necessário): publicar pacote versionado que o dev passe a **depender**, entregar o app de produção com roteamento e integração, ou commitar dentro do código deles. Rotule sempre como protótipo — pasta `proto/`, sem SLA, sem manutenção nossa.
+
+### O recorte: o que preservar, o que reescrever
+
+A tabela acima diz de quem é cada responsabilidade. Esta diz o que acontece com o
+**código entregue** — é ela que faz o resultado sair igual, e precisa estar escrita no
+`README.md` do pacote, não só aqui.
+
+| Preservar como está | Livre para reescrever |
+|---|---|
+| Markup e hierarquia dos elementos | Roteamento e navegação |
+| Classes utilitárias e tokens | Integração (API, estado, persistência) |
+| Estrutura dos estados de UI (loading, vazio, erro, disabled) | Organização de arquivos e nomes de módulo |
+| Breakpoints e comportamento responsivo | Testes, performance, build |
+
+**Por que importa:** reusar é mecânico, reinterpretar não. Toda vez que markup ou classe é
+reescrito, alguém decide de novo um valor que já estava decidido, e a decisão pode ser de
+uma IA que não pergunta quando fica em dúvida. Preservar essas quatro linhas é o que troca
+"parecido" por "igual". O resto muda à vontade: não afeta o visual.
 
 **Público desta skill:** o líder UX/PX. Seja direto: monte o pacote a partir do que já existe, pergunte só o que muda a decisão, confirme e feche.
 
@@ -229,7 +259,10 @@ handoff-ux/
 - [ ] README.md e handoff.md batem com o conteúdo real (referência visual, RNs, specs)
 
 **Pacote**
-- [ ] **Caminho do FONTE** (stack igual): `proto/` com os componentes do protótipo + `index.css` com os tokens aplicados. Build compilado, se houver, marcado como visualizador.
+- [ ] **Caminho do FONTE** (stack igual): `proto/` com os componentes do protótipo + `index.css` com os tokens aplicados
+- [ ] **Caminho do FONTE:** nenhum build compilado como arquivo no pacote. Link do protótipo publicado no `README.md` (ou pendência registrada no `handoff.md`)
+- [ ] **Caminho do FONTE:** `mapa-de-telas.md` presente (Tela / Rota / Arquivo / Histórias) e `pre-requisitos.md` com os 7 itens conferíveis
+- [ ] **Caminho do FONTE:** tabela "preservar versus reescrever" no `README.md` do pacote
 - [ ] **Caminho da REFERÊNCIA VISUAL** (stack diferente): HTML single-file **ou** build em `prototipo/`, mais `anatomia-visual.md` e `mapa-de-consumo.md`.
 - [ ] Se HTML single-file: `data-story="<ID>"` em cada elemento acionador
 - [ ] UI Kit presente e atualizado
@@ -237,7 +270,7 @@ handoff-ux/
 
 **Histórias**
 - [ ] BDD completo (feliz + vazio + erro + permissão) em cada história
-- [ ] Rastreabilidade: descrição em texto (+ anchor `data-story` quando há HTML single-file)
+- [ ] Rastreabilidade em arquivo separado: no caminho do FONTE, história ↔ componente no `mapa-de-telas.md`; no caminho da referência visual, descrição em texto + anchor `data-story` no HTML single-file
 - [ ] Nomes de arquivo sem prefixos numéricos
 - [ ] Nenhuma story técnica interna do PX — apenas histórias de negócio
 - [ ] Copy sem travessão e sem caixa alta total
