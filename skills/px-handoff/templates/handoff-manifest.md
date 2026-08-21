@@ -41,6 +41,7 @@ ruído interno pro dev e infla a entrega. Este manifesto fixa o recorte, de form
 | Discovery / auditoria | `audit/*.md`, `backlog-*.md` | Como chegamos aqui, não o quê construir |
 | Planejamento superado (como arquivo) | `epics/*.md`, `requests/*.md` | O arquivo fica de fora, mas seu **conteúdo essencial é extraído**: RNs → `regras-negocio.md`, specs referenciadas → `<spec>.md` no fluxo (sanitizados) |
 | Memória do assistente + scratchpad | `~/.claude/...`, arquivos temporários | Nunca sai |
+| Build compilado, quando há fonte | `dist/`, `standalone.html`, bundle single-file | O `proto/` roda. Bundle é o arquivo mais pesado e mais irreversível no repo do dev, e no caminho do fonte não acrescenta nada. Vai publicado, com link no README |
 | Config de build | `vite.config`, `tsconfig`, `package.json`, `.env` | Ambiente é do repo do dev |
 | Biblioteca de componentes | `src/components/ui/**` | Vem do registry `@centralit`, versionada — cópia no pacote duplica biblioteca |
 

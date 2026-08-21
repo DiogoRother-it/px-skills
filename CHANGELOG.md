@@ -3,6 +3,20 @@
 Todas as versões instaláveis via `npx github:DiogoRother-it/px-skills` / `npx @centralit/px-skills`.
 O instalador imprime só a versão mais recente no terminal — o histórico completo vive aqui.
 
+## 1.9.0 — 2026-08-21
+
+**O caminho do fonte existia, mas o pacote continuava podendo levar o bundle, e nada garantia que o código entregue fosse reusado em vez de reinterpretado.** A 1.8.0 passou a entregar `src/proto/**` quando a stack é a mesma, e ainda dizia que *"o build compilado pode ir também, como visualizador"*. Ou seja: o arquivo mais pesado e mais irreversível que a gente coloca no repo do dev continuava autorizado, justamente no caminho em que ele não acrescenta nada, porque o `proto/` roda. Faltavam também a visão geral das telas (a única crítica de ferramenta de design que um repo não responde de graça), a rastreabilidade em arquivo separado, e a lista do que precisa existir no app do dev para o fonte renderizar igual.
+
+**`px-handoff` — quatro fechamentos no caminho do fonte:**
+- **Bundle não entra mais como arquivo.** Ele continua existindo para visualizar e para o PO revisar, mas **publicado**, com o link no `README.md` do pacote. Sem lugar para publicar ainda, vira pendência no `handoff.md` — nunca arquivo. Também listado no `handoff-manifest.md` como o que não entra neste caminho.
+- **Nova seção "O recorte: o que preservar, o que reescrever"**, obrigatória no `README.md` do pacote. Markup, classes e tokens, estrutura dos estados de UI e breakpoints são para reusar; roteamento, integração, organização de arquivos, testes e performance são livres. A tabela de propriedade diz de quem é a responsabilidade; esta diz o que acontece com o código, e é ela que faz o resultado sair igual em vez de parecido. O motivo está escrito: reusar é mecânico, reinterpretar não, e quem reinterpreta pode ser uma IA que não pergunta quando fica em dúvida.
+- **`mapa-de-telas.md` obrigatório** (`Tela | Rota | Arquivo em proto/ | Histórias`). Resolve três coisas com um arquivo: dá a visão geral que um repositório não dá de graça, aponta onde cada tela vive, e move a rastreabilidade história ↔ componente para **arquivo separado**, em vez de escondida dentro da marcação — que era exatamente a crítica correta que veio dos devs.
+- **`pre-requisitos.md` obrigatório**, com 7 itens conferíveis do lado do dev: major do framework e do Tailwind, arquivo de tokens presente e atual, fonte carregada no HTML, plugin de animação, alias de import resolvendo, mesma estratégia de dark mode, e nenhuma classe montada por concatenação de string. São as sete formas conhecidas de o fonte chegar certo e renderizar diferente, e todas falham **em silêncio**. Conferíveis antes de virar retrabalho.
+
+**DoD** ganhou um item por promessa, para que nenhuma delas possa ser afirmada sem estar no pacote.
+
+---
+
 ## 1.8.1 — 2026-08-21
 
 **A 1.8.0 abriu o caminho do fonte e esqueceu de desarmar as travas que o proibiam.** O corpo da `px-handoff` passou a mandar entregar `src/proto/**` quando a stack do dev é a mesma, mas a `description` da skill continuava anunciando *"não envia código-fonte"*, o item da DoD continuava exigindo *"nenhum código-fonte (`.tsx`/`.ts`/`.jsx`/`.js` de componente)"* e o `handoff-manifest.md` mantinha código de componente em **🔒 Interno (nunca entra)**. Na prática as travas ganhavam: a `description` enquadra a skill inteira e a DoD é o portão de saída, então o caminho do fonte existia no texto e não acontecia na execução.
