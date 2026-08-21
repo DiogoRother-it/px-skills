@@ -236,16 +236,25 @@ Incluir também: **fluxo de decisão** ("está 🟢 ou 🟡? então existe, não
 handoff-ux/
 └── <label>/                     # semana-<NN> ou v<N>
     ├── handoff.md
-    ├── README.md
+    ├── README.md                # inclui a tabela "preservar versus reescrever"
     ├── ui-kit.md
+    │
+    │   # Caminho do FONTE (stack igual):
+    ├── proto/                   # código-fonte: telas .tsx + index.css com os tokens
+    ├── mapa-de-telas.md         # Tela | Rota | Arquivo | Histórias (visão geral + rastreabilidade)
+    ├── pre-requisitos.md        # os 7 itens conferíveis no app do dev
+    │                            # (build compilado NÃO entra — vai publicado, link no README)
+    │
+    │   # Caminho da REFERÊNCIA VISUAL (stack diferente):
     ├── prototipo/               # HTML unificado single-file OU build navegável
+    │
     └── <fluxo>/
         ├── stories/
         │   └── <historia>.md
         ├── regras-negocio.md
         └── <spec-referenciada>.md   # quando a história referenciar
 ```
-`handoff-ux/` sempre na raiz. Uma pasta por fluxo. HTML/build, UI Kit, README e handoff.md na raiz do rótulo.
+`handoff-ux/` sempre na raiz. Uma pasta por fluxo. Use só o bloco do caminho decidido na "Forma do protótipo" — os dois nunca coexistem no mesmo pacote.
 
 ## GATE — Barreira de saída (verificar antes do eco final)
 
