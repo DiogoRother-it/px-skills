@@ -1,6 +1,6 @@
 ---
 name: px-handoff
-description: Skill de FECHAMENTO da cadeia PX. Monta o pacote de handoff pro dev a partir das histórias já ready — consolida a referência visual navegável (HTML unificado ou build do protótipo), o UI Kit do produto, as histórias de negócio (BDD), as regras de negócio por fluxo e as specs referenciadas, tudo self-contained e organizado por fluxo. Não envia código-fonte nem artefatos internos. Use ao fechar um lote de telas prontas pra levar pro dev — "fechar o handoff", "preparar a entrega pro dev", "empacotar pro desenvolvimento", "qual sprint essa entrega entra", "finalizar o fluxo".
+description: Skill de FECHAMENTO da cadeia PX. Monta o pacote de handoff pro dev a partir das histórias já ready. Quando o dev implementa na MESMA stack do protótipo, entrega o FONTE do proto (componentes reais + tokens) — é o que garante fidelidade estrutural; quando a stack é diferente, entrega referência visual navegável + anatomia. Sempre acompanha o UI Kit do produto, as histórias de negócio (BDD), as regras de negócio por fluxo e as specs referenciadas, tudo self-contained e organizado por fluxo. Não envia config de build nem artefatos internos. Use ao fechar um lote de telas prontas pra levar pro dev — "fechar o handoff", "preparar a entrega pro dev", "empacotar pro desenvolvimento", "qual sprint essa entrega entra", "finalizar o fluxo".
 compatibility: claude-code
 metadata:
   audience: px-ux
@@ -222,14 +222,15 @@ handoff-ux/
 **Qualquer item com ✗ bloqueia** — resolver ou declarar como Pergunta em aberto com dono.
 
 **Self-contained (o coração da otimização)**
-- [ ] `grep` por `planning/`, `src/proto`, `epics/`, `requests/` no pacote = **zero** (nenhuma referência morta)
+- [ ] `grep` por caminhos internos (`planning/`, `epics/`, `requests/`, e `src/proto` como *referência de import*) no pacote = **zero** referência morta. Não confundir com os arquivos do proto copiados para `proto/`, que **devem** estar lá no caminho do fonte.
 - [ ] `grep` pelos termos de terminologia superada = **zero**
 - [ ] Toda spec referenciada por uma história está **incluída** no pacote
 - [ ] `regras-negocio.md` presente em cada fluxo (ou RNs inlined na história)
 - [ ] README.md e handoff.md batem com o conteúdo real (referência visual, RNs, specs)
 
 **Pacote**
-- [ ] Referência visual navegável presente (HTML single-file **ou** build em `prototipo/`)
+- [ ] **Caminho do FONTE** (stack igual): `proto/` com os componentes do protótipo + `index.css` com os tokens aplicados. Build compilado, se houver, marcado como visualizador.
+- [ ] **Caminho da REFERÊNCIA VISUAL** (stack diferente): HTML single-file **ou** build em `prototipo/`, mais `anatomia-visual.md` e `mapa-de-consumo.md`.
 - [ ] Se HTML single-file: `data-story="<ID>"` em cada elemento acionador
 - [ ] UI Kit presente e atualizado
 - [ ] `handoff.md` sem campos `<placeholder>` vazios
@@ -245,7 +246,8 @@ handoff-ux/
 - [ ] Toda pendência tem dono confirmado
 
 **O que nunca deve sair como arquivo** (ver `templates/handoff-manifest.md`)
-- [ ] Nenhum código-fonte (`.tsx`/`.ts`/`.jsx`/`.js` de componente) ou config (`vite.config`, `tsconfig`, `package.json`, `.env`)
+- [ ] Nenhuma **config de build**: `vite.config`, `tsconfig`, `package.json`, `.env`
+- [ ] Nenhum código de componente **fora do caminho do fonte**. No caminho do fonte, `proto/**` e `index.css` entram — é o artefato principal, não exceção. Nos dois casos, nada de `src/components/ui/**`: esses vêm do registry `@centralit`, não do pacote.
 - [ ] Nenhum artefato interno: checkpoint (`PX-PROGRESS`), prompt de continuidade, discovery/auditoria, épicos, requests, scratchpad, memória
 
 **O que deve entrar**
