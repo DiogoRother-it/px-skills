@@ -1,6 +1,6 @@
 ---
 name: px-handoff
-description: Skill de FECHAMENTO da cadeia PX. Monta o pacote de handoff pro dev a partir das histórias já ready. Quando o dev implementa na MESMA stack do protótipo, entrega o FONTE do proto (componentes reais + tokens) — é o que garante fidelidade estrutural; quando a stack é diferente, entrega referência visual navegável + anatomia. Sempre acompanha o UI Kit do produto, as histórias de negócio (BDD), as regras de negócio por fluxo e as specs referenciadas, tudo self-contained e organizado por fluxo. Não envia config de build nem artefatos internos. Use ao fechar um lote de telas prontas pra levar pro dev — "fechar o handoff", "preparar a entrega pro dev", "empacotar pro desenvolvimento", "qual sprint essa entrega entra", "finalizar o fluxo".
+description: Skill de FECHAMENTO da cadeia PX. Monta o pacote de handoff pro dev a partir das histórias já ready. Quando o dev implementa na MESMA stack do protótipo, entrega o FONTE em duas pastas com instrução oposta: a UI (copiar, não editar) e o andaime do protótipo (descartar), mais os tokens — é o que garante fidelidade visual, porque elimina a reescrita; quando a stack é diferente, entrega referência visual navegável + anatomia. Sempre acompanha o UI Kit do produto, as histórias de negócio (BDD), as regras de negócio por fluxo e as specs referenciadas, tudo self-contained e organizado por fluxo. Não envia config de build nem artefatos internos. Use ao fechar um lote de telas prontas pra levar pro dev — "fechar o handoff", "preparar a entrega pro dev", "empacotar pro desenvolvimento", "qual sprint essa entrega entra", "finalizar o fluxo".
 compatibility: claude-code
 metadata:
   audience: px-ux
@@ -256,6 +256,41 @@ handoff-ux/
 ```
 `handoff-ux/` sempre na raiz. Uma pasta por fluxo. Use só o bloco do caminho decidido na "Forma do protótipo" — os dois nunca coexistem no mesmo pacote.
 
+## PORTÃO EXECUTÁVEL — o pacote não sai se um destes falhar
+
+> Antes desta seção existir, o gate do handoff conferia apenas **presença de
+> arquivo**. Um pacote foi montado com uma tela que não compilava e ficou cinco
+> dias registrado como verde, porque nada nunca foi executado. Presença de arquivo
+> não é verificação.
+
+Rode, **na ordem**, e cole a saída no eco final:
+
+```bash
+npx tsc --noEmit -p tsconfig.app.json   # typecheck do fonte entregue
+npm run lint:spacing                    # grid de 8px
+npm run lint:travessao                  # travessão em copy visível
+npm run lint:caixa-alta                 # caixa alta total
+npm run lint:camadas                    # separação UI / andaime
+npm run lint:tipografia                 # escala de tipografia e altura de controle
+npm run build                           # build a partir de cópia limpa
+```
+
+### O `-p` não é detalhe
+
+`npx tsc --noEmit` **sem** o `-p` compila **zero arquivo** e sai com sucesso, porque o `tsconfig.json` da raiz do boilerplate tem `"files": []` e só `references`. Medido: com um erro de tipo plantado, o comando sem `-p` retorna exit 0 e nenhuma linha de saída; com `-p tsconfig.app.json` retorna exit 2 e a mensagem do erro.
+
+**Um gate que não pode falhar não é gate.** Ao introduzir um gate novo, rode-o uma vez contra um erro plantado e registre a mensagem. Sem essa prova, não conte o gate.
+
+### Tabela de dependências: derivada, nunca escrita
+
+A tabela "o que o `proto/` depende, e de onde vem" **não é redigida à mão**. Escrever à mão garante que vai divergir do código, e as entradas que faltarem serão justamente as que quebram o build do dev. Derive:
+
+```bash
+grep -rhoE 'from "@/(components|hooks|lib|assets)[^"]*"' src/<produto>/ src/proto/ | sort -u
+```
+
+Toda linha da saída precisa aparecer na tabela, com a origem (registry, boilerplate, ou arquivo dentro do pacote). Asset importado por módulo **entra no pacote** e a tabela diz para onde copiar.
+
 ## GATE — Barreira de saída (verificar antes do eco final)
 
 **Qualquer item com ✗ bloqueia** — resolver ou declarar como Pergunta em aberto com dono.
@@ -268,13 +303,19 @@ handoff-ux/
 - [ ] README.md e handoff.md batem com o conteúdo real (referência visual, RNs, specs)
 
 **Pacote**
-- [ ] **Caminho do FONTE** (stack igual): `proto/` com os componentes do protótipo + `index.css` com os tokens aplicados
+- [ ] **Caminho do FONTE** (stack igual): **duas pastas com instrução oposta** — `<produto>/` (a UI: copiar, não editar) e `proto/` (o andaime: descartar). Nenhum arquivo repetido entre as duas. `index.css` com os tokens aplicados vai junto
+- [ ] **Caminho do FONTE:** `<produto>/README.md` presente, declarando `camada: ui` e explicando o que entra por parâmetro (dados, papel, estado de carga, navegação)
+- [ ] **Caminho do FONTE:** a camada de UI não tem **nenhum** import de `@/proto/*` (`npm run lint:camadas` verde)
+- [ ] **Caminho do FONTE:** conteúdo de exemplo numa fixture única em `proto/fixtures.ts`, de dados puros, e o README dizendo para semear o ambiente de teste a partir dela
+- [ ] **Caminho do FONTE:** tabela de dependências **derivada** por grep, não escrita à mão
 - [ ] **Caminho do FONTE:** nenhum build compilado como arquivo no pacote. Link do protótipo publicado no `README.md` (ou pendência registrada no `handoff.md`)
 - [ ] **Caminho do FONTE:** `mapa-de-telas.md` presente (Tela / Rota / Arquivo / Histórias) e `pre-requisitos.md` com os 7 itens conferíveis
 - [ ] **Caminho do FONTE:** tabela "preservar versus reescrever" no `README.md` do pacote
 - [ ] **Caminho da REFERÊNCIA VISUAL** (stack diferente): HTML single-file **ou** build em `prototipo/`, mais `anatomia-visual.md` e `mapa-de-consumo.md`.
 - [ ] Se HTML single-file: `data-story="<ID>"` em cada elemento acionador
 - [ ] UI Kit presente e atualizado
+- [ ] `paridade/` presente: matriz de estados enumerada, spec de comparação visual, adaptador com o ponto de sessão a preencher, `excecoes.md` com a ordem de precedência e `gates.md` com a saída real dos comandos
+- [ ] `excecoes.md` declara a precedência: **o contrato do DS vence o protótipo**, e diff nesse ponto não é falha de paridade. Sem essa linha, o aceite "harness verde" obriga o dev a reimportar defeito nosso para o teste passar
 - [ ] `handoff.md` sem campos `<placeholder>` vazios
 
 **Histórias**
@@ -305,6 +346,9 @@ Antes de fechar, repita em 3–4 linhas: *"Handoff **<label>**: **N** histórias
 `handoff-ux/<label>/handoff.md` — o mesmo slug do rótulo.
 
 ## Regras
+
+- **Nada sai sem o portão executável passar.** Presença de arquivo não é verificação.
+- **A UI vai com instrução de copiar; o andaime com instrução de descartar.** Se o dev precisar editar um arquivo da camada de UI para rodar no projeto dele, é defeito nosso e conserta-se na origem.
 
 - **Pacote self-contained.** Nenhuma referência a caminho fora do pacote — refs mortas são reescritas para relativas ou removidas na sanitização (BLOCO 6).
 - **RNs e specs referenciadas viajam junto**, extraídas do interno e sanitizadas. O request fica de fora como arquivo; seu conteúdo essencial, não.

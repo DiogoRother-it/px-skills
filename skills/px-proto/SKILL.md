@@ -1,6 +1,6 @@
 ---
 name: px-proto
-description: Cria componentes/páginas de protótipo dentro do boilerplate (Vite + localhost) usando os componentes reais do shadcn, os tokens reais do UI KIT e mock data do px-request. O PX trabalha no localhost com HMR — vê, ajusta, aprova. Obrigatório após o px-request e antes do px-story. Use quando o líder disser "gera o proto", "quero ver como fica", "prototipar a tela", "visualizar a spec", ou ao fechar um px-request.
+description: Cria a tela do protótipo dentro do boilerplate (Vite + localhost) usando os componentes reais do shadcn, os tokens reais do UI KIT e mock data do px-request. Constrói em DUAS pastas obrigatoriamente: a UI, que é destinada à produção e o dev copia sem editar, e o andaime do protótipo (seletores de papel e estado, dados de exemplo), que é descartável. O PX trabalha no localhost com HMR — vê, ajusta, aprova. Obrigatório após o px-request e antes do px-story. Use quando o líder disser "gera o proto", "quero ver como fica", "prototipar a tela", "visualizar a spec", ou ao fechar um px-request.
 compatibility: claude-code
 metadata:
   audience: px-ux
@@ -9,13 +9,15 @@ metadata:
 
 # px-proto — protótipo visual no boilerplate (Vite + localhost)
 
-Esta skill cria o protótipo da tela **dentro do boilerplate**, usando os componentes reais do shadcn/ui, os tokens reais do `src/index.css` e o servidor de desenvolvimento Vite. O PX vê a tela no localhost com HMR — ajusta em tempo real, aprova — e só então a tela vira história (`px-story`). O protótipo fica em `src/proto/` e não é código de produção.
+Esta skill cria o protótipo da tela **dentro do boilerplate**, usando os componentes reais do shadcn/ui, os tokens reais do `src/index.css` e o servidor de desenvolvimento Vite. O PX vê a tela no localhost com HMR — ajusta em tempo real, aprova — e só então a tela vira história (`px-story`).
+
+**A tela nasce em duas pastas, e a distinção importa mais que qualquer outra regra desta skill:** `src/<produto>/` guarda a **UI, que é destinada à produção** e é entregue ao dev com a instrução de copiar sem editar; `src/proto/` guarda o **andaime**, que é descartável. Tratar o protótipo inteiro como descartável é o que produz código que o dev não consegue reaproveitar, e é a causa raiz da divergência visual entre protótipo e implementação.
 
 **Por que no boilerplate:** componentes reais, tokens reais, HMR. Standalone HTML via CDN é uma aproximação — aqui é o mesmo stack do produto, só com mock data e diretório separado.
 
-> **Este fonte vai ser lido por outro time.** Quando o dev implementa na mesma stack, a `px-handoff` entrega **o fonte de `src/proto/`** como referência de implementação — não um build compilado. Escreva pensando nisso: nome de variável que se explica, `// MOCK:` e `// INTEGRATION BOUNDARY:` nas fronteiras, e nenhum truque que você não queira ver copiado. É o que permite fidelidade 1:1 sem ninguém redesenhar pixel a partir de screenshot.
+> **Este fonte vai ser COPIADO por outro time, não lido.** Quando o dev implementa na mesma stack, a `px-handoff` entrega `src/<produto>/` com a instrução de copiar sem editar. Escreva pensando nisso: nome de variável que se explica, `// INTEGRATION BOUNDARY:` nas fronteiras, e nenhum truque que você não queira ver rodando em produção. É o que permite fidelidade 1:1 sem ninguém redesenhar a partir de screenshot, e sem ninguém redigitar centenas de decisões visuais.
 >
-> Continua sendo protótipo: `src/proto/` não é biblioteca, não é pacote, não é código de produção, e o PX não mantém. A fronteira de propriedade está registrada na `px-handoff`.
+> **Se o dev precisar editar um arquivo da camada de UI para rodar no projeto dele, é defeito nosso** e conserta-se na origem. O andaime é outra história: `src/proto/` não é biblioteca, não é pacote, não vai para produção, e o PX não mantém. A fronteira de propriedade está registrada na `px-handoff`.
 
 **Por que obrigatório:** spec textual não substitui revisão visual. Erros de hierarquia, densidade, estados e copy só aparecem quando você vê a tela. Corrigir aqui é grátis; corrigir depois do dev é caro.
 
@@ -121,80 +123,146 @@ Com a variação definida (px-request Bloco 6 + confirmações do Passo 2), cons
 
 ---
 
-## Passo 5 — Criar o arquivo do protótipo
+## Passo 5 — Criar os DOIS arquivos do protótipo
 
-Crie `src/proto/<slug-da-tela>.tsx`:
+> ⛔ **Nunca escreva a tela num arquivo só.** Todo protótipo nasce em duas pastas.
+> Esta é a regra que mais impacta fidelidade visual no handoff, e não é negociável.
+
+| Arquivo | O que contém | Destino |
+|---|---|---|
+| `src/<produto>/tela-<slug>.tsx` | **A UI.** Recebe dados, papel de usuário, estado de carga e navegação por parâmetro | Vai para produção. O dev copia e **não edita** |
+| `src/proto/page-<slug>.tsx` | **O andaime.** Seletor de papel, seletor de estado, tema, dados de exemplo, navegação de protótipo | Descartável |
+
+**Por que:** enquanto UI e andaime moram no mesmo arquivo, o dev é obrigado a **editar** para extrair a interface, e quem edita reescreve. Toda reescrita muda um espaçamento, uma variante, uma ordem. É a causa raiz da divergência visual entre protótipo e implementação, e revisão humana não pega isso de forma confiável.
+
+**A dependência é direcional:** o andaime conhece a UI; a UI nunca conhece o andaime. Declare a camada criando `src/<produto>/README.md` com a linha `camada: ui`, e `npm run lint:camadas` passa a barrar qualquer import da UI para `proto/`.
+
+### 5a — A UI
 
 ```tsx
-// PROTO: <Nome da Tela> — <slug do px-request>
-// Descartável. Não é código de produção.
-// Aprovado em: [data de aprovação]
+// Tela <Nome>: a UI, e só a UI.
+//
+// Estado de interface (filtro aberto, aba ativa, formulário de modal) é dela.
+// Dados, papel de usuário, estado de carga e navegação entram por parâmetro.
 
 import { useState } from "react"
-// Importar componentes reais — NUNCA reimplementar
-// ex: import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-// ex: import { Badge } from "@/components/ui/badge"
-// ex: import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+// Componentes reais do DS — NUNCA reimplementar
+// ex: import { Table, TableBody, TableCell } from "@/components/ui/table"
 
-// ── Mock data (Bloco 4 do px-request) ─────────────────────────
-const MOCK_ITEMS = [
-  // valores realistas — nomes, datas, números plausíveis
-  // nunca "Lorem Ipsum", nunca "Usuário 1"
-]
+import type { EstadoTela, Papel } from "@/<produto>/tipos"
 
-// ── Switcher de estado ─────────────────────────────────────────
-type Estado = "default" | "loading" | "empty" | "error" // ajustar ao B7
-
-export function ProtoNomeDaTela() {
-  const [estado, setEstado] = useState<Estado>("default")
+export function TelaNome({
+  itens,
+  papel,
+  podeEditar,
+  estado = "default",
+  onAbrirItem,
+  onSalvar,
+  onTentarNovamente,
+}: {
+  itens: Item[]
+  papel: Papel
+  /** Já resolvido por quem chama, incluindo a regra de consulta-only no mobile. */
+  podeEditar: boolean
+  estado?: EstadoTela
+  onAbrirItem?: (item: Item) => void
+  onSalvar?: (dados: DadosDoForm) => void
+  onTentarNovamente?: () => void
+}) {
+  // Estado de INTERFACE fica aqui. Estado de AMBIENTE vem por parâmetro.
+  const [busca, setBusca] = useState("")
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Barra de estado — visível só neste proto */}
-      <div className="flex items-center gap-2 px-4 py-2 bg-muted text-xs text-muted-foreground border-b">
-        <span>Estado proto:</span>
-        {(["default", "loading", "empty", "error"] as Estado[]).map((e) => (
-          <button
-            key={e}
-            onClick={() => setEstado(e)}
-            className={`px-2 py-1 rounded border text-xs ${
-              estado === e
-                ? "bg-primary text-primary-foreground border-primary"
-                : "border-border bg-transparent"
-            }`}
-          >
-            {e}
-          </button>
+    <main className="mx-auto max-w-7xl px-6 py-8">
+      {estado === "loading" && <EsqueletoDaLista />}
+      {estado === "empty"   && <EstadoVazio mensagem="..." />}
+      {estado === "error"   && <EstadoErro mensagem="..." onTentarNovamente={onTentarNovamente} />}
+      {estado === "default" && <ListaDeItens itens={itens} onAbrir={onAbrirItem} />}
+    </main>
+  )
+}
+```
+
+### 5b — O contrato de dado
+
+Em `src/<produto>/tipos.ts`, declarado **pela forma do contrato, não pela forma do mock**:
+
+```ts
+export type Item = {
+  id: string
+  nome: string
+  /** Ausente enquanto não classificado. NUNCA string vazia fazendo papel de ausência. */
+  categoria?: string
+  /** Lista vazia é legítima. Diferente de ausência. */
+  tags: string[]
+}
+```
+
+Duas regras, e as duas nasceram de divergência real em pacote entregue:
+
+1. **Ausente não é vazio.** Campo que pode não existir é opcional. Quem renderiza precisa distinguir "não informado" de "informado como vazio", senão a decisão de exibição (travessão, esconder o bloco, mostrar zero) acaba no adaptador que o dev escreve, e cada adaptador decide diferente.
+2. **Variante é união discriminada**, não tipo largo com tudo opcional. Tipo largo empurra "este registro tem este bloco?" para runtime, e é ali que o comportamento diverge.
+
+`typeof MOCK[0]` como tipo de prop é **proibido**: amarra a UI à forma do dado de exemplo.
+
+### 5c — A fixture
+
+Todo conteúdo de exemplo em **um módulo só**, `src/proto/fixtures.ts`, de dados puros: sem React, sem JSX, sem import de componente ou asset. As telas não declaram mock próprio.
+
+Isso não é organização, é pré-requisito do aceite visual: se protótipo e implementação renderizarem conteúdo diferente, o diff acusa diferença de **dado** em vez de diferença de **implementação**, em toda tela cujo layout dependa do tamanho do conteúdo. O desfecho previsível é alguém subir a tolerância até o teste calar.
+
+### 5d — O andaime
+
+```tsx
+// ANDAIME DO PROTÓTIPO — <nome da tela>.
+// Este arquivo NÃO é a UI. A UI está em @/<produto>/*. Aqui vive só o que existe
+// para demonstrar: seletor de papel, seletor de estado, tema e dados de exemplo.
+
+import { useEffect, useState } from "react"
+import { MOCK_ITENS } from "@/proto/fixtures"
+import { TelaNome } from "@/<produto>/tela-nome"
+import type { EstadoTela, Papel, Tema } from "@/<produto>/tipos"
+
+const ESTADOS_PROTO = ["default", "loading", "empty", "error"] as const
+
+export function ProtoPageNome() {
+  const [papel, setPapel] = useState<Papel>("consultor")
+  const [estado, setEstado] = useState<(typeof ESTADOS_PROTO)[number]>("default")
+  const [tema, setTema] = useState<Tema>(() => (localStorage.getItem("proto-tema") as Tema) ?? "dark")
+
+  useEffect(() => {
+    localStorage.setItem("proto-tema", tema)
+    document.documentElement.classList.toggle("dark", tema === "dark")
+  }, [tema])
+
+  return (
+    <div className={tema}>
+      {/* Barra de controle do protótipo. Não existe no produto final. */}
+      <div className="flex flex-wrap items-center gap-2 border-b bg-muted px-4 py-2 text-xs text-muted-foreground">
+        <span>Estado:</span>
+        {ESTADOS_PROTO.map((e) => (
+          <button key={e} onClick={() => setEstado(e)} className="rounded border px-2 py-1 text-xs">{e}</button>
+        ))}
+        <span className="ml-2">Papel:</span>
+        {(["consultor", "produto"] as Papel[]).map((p) => (
+          <button key={p} onClick={() => setPapel(p)} className="rounded border px-2 py-1 text-xs">{p}</button>
         ))}
       </div>
 
-      <div className="p-8">
-        {estado === "loading" && <EstadoLoading />}
-        {estado === "empty"   && <EstadoEmpty />}
-        {estado === "error"   && <EstadoError />}
-        {estado === "default" && <EstadoDefault />}
-      </div>
+      <TelaNome
+        itens={MOCK_ITENS}
+        papel={papel}
+        podeEditar={papel === "produto"}
+        estado={estado as EstadoTela}
+        onAbrirItem={() => { window.location.href = "/proto/page-detalhe" }}
+        onTentarNovamente={() => setEstado("default")}
+      />
     </div>
   )
 }
-
-function EstadoDefault() {
-  // Variação exata com componentes reais
-  return null
-}
-function EstadoLoading() {
-  // Skeleton que preserva o layout — usar <Skeleton> do shadcn
-  return null
-}
-function EstadoEmpty() {
-  // Mensagem + CTA — nunca tela morta
-  return null
-}
-function EstadoError() {
-  // Mensagem explicando como resolver + ação de recuperação
-  return null
-}
 ```
+
+> **Sinal de que a separação está certa:** o arquivo do andaime fica curto, na ordem de 100 a 150 linhas, independente do tamanho da tela. Se ele passar disso, tem UI vazando para dentro dele.
 
 ### Regras de implementação
 
@@ -284,7 +352,10 @@ Quando aprovado:
 
 ## Onde fica
 
-`src/proto/<slug-da-tela>.tsx` (boilerplate, temporário)
+- `src/<produto>/tela-<slug>.tsx` — a UI (vai para produção)
+- `src/<produto>/tipos.ts` — os contratos de dado
+- `src/proto/page-<slug>.tsx` — o andaime (descartável)
+- `src/proto/fixtures.ts` — o conteúdo de exemplo, fonte única
 
 ---
 
@@ -299,7 +370,10 @@ Quando aprovado:
 - **Borda, cor de destaque, visual de alerta em cards** → confirmar se aplica a todos ou só aos que têm condição.
 - **Header de tela** → confirmar se tem breadcrumb/router ou só H1.
 - **Switcher de estado obrigatório** — todos os estados do B7.
-- **Proto não é código de produção** — sem abstrações, sem otimizações. Referência visual descartável.
+- **A UI é código destinado à produção; o andaime é descartável.** Não trate o protótipo inteiro como descartável: a pasta de UI é entregue com a instrução "copie, não edite", e é isso que elimina a divergência visual. Só `src/proto/` é jogado fora.
+- **Contrato de dado pela forma do contrato, nunca `typeof MOCK[0]`.** Ausente não é vazio; variante é união discriminada.
+- **Uma fixture só**, em `src/proto/fixtures.ts`, de dados puros. Tela não declara mock próprio.
+- **`npm run lint:camadas` verde** antes de considerar o proto pronto.
 
 ---
 
