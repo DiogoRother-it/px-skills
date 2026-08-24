@@ -48,6 +48,15 @@ História e cenários em pt-BR. Gherkin em português: `Funcionalidade / Cenári
 **Perguntar (estruturada):** "Isto é uma entrega única ou são várias?" — *Uma história (Recomendado se cabe num ciclo)* · *Quebrar em várias → chamar `px-epic`.*
 
 ## S3 — Critérios de aceite (funcional)
+
+> **Numeração:** `CA-01`, `CA-02`... em **ordem crescente e contígua**, e a ordem no arquivo tem que bater com a numeração.
+>
+> **Ao acrescentar critério numa história já escrita** (é o caso de todo delta): o novo critério recebe o próximo número livre e é **inserido na posição numérica**, não no fim da seção. O erro comum é acrescentar `CA-13` logo depois do `CA-08` porque foi ali que o assunto encaixou. O dev lê a lista de cima para baixo e a numeração pula.
+>
+> **Nunca renumerar** para consertar. Os identificadores são referenciados pelos cenários BDD e pelas regras de negócio; renumerar quebra a rastreabilidade. Reordene as linhas, mantendo cada número onde nasceu.
+>
+> **ID estável no cabeçalho.** A história abre com `**ID:** \`<PROD>-<FLUXO>\`` (ex: `VIT-CAT`), o número de ordem de implementação e o arquivo da UI onde ela vive. O nome do arquivo não carrega número: ordem vive no `mapa-de-telas.md` do handoff, porque número em nome de arquivo envelhece.
+
 **Decidir:** o que precisa ser verdade pra dizer "funciona".
 **Por que importa:** é o contrato objetivo do que a feature faz. Cada item tem que ser **verificável** (dá pra apontar e dizer passou/não passou).
 **Fazer, um de cada vez:**
@@ -132,6 +141,8 @@ Escreva os cenários, mostre, e confirme a cobertura acima antes de fechar.
 - [ ] Critérios de aceite verificáveis, um por comportamento e por estado (S3)
 - [ ] Critérios de usabilidade por dimensão (S4), N/A justificado onde não se aplica
 - [ ] Fluxo principal em passos numerados, um por público (S4b)
+- [ ] Critérios de aceite em ordem crescente e contígua, com a ordem no arquivo batendo com a numeração (S3)
+- [ ] Cabeçalho com ID estável, ordem de implementação e arquivo da UI (S3)
 - [ ] BDD com cobertura: feliz + vazio + erro + permissão + regra de negócio (S5)
 - [ ] Rastreabilidade completa (S6)
 - [ ] Premissas registradas
