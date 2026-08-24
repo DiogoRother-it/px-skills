@@ -3,6 +3,31 @@
 Todas as versões instaláveis via `npx github:DiogoRother-it/px-skills` / `npx @centralit/px-skills`.
 O instalador imprime só a versão mais recente no terminal — o histórico completo vive aqui.
 
+## 1.11.0 — 2026-08-24
+
+**A cadeia tirou o número do nome do arquivo e não colocou a ordem em lugar nenhum.** O gate da `px-handoff` exigia "nomes de arquivo sem prefixos numéricos", com razão: número em nome de arquivo envelhece na primeira história que entra no meio e passa a mentir. Só que a ordem foi embora com ele. O time de desenvolvimento reclamou de duas coisas, e as duas eram nossas: *"não está sendo gerado com ordenação numérica correta"* e *"está difícil de identificar onde a história se reflete no protótipo"*.
+
+Auditando um pacote real, as duas se confirmaram, uma delas de forma mais concreta do que a reclamação sugeria:
+
+- **Não havia ordem alguma** entre os fluxos. Um arquivo de história por fluxo, sem número e sem indicação de por onde começar.
+- **Dentro de uma história, os critérios estavam fora de ordem de verdade.** Na história da matriz, os `CA-13`, `CA-14` e `CA-15` estavam entre o `CA-08` e o `CA-09`. Causa: quando um delta acrescenta critérios a uma história já escrita, eles recebem o próximo número livre mas são inseridos onde o assunto encaixa. Quem lê de cima para baixo vê a numeração pular.
+- **O `mapa-de-telas.md`, que a 1.9.0 tornou obrigatório justamente para resolver a rastreabilidade, não existia no pacote.** A reclamação do dev era literalmente o artefato que a gente definiu como obrigatório e não entregou.
+
+**`px-handoff`:**
+- **O `mapa-de-telas.md` passa a carregar ordem e identificador estável**, não só localização: `# | ID | Fluxo | Tela | Rota | Arquivo da UI | História | Depende de`. A coluna de ordem exige **o motivo escrito em prosa** logo abaixo da tabela, porque ordem sem motivo o dev ignora na primeira pressão de prazo.
+- **Inventário de peças obrigatório no mapa** (arquivo → o que é → em quais fluxos aparece). É o que responde "onde isto vive" quando o critério fala de um card, um modal, uma linha ou um selo em vez de da tela inteira. Só é útil com a UI em arquivos separados: num arquivo único de 600 linhas o ponteiro não ajuda ninguém, e é por isso que este item só faz sentido depois da separação de camadas da 1.10.0.
+- **A regra de não usar prefixo numérico ganhou a contrapartida explícita.** As duas andam juntas: tirar o número sem colocar a ordem em outro lugar deixa o dev sem saber por onde começar.
+- **Novo item no portão executável:** verificação de que os critérios de aceite estão em ordem crescente em cada história, com o comando pronto.
+
+**`px-story`:**
+- **Numeração crescente e contígua**, com a ordem no arquivo batendo com a numeração.
+- **Regra para delta:** critério novo recebe o próximo número livre e é **inserido na posição numérica**, não no fim da seção.
+- **Nunca renumerar para consertar.** Os identificadores são referenciados pelos cenários BDD e pelas regras de negócio; renumerar quebra a rastreabilidade. Reordenar as linhas, mantendo cada número onde nasceu.
+- **ID estável no cabeçalho** da história, mais a ordem de implementação e o arquivo da UI onde ela vive.
+- Dois itens novos na DoR.
+
+---
+
 ## 1.10.0 — 2026-08-24
 
 **A cadeia entregava o fonte, e o dev continuava obrigado a reescrever.** A 1.8.0 abriu o caminho do fonte e a 1.9.0 tirou o bundle do pacote, mas o `px-proto` continuava mandando escrever a tela num arquivo só, com o seletor de papel, o seletor de estado, a alternância de tema e o mock data costurados dentro da própria interface. Na prática o dev recebia código que não conseguia importar: para arrancar o andaime ele tinha que editar, e quem edita reescreve. Toda reescrita muda um espaçamento, uma variante, uma ordem. Medimos numa peça só, o card de produto de um projeto real: **18 decisões visuais que o design system não dita**, sendo uma delas um tamanho de fonte fora da escala que um dev seguindo o DS corretamente escreveria diferente, estando certo. Multiplicado pelas peças de um pacote, são centenas de decisões reproduzidas de olho. Era essa a causa raiz da divergência visual, e nenhuma revisão humana pega isso de forma confiável.

@@ -32,7 +32,10 @@ Ela **não desenha tela** (isso é `px-request`/`px-story`): fecha o ciclo, mont
 
 - **Por que:** a `px-proto` constrói o protótipo com os componentes reais e os mesmos aliases (`@/components/ui/...`). No repo do dev esses caminhos resolvem sem tradução. Entregar só o build obriga a rededuzir espaçamento, sombra, elevação e troca de estado a partir de screenshot — trabalho já feito uma vez, e a principal fonte de divergência visual.
 - **Documente no README** de onde vem cada import do proto (registry, boilerplate, interno ao pacote) e que **não há dependência nova a instalar**.
-- **`mapa-de-telas.md` (obrigatório neste caminho):** uma linha por tela, com `Tela | Rota | Arquivo em proto/ | Histórias`. Resolve três coisas de uma vez: dá a visão geral que um repo não dá de graça, aponta onde cada tela vive, e carrega a rastreabilidade história ↔ componente **em arquivo separado** em vez de escondida dentro de marcação.
+- **`mapa-de-telas.md` (obrigatório neste caminho):** uma linha por tela, com `# | ID | Fluxo | Tela | Rota | Arquivo da UI | História | Depende de`. Resolve quatro coisas de uma vez: dá a visão geral que um repo não dá de graça, aponta onde cada tela vive, carrega a rastreabilidade história ↔ componente **em arquivo separado**, e **expressa a ordem de implementação**.
+  - A coluna `#` é a ordem, **com o motivo escrito em prosa logo abaixo da tabela**. Ordem sem motivo o dev ignora na primeira pressão de prazo.
+  - A coluna `ID` é um identificador **estável** por fluxo (ex: `VIT-CAT`, `VIT-DET`), repetido no cabeçalho da história. Estável significa: sobrevive a reordenação e a inserção de história no meio.
+  - **Inclua também um inventário de peças** (arquivo → o que é → em quais fluxos aparece). É o que responde "onde isto vive" quando o critério de aceite fala de um card, um modal, uma linha ou um selo, em vez de da tela inteira. Isso só é útil se a UI estiver em arquivos separados; num arquivo único de 600 linhas o ponteiro não ajuda ninguém.
 - **`pre-requisitos.md` (obrigatório neste caminho):** o que precisa existir no app do dev para o `proto/` renderizar igual. Cada item é conferível, e o que falta aparece antes de virar retrabalho:
   1. Mesma major do framework e do Tailwind do protótipo
   2. O arquivo de tokens do pacote presente no CSS do app (não uma cópia antiga)
@@ -151,7 +154,8 @@ Segue `Skill Prompting Conventions` do `CLAUDE.md`. Estruturada pra decisões en
 - [ ] `regras-negocio.md` presente em cada fluxo (ou RNs inlined na história).
 - [ ] Toda spec referenciada por uma história está incluída no pacote.
 - [ ] **Conferência de completude executada** — nenhuma decisão ou história citada ficou fora (ver abaixo).
-- [ ] Nomes de arquivo sem prefixos numéricos (`historia-nome.md`, não `01-...`).
+- [ ] Nomes de arquivo sem prefixos numéricos (`historia-nome.md`, não `01-...`) **e a ordem expressa no `mapa-de-telas.md`**. As duas coisas andam juntas: número em nome de arquivo envelhece na primeira história que entra no meio e passa a mentir, mas tirar o número sem colocar a ordem em outro lugar deixa o dev sem saber por onde começar. Foi exatamente essa a reclamação que chegou do time de desenvolvimento.
+- [ ] Critérios de aceite em **ordem crescente** dentro de cada história (ver o comando no portão executável). Quando um delta acrescenta critérios a uma história já escrita, eles tendem a entrar no fim da numeração mas no meio da tabela. **Reordenar sem renumerar:** o identificador é referenciado pelos cenários BDD e pelas regras de negócio, então renumerar quebra rastreabilidade.
 - [ ] Copy sem travessão (— / –) e sem caixa alta total em toda a referência visual e nos `.md`.
 
 ### Anatomia visual — obrigatória quando o handoff cruza tecnologia
@@ -273,6 +277,114 @@ npm run lint:caixa-alta                 # caixa alta total
 npm run lint:camadas                    # separação UI / andaime
 npm run lint:tipografia                 # escala de tipografia e altura de controle
 npm run build                           # build a partir de cópia limpa
+```
+
+E, dentro da pasta do pacote, a ordem dos critérios de aceite:
+
+```bash
+for f in $(find . -path "*/stories/*.md"); do
+  seq=$(grep -oE "CA-[0-9]+" "$f" | sed 's/CA-//' | awk '!v[$0]++' | tr '\n' ' ')
+  ord=$(echo "$seq" | tr ' ' '\n' | grep -v '^
+
+### O `-p` não é detalhe
+
+`npx tsc --noEmit` **sem** o `-p` compila **zero arquivo** e sai com sucesso, porque o `tsconfig.json` da raiz do boilerplate tem `"files": []` e só `references`. Medido: com um erro de tipo plantado, o comando sem `-p` retorna exit 0 e nenhuma linha de saída; com `-p tsconfig.app.json` retorna exit 2 e a mensagem do erro.
+
+**Um gate que não pode falhar não é gate.** Ao introduzir um gate novo, rode-o uma vez contra um erro plantado e registre a mensagem. Sem essa prova, não conte o gate.
+
+### Tabela de dependências: derivada, nunca escrita
+
+A tabela "o que o `proto/` depende, e de onde vem" **não é redigida à mão**. Escrever à mão garante que vai divergir do código, e as entradas que faltarem serão justamente as que quebram o build do dev. Derive:
+
+```bash
+grep -rhoE 'from "@/(components|hooks|lib|assets)[^"]*"' src/<produto>/ src/proto/ | sort -u
+```
+
+Toda linha da saída precisa aparecer na tabela, com a origem (registry, boilerplate, ou arquivo dentro do pacote). Asset importado por módulo **entra no pacote** e a tabela diz para onde copiar.
+
+## GATE — Barreira de saída (verificar antes do eco final)
+
+**Qualquer item com ✗ bloqueia** — resolver ou declarar como Pergunta em aberto com dono.
+
+**Self-contained (o coração da otimização)**
+- [ ] `grep` por caminhos internos (`planning/`, `epics/`, `requests/`, e `src/proto` como *referência de import*) no pacote = **zero** referência morta. Não confundir com os arquivos do proto copiados para `proto/`, que **devem** estar lá no caminho do fonte.
+- [ ] `grep` pelos termos de terminologia superada = **zero**
+- [ ] Toda spec referenciada por uma história está **incluída** no pacote
+- [ ] `regras-negocio.md` presente em cada fluxo (ou RNs inlined na história)
+- [ ] README.md e handoff.md batem com o conteúdo real (referência visual, RNs, specs)
+
+**Pacote**
+- [ ] **Caminho do FONTE** (stack igual): **duas pastas com instrução oposta** — `<produto>/` (a UI: copiar, não editar) e `proto/` (o andaime: descartar). Nenhum arquivo repetido entre as duas. `index.css` com os tokens aplicados vai junto
+- [ ] **Caminho do FONTE:** `<produto>/README.md` presente, declarando `camada: ui` e explicando o que entra por parâmetro (dados, papel, estado de carga, navegação)
+- [ ] **Caminho do FONTE:** a camada de UI não tem **nenhum** import de `@/proto/*` (`npm run lint:camadas` verde)
+- [ ] **Caminho do FONTE:** conteúdo de exemplo numa fixture única em `proto/fixtures.ts`, de dados puros, e o README dizendo para semear o ambiente de teste a partir dela
+- [ ] **Caminho do FONTE:** tabela de dependências **derivada** por grep, não escrita à mão
+- [ ] **Caminho do FONTE:** nenhum build compilado como arquivo no pacote. Link do protótipo publicado no `README.md` (ou pendência registrada no `handoff.md`)
+- [ ] **Caminho do FONTE:** `mapa-de-telas.md` presente (Tela / Rota / Arquivo / Histórias) e `pre-requisitos.md` com os 7 itens conferíveis
+- [ ] **Caminho do FONTE:** tabela "preservar versus reescrever" no `README.md` do pacote
+- [ ] **Caminho da REFERÊNCIA VISUAL** (stack diferente): HTML single-file **ou** build em `prototipo/`, mais `anatomia-visual.md` e `mapa-de-consumo.md`.
+- [ ] Se HTML single-file: `data-story="<ID>"` em cada elemento acionador
+- [ ] UI Kit presente e atualizado
+- [ ] `paridade/` presente: matriz de estados enumerada, spec de comparação visual, adaptador com o ponto de sessão a preencher, `excecoes.md` com a ordem de precedência e `gates.md` com a saída real dos comandos
+- [ ] `excecoes.md` declara a precedência: **o contrato do DS vence o protótipo**, e diff nesse ponto não é falha de paridade. Sem essa linha, o aceite "harness verde" obriga o dev a reimportar defeito nosso para o teste passar
+- [ ] `handoff.md` sem campos `<placeholder>` vazios
+
+**Histórias**
+- [ ] BDD completo (feliz + vazio + erro + permissão) em cada história
+- [ ] Rastreabilidade em arquivo separado: no caminho do FONTE, história ↔ componente no `mapa-de-telas.md`; no caminho da referência visual, descrição em texto + anchor `data-story` no HTML single-file
+- [ ] Nomes de arquivo sem prefixos numéricos
+- [ ] Nenhuma story técnica interna do PX — apenas histórias de negócio
+- [ ] Copy sem travessão e sem caixa alta total
+
+**Perguntas em aberto**
+- [ ] Toda pendência tem dono confirmado
+
+**O que nunca deve sair como arquivo** (ver `templates/handoff-manifest.md`)
+- [ ] Nenhuma **config de build**: `vite.config`, `tsconfig`, `package.json`, `.env`
+- [ ] Nenhum código de componente **fora do caminho do fonte**. No caminho do fonte, `proto/**` e `index.css` entram — é o artefato principal, não exceção. Nos dois casos, nada de `src/components/ui/**`: esses vêm do registry `@centralit`, não do pacote.
+- [ ] Nenhum artefato interno: checkpoint (`PX-PROGRESS`), prompt de continuidade, discovery/auditoria, épicos, requests, scratchpad, memória
+
+**O que deve entrar**
+- [ ] Regras de negócio por fluxo + specs referenciadas (extraídas/sanitizadas)
+- [ ] Decisões de produto canônicas (`decisoes/*.md`) e mapa de permissões (`rbac-*.md`) quando existirem
+
+## Eco final
+
+Antes de fechar, repita em 3–4 linhas: *"Handoff **<label>**: **N** histórias em **M** fluxos, cada fluxo com regras de negócio e specs referenciadas incluídas, referência visual = **<HTML single-file | build em prototipo/>**, UI Kit incluído, **X** fronteiras de integração. Pacote self-contained (0 referência morta). Perguntas em aberto: `<N ou nenhuma>`. **<Push via branch órfã `ux/<label>` no repo do dev | Sem repo ainda: organizado localmente, push pendente>**. **<Repo central: rodar px-sync em seguida | Sem repo central>** — confirma?"*. Só então feche.
+
+## Onde salvar
+
+`handoff-ux/<label>/handoff.md` — o mesmo slug do rótulo.
+
+## Regras
+
+- **Nada sai sem o portão executável passar.** Presença de arquivo não é verificação.
+- **A UI vai com instrução de copiar; o andaime com instrução de descartar.** Se o dev precisar editar um arquivo da camada de UI para rodar no projeto dele, é defeito nosso e conserta-se na origem.
+
+- **Pacote self-contained.** Nenhuma referência a caminho fora do pacote — refs mortas são reescritas para relativas ou removidas na sanitização (BLOCO 6).
+- **RNs e specs referenciadas viajam junto**, extraídas do interno e sanitizadas. O request fica de fora como arquivo; seu conteúdo essencial, não.
+- **Terminologia canônica.** Termos superados são substituídos pela nomenclatura atual do produto na sanitização.
+- **Referência visual em camadas.** HTML unificado single-file com `data-story` é o alvo; o build em `prototipo/` é fallback aceitável; localhost é último recurso. Não bloqueie por não ter o single-file.
+- **Doc reconciliada.** README/handoff.md descrevem o que o pacote realmente contém.
+- **Push condicional.** Sem repo do dev, organiza localmente e o push fica pendente. Com repo, push sempre via **branch órfã** — nunca a partir do histórico do boilerplate.
+- **Não desenha tela** e **não inventa boundary.** Consolida o que `px-request`/`px-story` produziram; o que faltar vira Pergunta em aberto com dono.
+- **Nunca executa o push sem aceite explícito do PX.**
+- **`handoff-ux/` sempre na raiz.** HTML é sempre unificado — nunca separado por funcionalidade.
+
+## Relação com o fluxo
+
+```
+                            ┌─→ dev (referência visual)         [pacote reduzido, branch órfã]
+px-request → px-story → px-handoff ─┤
+                            └─→ px-sync → repo CENTRAL do PX     [espelho completo, main fast-forward]
+                            ^ você está aqui
+                            (fecha a cadeia: referência visual + UI Kit + histórias + RNs + specs, por fluxo, self-contained)
+```
+
+> `px-handoff` fecha o ciclo: consolida um pacote **self-contained** de referência visual e o entrega (push quando há repo; organização local quando ainda não há). O dev implementa na stack do projeto — o PX é referência, não código de produção. Quando o projeto também mantém um repo central do PX, `px-handoff` pergunta isso logo no início (pergunta 3) e delega pro `px-sync` — são destinos e conteúdos diferentes, nenhum substitui o outro.
+ | sort -n | tr '\n' ' ')
+  [ "$seq" != "$ord" ] && echo "FORA DE ORDEM: $f ($seq)"
+done
 ```
 
 ### O `-p` não é detalhe
