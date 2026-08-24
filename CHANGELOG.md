@@ -3,6 +3,31 @@
 Todas as versões instaláveis via `npx github:DiogoRother-it/px-skills` / `npx @centralit/px-skills`.
 O instalador imprime só a versão mais recente no terminal — o histórico completo vive aqui.
 
+## 1.10.0 — 2026-08-24
+
+**A cadeia entregava o fonte, e o dev continuava obrigado a reescrever.** A 1.8.0 abriu o caminho do fonte e a 1.9.0 tirou o bundle do pacote, mas o `px-proto` continuava mandando escrever a tela num arquivo só, com o seletor de papel, o seletor de estado, a alternância de tema e o mock data costurados dentro da própria interface. Na prática o dev recebia código que não conseguia importar: para arrancar o andaime ele tinha que editar, e quem edita reescreve. Toda reescrita muda um espaçamento, uma variante, uma ordem. Medimos numa peça só, o card de produto de um projeto real: **18 decisões visuais que o design system não dita**, sendo uma delas um tamanho de fonte fora da escala que um dev seguindo o DS corretamente escreveria diferente, estando certo. Multiplicado pelas peças de um pacote, são centenas de decisões reproduzidas de olho. Era essa a causa raiz da divergência visual, e nenhuma revisão humana pega isso de forma confiável.
+
+O outro lado do mesmo problema: o **gate de saída da `px-handoff` conferia presença de arquivo e nunca executava nada**. Um pacote foi montado com uma tela que não compilava e ficou cinco dias registrado como verde. Presença de arquivo não é verificação.
+
+**`px-proto` — a tela nasce em duas pastas, e isso vira a regra central da skill:**
+- **Passo 5 reescrito de um arquivo para dois.** `src/<produto>/tela-<slug>.tsx` guarda a **UI, que é destinada à produção** e é entregue com a instrução de copiar sem editar; `src/proto/page-<slug>.tsx` guarda o **andaime**, descartável. A dependência é direcional: o andaime conhece a UI, a UI nunca conhece o andaime. Com templates para os quatro arquivos (UI, contrato, fixture, andaime).
+- **A regra que dizia que o protótipo inteiro é descartável foi corrigida.** Era ela que produzia código inaproveitável. Só `src/proto/` é jogado fora.
+- **Contrato de dado declarado pela forma do contrato, nunca `typeof MOCK[0]`.** Duas regras que nasceram de divergência real em pacote entregue: *ausente não é vazio* (campo que pode não existir é opcional, nunca string vazia fazendo papel de ausência) e *variante é união discriminada* (não tipo largo com tudo opcional). Sem isso, a decisão de exibição acaba no adaptador que o dev escreve, e cada adaptador decide diferente.
+- **Fixture única**, de dados puros, em `proto/fixtures.ts`. Tela não declara mock próprio. Não é organização: é pré-requisito do aceite visual, porque conteúdo divergente faz o diff acusar diferença de dado em vez de diferença de implementação, e o desfecho previsível é alguém subir a tolerância até o teste calar.
+- **Sinal de sanidade verificável:** o arquivo do andaime fica em 100 a 150 linhas independente do tamanho da tela. Passou disso, tem UI vazando para dentro dele.
+- **`description` e introdução alinhadas ao corpo.** A 1.8.1 já ensinou que trava contradizendo o corpo faz a trava ganhar: a `description` anunciava que o protótipo não é código de produção, o que passou a contradizer a regra nova.
+
+**`px-handoff` — portão que executa, antes do portão que confere:**
+- **Seção nova PORTÃO EXECUTÁVEL**, com sete comandos e a saída colada no eco final. Vem antes do gate de conteúdo, que continua existindo.
+- **A armadilha do `-p` documentada com número medido.** `npx tsc --noEmit` sem o `-p` compila **zero arquivo** e sai com sucesso, porque o `tsconfig.json` da raiz do boilerplate tem `"files": []` e só `references`. Com erro de tipo plantado: sem `-p`, exit 0 e nenhuma linha de saída; com `-p tsconfig.app.json`, exit 2 e a mensagem. Um portão falso é pior que portão nenhum.
+- **Regra: gate novo tem que ser provado contra erro plantado** e a mensagem registrada. Sem essa prova, não conte o gate.
+- **Tabela de dependências passa a ser derivada por grep, nunca escrita à mão.** Escrever à mão garante que vai divergir do código, e as entradas que faltarem serão justamente as que quebram o build do dev. Aconteceu: faltavam duas, e eram as duas fatais.
+- **Checklist de pacote atualizado** para as duas pastas com instrução oposta, o README da camada de UI, a fixture única, o gate de camadas verde, e a pasta `paridade/` com a ordem de precedência (**o contrato do DS vence o protótipo**, e diff nesse ponto não é falha de paridade) mais a lista versionada de exceções com motivo, dono e data. Sem essa linha, o aceite "harness verde" obriga o dev a reimportar defeito nosso para o teste passar.
+
+**No boilerplate** (repositório separado, já mergeado): `check-camadas.mjs` barra import da camada de UI para `proto/`, ativado por declaração `camada: ui` no README da pasta; `check-tipografia.mjs` barra tamanho fora da escala, peso acima de 700 e altura de controle fora de 32/40/48.
+
+---
+
 ## 1.9.0 — 2026-08-21
 
 **O caminho do fonte existia, mas o pacote continuava podendo levar o bundle, e nada garantia que o código entregue fosse reusado em vez de reinterpretado.** A 1.8.0 passou a entregar `src/proto/**` quando a stack é a mesma, e ainda dizia que *"o build compilado pode ir também, como visualizador"*. Ou seja: o arquivo mais pesado e mais irreversível que a gente coloca no repo do dev continuava autorizado, justamente no caminho em que ele não acrescenta nada, porque o `proto/` roda. Faltavam também a visão geral das telas (a única crítica de ferramenta de design que um repo não responde de graça), a rastreabilidade em arquivo separado, e a lista do que precisa existir no app do dev para o fonte renderizar igual.
