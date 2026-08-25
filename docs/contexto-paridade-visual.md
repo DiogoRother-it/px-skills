@@ -68,7 +68,11 @@ Precisa ser movido para cá. Nada disso deveria estar num repo de projeto.
 
 **Fica no projeto, porque é instância:** `matriz-estados.json`, as entradas de `excecoes.md`, `mapa-de-telas.md`, `pre-requisitos.md` preenchido.
 
-**Decisão pendente antes de mover:** o `install.mjs` copia `assets/design-system/*` e `assets/px-protocol.md` para todo projeto. Se o harness for para `assets/`, decidir se o instalador passa a copiá-lo também. A favor: todo projeto ganha o harness sem esforço. Contra: projeto que não usa Playwright recebe arquivo morto.
+**Decisão tomada em 25/08/2026: o `install.mjs` NÃO copia o harness.** Ele continua copiando só `assets/design-system/*` e `assets/px-protocol.md`. O harness vai para `assets/paridade/` como **template do repo da esteira**, e quem precisa copia.
+
+Motivo: projeto que não usa Playwright receberia arquivo que não roda, e arquivo que não roda dentro de um projeto é exatamente a cópia órfã que a seção 2 existe para evitar — só que multiplicada por todo projeto instalado.
+
+**O custo dessa escolha é real e fica registrado:** a adoção do harness passa a depender de alguém lembrar, o que arranha a condição 4 do objetivo (valer por padrão da esteira, não por esforço de quem está atento). O contrapeso não é o instalador, é a `px-handoff`: o portão executável é quem cobra, e cobrar no portão não deixa arquivo morto em projeto nenhum. Se depois do piloto da seção 7 ficar claro que a cobrança no portão não basta, esta decisão volta para a mesa.
 
 ## 6. As três armadilhas de falso verde — corrigidas em 25/08/2026
 
@@ -161,10 +165,10 @@ npm run build
 ## 12. Ordem sugerida para retomar
 
 1. ~~Consertar as armadilhas da seção 6.~~ **Feito em 25/08/2026**, e virou três em vez de duas. As três rodadas contra erro plantado.
-2. **Decidir a questão do `install.mjs`** (seção 5) e então **mover o que a seção 5 lista**. É a decisão que destrava tudo o mais: enquanto o harness não tem casa, o template não pode sair do repo do projeto sem deixar o dev sem instrumento.
+2. **Mover o que a seção 5 lista.** A decisão do `install.mjs` está tomada (não copia), então o destino de cada arquivo está definido: harness e gerador de PDF para `assets/`, instâncias ficam no projeto. Separar template de instância arquivo por arquivo, não mover a pasta inteira.
 3. **Rodar o piloto da seção 7** antes de migrar mais projeto. É o que valida ou derruba a suposição central.
 4. Só então migrar os projetos pendentes.
 
 O item 3 tem prioridade sobre o 4 mesmo parecendo menor. Migrar cinco telas de um projeto com o modelo não validado é multiplicar por cinco um retrabalho possível.
 
-**O item 2 é o único que precisa de decisão sua.** O 3 depende de agenda com o time de desenvolvimento.
+Nenhum dos itens está esperando decisão: a do `install.mjs` saiu em 25/08. O item 3 depende de agenda com o time de desenvolvimento, e é o único com dependência externa.
