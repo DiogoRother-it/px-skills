@@ -2,7 +2,7 @@
 
 > Documento de continuidade. Leia inteiro antes de mexer em qualquer coisa desta iniciativa.
 > Não é instalado nos projetos: `install.mjs` copia `skills/` e `assets/`, não `docs/`.
-> Última atualização: 24/08/2026 · px-skills 1.11.0
+> Última atualização: 25/08/2026 · px-skills 1.11.1
 
 ---
 
@@ -70,15 +70,21 @@ Precisa ser movido para cá. Nada disso deveria estar num repo de projeto.
 
 **Decisão pendente antes de mover:** o `install.mjs` copia `assets/design-system/*` e `assets/px-protocol.md` para todo projeto. Se o harness for para `assets/`, decidir se o instalador passa a copiá-lo também. A favor: todo projeto ganha o harness sem esforço. Contra: projeto que não usa Playwright recebe arquivo morto.
 
-## 6. Duas armadilhas que eu criei e não consertei
+## 6. As três armadilhas de falso verde — corrigidas em 25/08/2026
 
-As duas são do mesmo tipo, e é o tipo mais perigoso: **portão que fica verde sem ter verificado nada.**
+Eram duas conhecidas, e uma terceira apareceu ao mexer. Todas do mesmo tipo, que é o mais perigoso: **portão que fica verde sem ter verificado nada.**
 
-**`lint:camadas` é opt-in.** Ele só roda se o projeto declarar `camada: ui` no README da pasta de UI. Se ninguém declarar, ele imprime "nenhuma camada declarada" e **sai com sucesso**. É exatamente o falso verde do `tsc` sem `-p` que esta iniciativa existe para combater, reproduzido por mim.
-*Correção:* falhar quando encontrar `src/proto/` com arquivos de tela e nenhuma camada declarada. Se existe andaime, tem que existir camada.
+**`lint:camadas` era opt-in.** Ele só rodava se o projeto declarasse `camada: ui` no README da pasta de UI. Sem isso, imprimia "nenhuma camada declarada" e **saía com sucesso** — o mesmo defeito do `tsc` sem `-p` que esta iniciativa existe para combater.
+*Corrigido:* falha quando existe `src/proto/` com arquivos `.tsx` e nenhuma camada declarada. Se existe andaime, tem que existir camada.
+*Provado contra erro plantado:* `✖ check-camadas: existem 1 arquivo(s) de tela em src/proto/ e nenhuma camada de UI declarada`, exit 1. Projeto legítimo sem andaime continua exit 0.
 
-**O gate do `px-handoff` não detecta projeto ainda misturado.** Alguém pode empacotar um projeto metade separado achando que a skill resolveu.
-*Correção:* medir o tamanho dos arquivos do andaime. O sinal documentado é 100 a 150 linhas independente do tamanho da tela; um arquivo de tela em `proto/` com 800 linhas denuncia UI vazando.
+**O gate não detectava projeto ainda misturado.** Se a UI nunca foi extraída, não existe import da UI para fora, e a regra de import fica verde num projeto totalmente misturado.
+*Corrigido:* mede o tamanho dos arquivos do andaime. Limite 300 linhas, que é o dobro do topo da faixa documentada (100 a 150) — folga para variação sem deixar passar o caso real de 800 linhas. **Fixtures ficam fora da regra:** são dados puros e crescerem é esperado; acusar fixture seria falso positivo, e gate com falso positivo o time aprende a ignorar.
+*Provado contra erro plantado:* andaime de 802 linhas → `✖ 1 arquivo(s) de andaime grande(s) demais (limite: 300 linhas)`, exit 1, com fixture de 900 linhas no mesmo diretório **não** acusada.
+
+**O comando de ordem dos CA estava publicado quebrado** (descoberto em 25/08). A `px-handoff` 1.11.0 anunciou o comando no portão executável; ele foi gravado por heredoc não citado, o shell expandiu o `'^$'` do `grep -v`, e o bloco saiu cortado no meio da terceira linha. Cerca de código aberta, 95 linhas do arquivo duplicadas. Colar no terminal dava erro de sintaxe.
+*Corrigido na px-skills 1.11.1:* bloco restaurado, duplicata removida (495 → 393 linhas), e o comando agora **devolve código de saída** — a versão original só imprimia `FORA DE ORDEM:` e terminava em 0, ou seja, mesmo inteiro era um gate que não podia falhar.
+*Provado contra erro plantado:* `CA-1 CA-3 CA-2` → `FORA DE ORDEM`, exit 1.
 
 ## 7. A suposição mais arriscada, e ela não foi testada
 
@@ -128,6 +134,8 @@ A separação em duas pastas é a pré-condição disso. Implica decidir quem ma
 
 **Contradição entre `description` e corpo da skill faz a trava ganhar.** A própria 1.8.1 documentou isso, e eu repeti na 1.10.0: a `description` do `px-proto` anunciava que o protótipo não é código de produção, contradizendo a regra nova. Ao mudar regra central de uma skill, revisar `description` e introdução.
 
+**Heredoc não citado mutila o arquivo em silêncio.** Gravar bloco de shell dentro de um `.md` com `<<EOF` faz o shell expandir `$`, crase e `\` do conteúdo. Foi o que cortou o comando de ordem dos CA no meio e duplicou 95 linhas da `px-handoff` (seção 6). Não houve erro na gravação: o comando terminou com sucesso e o arquivo saiu mutilado. **Sempre `<<'EOF'`, com o delimitador citado.** Depois de gravar, confira contando as cercas de código do arquivo: número ímpar denuncia bloco aberto, e número par não prova pareamento correto, então olhe também as posições.
+
 ## 11. Como verificar que está tudo de pé
 
 ```bash
@@ -136,20 +144,27 @@ npx tsc --noEmit -p tsconfig.app.json   # 0 erros
 npm run lint                            # inclui lint:camadas
 npm run lint:tipografia                 # fora da corrente, decisão pendente
 npm run build
+```
 
+```bash
 # ordem dos critérios de aceite, dentro do pacote de handoff
-for f in $(find . -path "*/stories/*.md"); do
-  seq=$(grep -oE "CA-[0-9]+" "$f" | sed 's/CA-//' | awk '!v[$0]++' | tr '\n' ' ')
-  ord=$(echo "$seq" | tr ' ' '\n' | grep -v '^$' | sort -n | tr '\n' ' ')
-  [ "$seq" != "$ord" ] && echo "FORA DE ORDEM: $f"
-done
+( falhas=0
+  for f in $(find . -path "*/stories/*.md"); do
+    seq=$(grep -oE "CA-[0-9]+" "$f" | sed 's/CA-//' | awk '!v[$0]++' | tr '\n' ' ')
+    ord=$(echo "$seq" | tr ' ' '\n' | grep -v '^$' | sort -n | tr '\n' ' ')
+    [ "$seq" = "$ord" ] || { echo "FORA DE ORDEM: $f"; falhas=$((falhas + 1)); }
+  done
+  [ "$falhas" -eq 0 ] || { echo "✖ $falhas história(s) com CA fora de ordem"; exit 1; }
+  echo "✔ CA em ordem em todas as histórias" )
 ```
 
 ## 12. Ordem sugerida para retomar
 
-1. **Consertar as duas armadilhas da seção 6.** São ~10 linhas cada e sem elas a condição 4 do objetivo depende de atenção humana, que é o que a iniciativa existe para remover.
-2. **Mover o que a seção 5 lista**, decidindo antes a questão do `install.mjs`.
+1. ~~Consertar as armadilhas da seção 6.~~ **Feito em 25/08/2026**, e virou três em vez de duas. As três rodadas contra erro plantado.
+2. **Decidir a questão do `install.mjs`** (seção 5) e então **mover o que a seção 5 lista**. É a decisão que destrava tudo o mais: enquanto o harness não tem casa, o template não pode sair do repo do projeto sem deixar o dev sem instrumento.
 3. **Rodar o piloto da seção 7** antes de migrar mais projeto. É o que valida ou derruba a suposição central.
 4. Só então migrar os projetos pendentes.
 
 O item 3 tem prioridade sobre o 4 mesmo parecendo menor. Migrar cinco telas de um projeto com o modelo não validado é multiplicar por cinco um retrabalho possível.
+
+**O item 2 é o único que precisa de decisão sua.** O 3 depende de agenda com o time de desenvolvimento.

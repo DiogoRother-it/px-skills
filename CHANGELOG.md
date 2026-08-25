@@ -3,6 +3,33 @@
 Todas as versões instaláveis via `npx github:DiogoRother-it/px-skills` / `npx @centralit/px-skills`.
 O instalador imprime só a versão mais recente no terminal — o histórico completo vive aqui.
 
+## 1.11.1 — 2026-08-25
+
+**O comando que a 1.11.0 acrescentou ao portão executável foi publicado quebrado, e o arquivo da skill saiu com 95 linhas duplicadas.** Correção de defeito. Nenhuma regra nova.
+
+A 1.11.0 fechou com "novo item no portão executável: verificação de que os critérios de aceite estão em ordem crescente, com o comando pronto". O comando **não estava pronto**: foi gravado por um heredoc não citado, o shell expandiu o `'^$'` de dentro do `grep -v`, e o bloco terminou cortado no meio da terceira linha. O que estava publicado era isto:
+
+```
+  ord=$(echo "$seq" | tr ' ' '\n' | grep -v '^
+```
+
+A cerca de código ficou aberta, o resto do arquivo foi remontado fora de ordem, e o trecho de `### O -p não é detalhe` até `## Relação com o fluxo` apareceu **duas vezes**, idêntico. Quem colasse o comando no terminal recebia erro de sintaxe.
+
+É o mesmo defeito que esta seção do arquivo existe para combater, na forma mais direta possível: **o gate que verifica a ordem dos critérios não podia rodar.** Ficou cinco versões contado como cobertura e nunca executou.
+
+**Correção:**
+- Bloco restaurado inteiro e cercas de código repareadas.
+- 95 linhas duplicadas removidas (arquivo de 495 para 393 linhas). O conteúdo das duas cópias era idêntico; nada de regra se perdeu.
+- **O comando agora devolve código de saída.** A versão anterior só imprimia `FORA DE ORDEM:` e terminava com exit 0 — ou seja, mesmo se tivesse sido publicado inteiro, era um gate que não podia falhar. Agora conta as falhas e sai 1. O `exit` está dentro de parênteses de propósito: o bloco é feito para ser colado num terminal e precisa devolver código sem derrubar a sessão de quem colou.
+- **Rodado contra erro plantado**, como a própria seção manda. Com `CA-1 CA-3 CA-2` numa história: `FORA DE ORDEM: ./stories/quebrado.md`, `✖ 1 história(s) com CA fora de ordem`, exit 1. Com a ordem certa: `✔ CA em ordem em todas as histórias`, exit 0.
+
+**Regra que fica:** ao gravar bloco de shell dentro de arquivo por heredoc, o delimitador vai **citado** (`<<'EOF'`). Sem as aspas o shell come `$`, crase e `\`, e o estrago aparece calado — não houve erro na gravação, só um arquivo mutilado.
+
+**Do lado do `centralit-boilerplate`** (PR próprio), as duas armadilhas de falso verde do `check-camadas.mjs`: ele deixou de sair com sucesso quando existe `src/proto/` e nenhuma camada de UI declarada, e passou a acusar arquivo de andaime acima de 300 linhas, que é o sinal de UI ainda misturada. Fixtures ficam de fora da regra de tamanho.
+
+---
+
+
 ## 1.11.0 — 2026-08-24
 
 **A cadeia tirou o número do nome do arquivo e não colocou a ordem em lugar nenhum.** O gate da `px-handoff` exigia "nomes de arquivo sem prefixos numéricos", com razão: número em nome de arquivo envelhece na primeira história que entra no meio e passa a mentir. Só que a ordem foi embora com ele. O time de desenvolvimento reclamou de duas coisas, e as duas eram nossas: *"não está sendo gerado com ordenação numérica correta"* e *"está difícil de identificar onde a história se reflete no protótipo"*.
