@@ -14,6 +14,9 @@ import {
 const PKG = dirname(fileURLToPath(import.meta.url))
 const TARGET = process.cwd()
 
+// Versão: fonte única é o package.json. Nunca escreva o número à mão aqui.
+const VERSION = JSON.parse(readFileSync(join(PKG, "package.json"), "utf8")).version
+
 const c = { g: "\x1b[32m", y: "\x1b[33m", b: "\x1b[36m", d: "\x1b[2m", x: "\x1b[0m" }
 const log = (m) => console.log(m)
 const ok = (m) => log(`${c.g}✓${c.x} ${m}`)
@@ -27,6 +30,10 @@ log(`${c.d}destino: ${TARGET}${c.x}\n`)
 const skillsSrc = join(PKG, "skills")
 const skillsDest = join(TARGET, ".claude", "skills")
 mkdirSync(skillsDest, { recursive: true })
+
+// Marca da versão já instalada neste repo — é o que permite resumir só o delta.
+const stampPath = join(skillsDest, ".px-skills-version")
+const prev = existsSync(stampPath) ? readFileSync(stampPath, "utf8").trim() : null
 let nSkills = 0
 for (const name of readdirSync(skillsSrc)) {
   const src = join(skillsSrc, name)
@@ -35,6 +42,7 @@ for (const name of readdirSync(skillsSrc)) {
   nSkills++
 }
 ok(`${nSkills} skills instaladas em ${relative(TARGET, skillsDest) || ".claude/skills"}`)
+writeFileSync(stampPath, VERSION + "\n")
 
 // 2. Docs de design system → <target>/docs/design-system/ (não sobrescreve sem avisar)
 const dsSrc = join(PKG, "assets", "design-system")
@@ -80,17 +88,62 @@ log(`${c.d}  /px-request · /px-change · /px-story · /px-handoff · /px-previe
 log(`${c.d}  /ux-flows · /ux-persona${c.x} ${c.y}(execução — rodam sobre o produto ao vivo)${c.x}`)
 log(`\n${c.y}Pré-requisito de UI:${c.x} a biblioteca de componentes (src/components/ui + tokens) precisa`)
 log(`${c.d}  estar no repo — ela vem no bundle do design system, não neste pacote de skills.${c.x}`)
-log(`\n${c.b}── O que mudou na v1.9.0 ──────────────────────────────────────${c.x}`)
-log(`${c.g}px-handoff${c.x} — o caminho do FONTE ficou à prova de balas:`)
-log(`${c.d}  · Bundle NÃO entra mais como arquivo no pacote. Vai publicado, com link no${c.x}`)
-log(`${c.d}    README. No caminho do fonte ele não acrescenta nada: o proto/ roda.${c.x}`)
-log(`${c.d}  · Nova seção "preservar versus reescrever", obrigatória no README do pacote:${c.x}`)
-log(`${c.d}    markup, classes, tokens e estados são pra reusar; roteamento, integração,${c.x}`)
-log(`${c.d}    arquivos e testes são livres. É o que faz sair igual em vez de parecido.${c.x}`)
-log(`${c.d}  · mapa-de-telas.md obrigatório: visão geral das telas + rastreabilidade${c.x}`)
-log(`${c.d}    história ↔ componente em arquivo separado, não dentro da marcação.${c.x}`)
-log(`${c.d}  · pre-requisitos.md obrigatório: os 7 itens que fazem o fonte chegar certo${c.x}`)
-log(`${c.d}    e renderizar diferente, todos falhando em silêncio. Conferíveis antes.${c.x}`)
+// 5. Resumo do que veio — só as versões que este repo ainda não tinha.
+// Ao publicar uma versão nova: acrescente a chave aqui, 1 a 3 linhas de ~74 colunas.
+// Isto é o resumo de leitura rápida; a íntegra vive no CHANGELOG.md.
+const HIGHLIGHTS = {
+  "1.13.0": [
+    "Teto de tamanho: a história fecha com no máximo 13 CA e 13 cenários BDD,",
+    "  ou justifica por escrito. Pega a tela funda que o teste de rota não pegava.",
+    "Aba conta como item: tela com 3+ abas independentes entra no backlog já",
+    "  quebrada, uma história por aba. Tamanho G virou estado proibido.",
+    "ID de regra de negócio unificado: RN-<SIGLA>-<DOMINIO>-<NN>, global por",
+    "  iniciativa, num único regras-negocio.md. RN por tela/fluxo é proibida.",
+  ],
+  "1.12.0": [
+    "Uma história = uma TELA. Fluxo e público são agrupamento, não recorte.",
+    "ID da história por tela: <PROD>-<FLUXO>-<TELA>, nunca por fluxo.",
+  ],
+  "1.11.1": [
+    "O portão de ordem dos critérios de aceite voltou a rodar (estava quebrado).",
+  ],
+  "1.11.0": [
+    "mapa-de-telas.md carrega ordem de implementação e ID estável por tela.",
+  ],
+}
 
-log(`\n${c.d}Histórico completo de versões: CHANGELOG.md${c.x}`)
+const cmp = (a, b) => {
+  const pa = a.split(".").map(Number), pb = b.split(".").map(Number)
+  for (let i = 0; i < 3; i++) if ((pa[i] || 0) !== (pb[i] || 0)) return (pa[i] || 0) - (pb[i] || 0)
+  return 0
+}
+const rule = (title) => title + " " + "─".repeat(Math.max(4, 64 - title.length))
+
+let titulo, versoes
+if (!prev) {
+  titulo = `── px-skills ${VERSION}`
+  versoes = HIGHLIGHTS[VERSION] ? [VERSION] : []      // 1ª instalação: só a atual
+} else if (cmp(prev, VERSION) === 0) {
+  titulo = `── px-skills ${VERSION} — já era a versão deste repo`
+  versoes = []
+} else if (cmp(prev, VERSION) > 0) {
+  titulo = `── px-skills ${prev} → ${VERSION} (downgrade)`
+  versoes = []
+} else {
+  titulo = `── px-skills ${prev} → ${VERSION}`
+  versoes = Object.keys(HIGHLIGHTS)
+    .filter((v) => cmp(v, prev) > 0 && cmp(v, VERSION) <= 0)
+    .sort((a, b) => cmp(b, a))
+}
+
+log(`\n${c.b}${rule(titulo)}${c.x}`)
+for (const v of versoes) {
+  log(`${c.g}${v}${c.x}`)
+  for (const linha of HIGHLIGHTS[v]) log(`${c.d}  ${linha}${c.x}`)
+}
+if (!versoes.length && prev && cmp(prev, VERSION) < 0) {
+  log(`${c.d}  Sem resumo registrado para esta versão — ver CHANGELOG.md.${c.x}`)
+}
+
+if (versoes.length) log(`\n${c.d}Íntegra: CHANGELOG.md${c.x}`)
 log(`${c.b}────────────────────────────────────────────────────────────────${c.x}\n`)
