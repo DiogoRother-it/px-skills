@@ -54,9 +54,13 @@
 - **Mensagens (vazio/erro/sucesso):**
 
 ## B9 — Regras de negócio e validações
+
+<!-- ID global por iniciativa: RN-<SIGLA>-<DOMÍNIO>-<NN>. NUNCA reinicie em 01 nesta tela —
+     consulte o regras-negocio.md da iniciativa e cite o ID se a regra já existir. -->
+
 | ID | Regra | Validação |
 |---|---|---|
-| RN-01 | | |
+| RN-<SIGLA>-<DOMÍNIO>-01 | | |
 
 ## B10 — Responsividade e acessibilidade
 - **Mobile (o que colapsa/vira menu):**

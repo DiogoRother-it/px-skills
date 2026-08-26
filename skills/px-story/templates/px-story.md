@@ -1,6 +1,13 @@
 # História: <título>
 
+**ID:** `<PROD>-<FLUXO>-<TELA>` · **Ordem de implementação:** <#> · **Arquivo da UI:** `<caminho>`
+
 **Origem:** `planning/<iniciativa>/requests/<slug>.md` (px-request) · **Data:** <YYYY-MM-DD>
+
+<!-- Uma história = uma tela (ou um modal com lógica própria). Fluxo e público são agrupamento, não recorte. -->
+<!-- Teto: até 13 CA e 13 cenários BDD. Acima disso, ou quebra, ou preenche a linha abaixo. -->
+
+**Escopo mantido acima do teto:** <motivo — apagar esta linha se estiver dentro do teto>
 
 ## 1. Narrativa
 > **Como** <público-alvo do kickoff>, **quero** <ação>, **para** <valor de negócio>.

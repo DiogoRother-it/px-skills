@@ -15,9 +15,11 @@ traz só a stack de componentes; as skills não vêm com ela).
 O pacote é **autossuficiente**: leva as skills e suas dependências de documentação juntas, então
 não quebra se rodado num repo que ainda não tem o design system.
 
-Toda atualização de skill é descrita no terminal ao instalar (seção "O que mudou") **e** fica
-registrada no [`CHANGELOG.md`](CHANGELOG.md) — o terminal mostra só a versão mais recente, o
-changelog guarda o histórico completo.
+Toda atualização de skill é descrita no terminal ao instalar **e** fica registrada no
+[`CHANGELOG.md`](CHANGELOG.md). O terminal mostra **só o delta deste repo**: o instalador grava
+a versão em `.claude/skills/.px-skills-version` e, na próxima instalação, resume apenas as
+versões que aquele repo ainda não tinha (`1.11.1 → 1.13.0` lista as duas que faltavam). Quem já
+está na versão atual não recebe resumo nenhum. O changelog guarda a íntegra.
 
 ## Como instalar
 
@@ -65,6 +67,6 @@ O sandbox do PX (`px-setup`) é o próprio boilerplate clonado — por isso `doc
 **Fluxo de edição:**
 - **Regra de componente** → edite no **boilerplate** (`docs/design-system/`) → propague a cópia pra cá (`assets/design-system/`).
 - **Protocolo** → edite **aqui** (`assets/px-protocol.md`) → propague pro boilerplate (`docs/px-protocol.md`).
-- **Skill** → edite **aqui** (`skills/`) e suba a versão em `package.json` + o changelog do `install.mjs` (ver `CHANGELOG.md`) — não precisa propagar pra lugar nenhum, o próximo `npx` já leva a versão nova.
+- **Skill** → edite **aqui** (`skills/`) e faça as três coisas, na ordem: (1) suba a versão no `package.json` — **fonte única**, o `install.mjs` lê dela e nunca tem número escrito à mão; (2) escreva a entrada no `CHANGELOG.md`, que é a íntegra; (3) acrescente a chave da versão em `HIGHLIGHTS`, no fim do `install.mjs`, com **1 a 3 linhas de até ~74 colunas** — é o resumo curto que o UX lê no terminal ao puxar as skills. Não precisa propagar pra lugar nenhum, o próximo `npx` já leva a versão nova.
 
 Ao sincronizar pro boilerplate, **nunca** `git add -A` (o working tree de lá costuma ter WIP do time) — stageie só os caminhos que você mudou.

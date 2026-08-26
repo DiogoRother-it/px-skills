@@ -45,7 +45,14 @@ História e cenários em pt-BR. Gherkin em português: `Funcionalidade / Cenári
 ## S2 — Granularidade
 **Decidir:** isto cabe em uma história ou precisa quebrar?
 **Por que importa:** história grande demais não fecha num ciclo e vira handoff impreciso.
+**Teste rápido, antes de perguntar:** a história cobre **uma tela** (ou um modal com lógica própria)? Se ela atravessa duas telas navegáveis, é **fluxo**, não história — quebre. Se serve dois públicos na **mesma** tela, continua **uma** história (o passo a passo por público é S4b). É a mesma regra de ouro do recorte da `px-epic`.
 **Perguntar (estruturada):** "Isto é uma entrega única ou são várias?" — *Uma história (Recomendado se cabe num ciclo)* · *Quebrar em várias → chamar `px-epic`.*
+
+**Teto contável (verificado ao fechar a história).** Acima de **13 critérios de aceite** ou **13 cenários BDD**, a história não fecha sem uma **proposta explícita de quebra** por aba, bloco ou overlay. O líder pode recusar a quebra — mas o motivo fica escrito na própria história, na linha `Escopo mantido acima do teto: <motivo>`. Teto estourado e sem motivo escrito reprova a Definition of Ready.
+
+**Onde o 13 foi calibrado:** contra um lote real de 5 histórias entregues, o corte tem que ficar entre 13 e 14 — abaixo disso reprova uma história de escopo correto (1 rota, 0 abas, 13 critérios, que só precisava de BDD mais enxuto), acima disso deixa passar uma que precisava quebrar. Não é número redondo de propósito; **12 reprova a história certa junto com as erradas.** Se for recalibrar, refaça a conta contra um lote real, não por estética do número.
+
+**Por que o teto, e não só o teste de rota:** uma tela de **uma rota só**, com 6 abas e um modal de 3 abas, passa no teste de rota e chega ao dev com 18 critérios de aceite. Foi exatamente esse o caso que gerou a reclamação de "história grande demais" — não fluxo virando história. O teste de rota pega o escopo largo; o teto pega o escopo **fundo**.
 
 ## S3 — Critérios de aceite (funcional)
 
@@ -55,7 +62,7 @@ História e cenários em pt-BR. Gherkin em português: `Funcionalidade / Cenári
 >
 > **Nunca renumerar** para consertar. Os identificadores são referenciados pelos cenários BDD e pelas regras de negócio; renumerar quebra a rastreabilidade. Reordene as linhas, mantendo cada número onde nasceu.
 >
-> **ID estável no cabeçalho.** A história abre com `**ID:** \`<PROD>-<FLUXO>\`` (ex: `VIT-CAT`), o número de ordem de implementação e o arquivo da UI onde ela vive. O nome do arquivo não carrega número: ordem vive no `mapa-de-telas.md` do handoff, porque número em nome de arquivo envelhece.
+> **ID estável no cabeçalho.** A história abre com `**ID:** \`<PROD>-<FLUXO>-<TELA>\`` (ex: `VIT-CAT-LISTA`; com um fluxo só, `VIT-LISTA`), o número de ordem de implementação e o arquivo da UI onde ela vive. **Um ID por tela, nunca por fluxo** — o mesmo ID em duas histórias quebra a rastreabilidade (ver a coluna `ID` do `mapa-de-telas.md` na `px-handoff`). O nome do arquivo não carrega número: ordem vive no `mapa-de-telas.md` do handoff, porque número em nome de arquivo envelhece.
 
 **Decidir:** o que precisa ser verdade pra dizer "funciona".
 **Por que importa:** é o contrato objetivo do que a feature faz. Cada item tem que ser **verificável** (dá pra apontar e dizer passou/não passou).
@@ -139,6 +146,7 @@ Escreva os cenários, mostre, e confirme a cobertura acima antes de fechar.
 ## S7 — Definition of Ready (trava + eco final)
 - [ ] Narrativa ancorada num público real (S1)
 - [ ] Critérios de aceite verificáveis, um por comportamento e por estado (S3)
+- [ ] Teto contável respeitado: ≤ 13 CA e ≤ 13 cenários BDD — ou `Escopo mantido acima do teto:` com o motivo escrito (S2)
 - [ ] Critérios de usabilidade por dimensão (S4), N/A justificado onde não se aplica
 - [ ] Fluxo principal em passos numerados, um por público (S4b)
 - [ ] Critérios de aceite em ordem crescente e contígua, com a ordem no arquivo batendo com a numeração (S3)

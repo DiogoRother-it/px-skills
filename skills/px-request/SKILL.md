@@ -143,7 +143,10 @@ Segue `Skill Prompting Conventions` do `CLAUDE.md`. Estruturada para decisões e
 - "Tem campo obrigatório? Regra de formato (e-mail, CPF, valor mínimo)?"
 - "Alguma combinação proibida ou limite?" — *ex: não desativar o último admin.*
 - "Algo é calculado/derivado automaticamente?"
-- Registre cada regra com um ID (ex: `RN-01`) — o `px-story` e o dev vão citar.
+- **ID da regra — global por iniciativa, nunca por tela.** Registre cada regra como `RN-<SIGLA>-<DOMÍNIO>-<NN>` (ex: `RN-VIT-STATUS-01`, `RN-VIT-PERM-03`), num **único** `regras-negocio.md` na raiz do planning da iniciativa. `<SIGLA>` é a do projeto, `<DOMÍNIO>` é o assunto (`STATUS`, `PERM`, `PRECO`, `EXPORT`…), `<NN>` é sequencial dentro do domínio. É a mesma convenção que a `px-epic` usa ao consolidar — uma só, no repo inteiro.
+  - ⛔ **RN numerada por tela ou por fluxo é proibida.** A `px-request` roda **uma vez por tela**: numeração que reinicia em `01` a cada tela produz o mesmo `RN-02` com cinco significados incompatíveis dentro da mesma iniciativa, e o dev não tem como saber qual é qual. O ID passa a apontar para nada, que é pior do que não ter ID.
+  - **Antes de criar RN nova, consulte o arquivo da iniciativa.** Se a regra já existe — mesmo enunciada com outras palavras —, **cite o ID** e não redija de novo. Regra transversal reescrita a cada tela é o que faz uma única regra (ex: dark mode) existir com cinco IDs diferentes e divergir sem ninguém notar.
+  - O `px-story` e o dev vão **citar** esses IDs; eles não podem consertar um ID que já nasceu colidido.
 
 > **Trava — "sim, é calculado" não é resposta suficiente.** Toda regra derivada precisa da **fórmula escrita** e do **escopo dos dados**, não do reconhecimento de que existe. Registrar *"a prioridade é calculada a partir dos sinais vitais"* é o mesmo que não registrar nada: quem implementa não tem como adivinhar o valor de corte. Para cada item, extraia:
 > - **Fórmula literal** — *ex: `espera = agora − chegada`, em minutos completos, recalculada a cada render (não é campo persistido).*
@@ -167,7 +170,8 @@ Segue `Skill Prompting Conventions` do `CLAUDE.md`. Estruturada para decisões e
 | demais | "Ver detalhes" | `ghost` | `info` |
 
 - Cobrir também: **visibilidade por papel/permissão** (elemento que não aparece para certo perfil é regra, com ID), **faixas numéricas que colorem** (ex: espera > 30min → crítico), e **conjuntos de coluna diferentes** quando duas telas reusam o mesmo componente de tabela.
-- Cada linha da tabela recebe ID (`RN-UI-01`…) e vira critério de aceite no `px-story`.
+- Cada linha da tabela recebe ID **na mesma convenção do Bloco 9** — `RN-<SIGLA>-<DOMÍNIO>-<NN>`, com o domínio do assunto (uma tabela de variante por status é `RN-VIT-STATUS-…`) — e vira critério de aceite no `px-story`.
+- ⛔ **`RN-UI-…` está aposentado.** Esta skill mantinha duas convenções concorrentes (`RN-01` no Bloco 9, `RN-UI-01` aqui) e **nenhuma das duas tinha escopo de iniciativa**. Regra de variante de UI é regra de negócio como qualquer outra: mesmo arquivo, mesma numeração.
 
 > Se nenhuma variante depende de estado nesta tela, escreva **"N/A — nenhum elemento troca por estado do dado"**. Não deixe o bloco em branco.
 

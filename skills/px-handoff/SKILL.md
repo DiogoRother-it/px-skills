@@ -15,7 +15,7 @@ Esta skill **fecha** o ciclo de uma entrega: pega as histórias que já estão *
 - **Referência de implementação ou referência visual** — depende de uma pergunta só; ver "Forma do protótipo" abaixo. **Decida isto antes de montar o pacote.**
 - **UI Kit** do produto (`ui-kit.md`, tokens reais).
 - **Histórias de negócio** por fluxo (`stories/`, BDD + CA + estados).
-- **Regras de negócio por fluxo** (`regras-negocio.md`) — as RNs NÃO podem ficar só no request interno.
+- **Regras de negócio** — um **único** `regras-negocio.md` na **raiz do pacote**, com todas as RNs da entrega numeradas `RN-<SIGLA>-<DOMÍNIO>-<NN>`. As RNs NÃO podem ficar só no request interno, e também não podem ser **reescritas por fluxo** (ver BLOCO 5).
 - **Specs referenciadas** por qualquer história (ex.: spec de aba/componente) — copiadas para dentro do fluxo.
 - **README.md** do pacote (como ver, como está organizado), com a tabela **preservar versus reescrever**.
 - **No caminho do fonte:** `mapa-de-telas.md` (visão geral + rastreabilidade) e `pre-requisitos.md` (o que o app do dev precisa ter).
@@ -34,7 +34,8 @@ Ela **não desenha tela** (isso é `px-request`/`px-story`): fecha o ciclo, mont
 - **Documente no README** de onde vem cada import do proto (registry, boilerplate, interno ao pacote) e que **não há dependência nova a instalar**.
 - **`mapa-de-telas.md` (obrigatório neste caminho):** uma linha por tela, com `# | ID | Fluxo | Tela | Rota | Arquivo da UI | História | Depende de`. Resolve quatro coisas de uma vez: dá a visão geral que um repo não dá de graça, aponta onde cada tela vive, carrega a rastreabilidade história ↔ componente **em arquivo separado**, e **expressa a ordem de implementação**.
   - A coluna `#` é a ordem, **com o motivo escrito em prosa logo abaixo da tabela**. Ordem sem motivo o dev ignora na primeira pressão de prazo.
-  - A coluna `ID` é um identificador **estável** por fluxo (ex: `VIT-CAT`, `VIT-DET`), repetido no cabeçalho da história. Estável significa: sobrevive a reordenação e a inserção de história no meio.
+  - A coluna `ID` é um identificador **estável por tela** — uma linha, um ID, uma história —, repetido no cabeçalho da história. Formato `<PROD>-<FLUXO>-<TELA>` (ex: `VIT-CAT-LISTA`, `VIT-CAT-DET`); quando a iniciativa tem um fluxo só, o segmento do meio cai (`VIT-LISTA`). Estável significa: sobrevive a reordenação e a inserção de história no meio — o ID nasce com a tela, nunca é renumerado nem reaproveitado.
+  - ⛔ **Não use o fluxo como ID.** `VIT-CAT` para duas telas do mesmo fluxo produz dois IDs iguais e quebra exatamente a rastreabilidade história ↔ código que esta tabela existe para dar. Se uma tela for quebrada em duas mais tarde, a nova recebe ID novo e a antiga mantém o seu.
   - **Inclua também um inventário de peças** (arquivo → o que é → em quais fluxos aparece). É o que responde "onde isto vive" quando o critério de aceite fala de um card, um modal, uma linha ou um selo, em vez de da tela inteira. Isso só é útil se a UI estiver em arquivos separados; num arquivo único de 600 linhas o ponteiro não ajuda ninguém.
 - **`pre-requisitos.md` (obrigatório neste caminho):** o que precisa existir no app do dev para o `proto/` renderizar igual. Cada item é conferível, e o que falta aparece antes de virar retrabalho:
   1. Mesma major do framework e do Tailwind do protótipo
@@ -129,7 +130,9 @@ Segue `Skill Prompting Conventions` do `CLAUDE.md`. Estruturada pra decisões en
 - Marque o que **fica pra depois** (e por quê) — vira a próxima leva.
 - **Para CADA fluxo que entra, o pacote leva:**
   - a **história** (`stories/<historia>.md`);
-  - as **regras de negócio** (`regras-negocio.md`) — extraídas da seção "Regras de negócio" do request de origem, **sanitizadas** (ver BLOCO 6). Sem isso o dev fica com os CA mas sem a fonte das regras;
+  - as **regras de negócio** — extraídas da seção "Regras de negócio" dos requests de origem, **sanitizadas** (ver BLOCO 6), e consolidadas num **único `regras-negocio.md` na raiz do pacote**. Sem isso o dev fica com os CA mas sem a fonte das regras;
+    - ⛔ **Uma RN tem um enunciado só, num lugar só.** Se o pacote tiver um `regras-negocio.md` por fluxo com o texto da regra repetido, a mesma regra passa a existir em N versões que divergem na primeira correção — e a mesma numeração local (`RN-02` em cinco fluxos) aponta para cinco regras diferentes. Foi o que aconteceu na Vitrine: "dark mode" com **5 IDs distintos** e o lifecycle de status escrito por extenso em 3 histórias.
+    - **Proximidade por fluxo é opcional e só como índice:** se o fluxo tiver um `regras-negocio.md`, ele lista **apenas os IDs** que aquele fluxo usa, com uma linha de resumo e ponteiro para o arquivo da raiz. Nunca o enunciado completo;
   - toda **spec referenciada** pela história (ex.: "ver `spec-da-aba.md`") — copiada para o fluxo e sanitizada.
 - **Recorte dev-facing vs. interno:** aplicar o `templates/handoff-manifest.md`. Entram também **decisões de produto canônicas** (`decisoes/*.md`) e **mapa de permissões/triggers** (`rbac-*.md`) quando existirem. Ficam de fora **os arquivos** de checkpoint (`PX-PROGRESS`), prompts de continuidade, discovery/auditoria, épicos e requests **como arquivos** — mas o **conteúdo essencial** deles (RNs, specs referenciadas) é extraído para os `.md` do pacote. Se a iniciativa tiver muitos `.md` internos, gravar/atualizar `planning/<iniciativa>/HANDOFF-MANIFEST.md` e confirmar o recorte com o PX.
 
@@ -151,7 +154,7 @@ Segue `Skill Prompting Conventions` do `CLAUDE.md`. Estruturada pra decisões en
 - [ ] **`anatomia-visual.md` presente** quando a entrega atravessa fronteira de tecnologia (ver abaixo). Na mesma stack, marcar **N/A — o componente é a especificação**.
 - [ ] **`mapa-de-consumo.md` presente** quando o dev usa a mesma biblioteca de componentes que nós (ver abaixo).
 - [ ] Histórias com BDD completo (feliz + vazio + erro + permissão).
-- [ ] `regras-negocio.md` presente em cada fluxo (ou RNs inlined na história).
+- [ ] `regras-negocio.md` **único, na raiz do pacote**, com todas as RNs em `RN-<SIGLA>-<DOMÍNIO>-<NN>`. Índice por fluxo, se houver, cita só IDs.
 - [ ] Toda spec referenciada por uma história está incluída no pacote.
 - [ ] **Conferência de completude executada** — nenhuma decisão ou história citada ficou fora (ver abaixo).
 - [ ] Nomes de arquivo sem prefixos numéricos (`historia-nome.md`, não `01-...`) **e a ordem expressa no `mapa-de-telas.md`**. As duas coisas andam juntas: número em nome de arquivo envelhece na primeira história que entra no meio e passa a mentir, mas tirar o número sem colocar a ordem em outro lugar deixa o dev sem saber por onde começar. Foi exatamente essa a reclamação que chegou do time de desenvolvimento.
@@ -252,10 +255,12 @@ handoff-ux/
     │   # Caminho da REFERÊNCIA VISUAL (stack diferente):
     ├── prototipo/               # HTML unificado single-file OU build navegável
     │
+    ├── regras-negocio.md        # ÚNICO, na raiz: todas as RNs da entrega
+    │
     └── <fluxo>/
         ├── stories/
         │   └── <historia>.md
-        ├── regras-negocio.md
+        ├── regras-negocio.md        # OPCIONAL: só a lista de IDs usados neste fluxo
         └── <spec-referenciada>.md   # quando a história referenciar
 ```
 `handoff-ux/` sempre na raiz. Uma pasta por fluxo. Use só o bloco do caminho decidido na "Forma do protótipo" — os dois nunca coexistem no mesmo pacote.
@@ -328,7 +333,9 @@ Toda linha da saída precisa aparecer na tabela, com a origem (registry, boilerp
 - [ ] `grep` por caminhos internos (`planning/`, `epics/`, `requests/`, e `src/proto` como *referência de import*) no pacote = **zero** referência morta. Não confundir com os arquivos do proto copiados para `proto/`, que **devem** estar lá no caminho do fonte.
 - [ ] `grep` pelos termos de terminologia superada = **zero**
 - [ ] Toda spec referenciada por uma história está **incluída** no pacote
-- [ ] `regras-negocio.md` presente em cada fluxo (ou RNs inlined na história)
+- [ ] `regras-negocio.md` **único, na raiz do pacote**, com todas as RNs em `RN-<SIGLA>-<DOMÍNIO>-<NN>`
+- [ ] **Nenhum ID de RN repetido** apontando para regras diferentes, e **nenhuma regra repetida** apontando para IDs diferentes
+- [ ] Índice de RN por fluxo (se existir) cita **só IDs**, sem reescrever o enunciado
 - [ ] README.md e handoff.md batem com o conteúdo real (referência visual, RNs, specs)
 
 **Pacote**
