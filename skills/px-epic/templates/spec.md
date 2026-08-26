@@ -37,7 +37,7 @@ Como [papel], quero [ação], para [benefício].
 
 ### Regras de Negócio (se houver)
 
-- **RN-[SIGLA]-001** [regra]
+- **RN-[SIGLA]-[DOMÍNIO]-001** [regra]
 
 ### Estados de UI
 

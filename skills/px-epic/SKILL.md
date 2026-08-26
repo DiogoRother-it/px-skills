@@ -43,7 +43,11 @@ Idênticas às do `px-request`:
 
 Conduza em pt-BR, acentuação correta. Pré-requisito: o projeto já passou pelo `px-kickoff` (públicos-alvo + UI KIT) — se não passou, o Bloco 2 depende disso; ofereça rodar `px-kickoff` antes. Idealmente vem de um `px-intake` que apontou "iniciativa".
 
-**Regra de ouro do recorte:** decomponha por **fatia vertical de valor = tela/fluxo observável**, nunca por camada técnica. Cada história do backlog é **uma tela** (ou um modal significativo) que entrega algo que a pessoa vê e usa — e que caberá numa `px-request`.
+**Regra de ouro do recorte:** decomponha por **fatia vertical de valor = uma tela observável**, nunca por camada técnica e nunca por fluxo inteiro. Cada história do backlog é **uma tela** (ou um modal com lógica própria) que entrega algo que a pessoa vê e usa — e que caberá numa `px-request`.
+
+**Fluxo é agrupamento, não unidade de recorte.** Um fluxo com três telas navegáveis são **três** itens no backlog, não um. O fluxo continua existindo como rótulo (a coluna `Fluxo` do `mapa-de-telas.md`) e é ele que ancora a ordem — mas quem vira história é a tela. Fluxo virando história é a causa número um de história grande demais para fechar num ciclo.
+
+**Público também não é unidade de recorte.** Uma tela que serve dois públicos continua **uma** história, com um passo a passo por público (`px-story` S4b). Duplicar a tela por persona infla o backlog e faz a mesma UI ser especificada duas vezes, com divergência garantida.
 
 ## Prompting
 
@@ -86,7 +90,9 @@ Segue `Skill Prompting Conventions` do `CLAUDE.md`. Estruturada pra decisões en
   - **Tamanho** (P/M/G) — sinaliza esforço da `px-request` depois.
   - **Família(s) provável(is) da biblioteca** — só um palpite pra ancorar (ex: "provavelmente uma Data Table"); a variação definitiva é decidida na `px-request`, não aqui.
 - Não detalhe campos/estados/copy — isso é da `px-request`. Aqui é só recorte + objetivo.
-- **Modal conta como item** quando tem lógica própria (ex: modal de confirmação de revogação).
+- **Modal conta como item** quando tem lógica própria (ex: modal de confirmação de revogação) — **inclusive modal que tem abas próprias**.
+- **Aba conta como item** quando a tela tem **3 ou mais abas independentes**: entra no backlog **já quebrada**, uma linha por aba, com o mesmo prefixo de fluxo. Aba que só reordena ou filtra a mesma lista **não** conta; aba com dados, ações e estados próprios conta. Sem isso, uma tela de uma rota só vira uma história de 18 critérios de aceite e o recorte por tela não protege ninguém.
+- ⛔ **"G" é estado proibido no fechamento do épico.** O campo Tamanho existe para **disparar recorte**, não para descrever esforço: item marcado G **volta a este bloco** e é quebrado antes de virar `px-request`. Fechar o épico com um G é declarar "esta história vai estourar" e seguir em frente.
 
 ## BLOCO 4 — Dependências e ordem (o roadmap)
 **Decidir:** o que destrava o quê e em que ordem construir.
@@ -110,6 +116,7 @@ Segue `Skill Prompting Conventions` do `CLAUDE.md`. Estruturada pra decisões en
 - [ ] Contexto: AS-IS / TO-BE / fora de escopo (B1)
 - [ ] Públicos + jornadas (B2)
 - [ ] Backlog de telas: cada uma com nome, objetivo, público, tamanho (B3)
+- [ ] **Nenhum item marcado G**, e toda tela com ≥3 abas independentes já quebrada por aba (B3)
 - [ ] Dependências + roadmap + caminho crítico (B4)
 - [ ] Riscos com mitigação (B5)
 - [ ] Critério de aceite do épico, verificável (B5)
@@ -145,7 +152,7 @@ planning/<iniciativa>/epics/NN-<nome-do-epico>/
 **Regras de transformação (inegociáveis):**
 1. **Não inventar.** Todo conteúdo vem dos `px-story`/overview. Seção sem fonte → **omita** (não preencha com suposição).
 2. **Uma história por seção `##`.** Não agrupar. Sub-item de épico vira história própria.
-3. **IDs preservados.** Reusar o ID da história (ex: `US-SC-001`). Sem ID → criar sequencial com a sigla do projeto (`SC-01`, `SC-02`). Regras: `RN-[SIGLA]-001`…
+3. **IDs preservados.** Reusar o ID da história (ex: `US-SC-001`). Sem ID → criar sequencial com a sigla do projeto (`SC-01`, `SC-02`). Regras: `RN-[SIGLA]-[DOMÍNIO]-01`… — convenção única do repo, definida no Bloco 9 da `px-request`.
 4. **Não duplicar.** Comportamento já descrito em outra história → **citar o ID** ("mesmo padrão de `SC-05`"), não repetir.
 5. **Estados de UI** — chips derivados dos CA/estados do `px-story`. Nunca vazio: mínimo `default` · `loading` · `vazio` · `erro`.
 6. **BDD** — mínimo happy path + 1 exceção por história. Na **v1**, só `Dado / Quando / Então` (sem `E`/`Mas`). *(Nota: o `px-story` usa `E`; ao consolidar, quebre em cenários simples.)*
@@ -169,7 +176,7 @@ Como [papel], quero [ação], para [benefício].
 - [CA 1]
 
 ### Regras de Negócio (se houver)
-- **RN-[SIGLA]-[NUM]** [regra]
+- **RN-[SIGLA]-[DOMÍNIO]-[NUM]** [regra]
 
 ### Estados de UI
 `default` · `loading` · `vazio` · `erro`

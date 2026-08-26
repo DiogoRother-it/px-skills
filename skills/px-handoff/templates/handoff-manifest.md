@@ -26,7 +26,7 @@ ruído interno pro dev e infla a entrega. Este manifesto fixa o recorte, de form
 | Referência visual navegável | `prototipo/` — HTML unificado single-file (`#view-*`/`data-story`) **ou** build do protótipo | Referência de fidelidade (visual + comportamento) |
 | UI Kit / tokens | `ui-kit.md`, tokens reais do projeto | Valores reais de identidade |
 | Histórias de negócio | `stories/*.md` (CA + BDD + rastreabilidade) | **O contrato** do que fazer |
-| Regras de negócio por fluxo | `regras-negocio.md` (extraído do request, sanitizado) | A fonte das regras que os CA verificam |
+| Regras de negócio da entrega | `regras-negocio.md` **na raiz** (extraído dos requests, sanitizado, IDs `RN-<SIGLA>-<DOMÍNIO>-<NN>`) | A fonte das regras que os CA verificam |
 | Specs referenciadas por uma história | `<spec>.md` no fluxo (ex.: spec de aba/componente) | Detalhe que a história cita e o dev precisa |
 | Decisões de produto canônicas | `decisoes/*.md` (regras de fluxo, dados, dicionários de status/toasts) | Regras que o dev implementa |
 | Mapa de permissões / triggers | `rbac-*.md` (quando o produto tem RBAC) | Checks a plugar |

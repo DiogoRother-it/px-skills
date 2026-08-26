@@ -3,6 +3,79 @@
 Todas as versões instaláveis via `npx github:DiogoRother-it/px-skills` / `npx @centralit/px-skills`.
 O instalador imprime só a versão mais recente no terminal — o histórico completo vive aqui.
 
+## 1.13.0 — 2026-08-26
+
+**Diagnóstico num projeto real (5 histórias entregues) mostrou que a 1.12.0 consertou o eixo errado.** A 1.12.0 proibiu fluxo e público como unidade de recorte. As duas regras **foram cumpridas** naquele projeto — e as histórias estavam grandes de qualquer forma. O que faltava era teto: uma tela de **uma rota só**, com 6 abas e um modal de 3 abas, passa em todos os testes de recorte e chega ao dev com **18 critérios de aceite**.
+
+### O teto contável (`px-story` S2)
+
+Acima de **13 CA** ou **13 cenários BDD** a história não fecha sem proposta explícita de quebra por aba, bloco ou overlay. O líder pode recusar, mas o motivo fica escrito na história (`Escopo mantido acima do teto:`) e a Definition of Ready cobra.
+
+O teste de rota da 1.12.0 pega escopo **largo**; o teto pega escopo **fundo**. São falhas diferentes, e uma não cobre a outra.
+
+**O 13 é calibrado, não estético.** O corte foi rodado contra as 5 histórias reais: precisa reprovar as de 14, 15, 18 e 20 critérios e **passar** a de 13, que tem escopo correto (1 rota, 0 abas) e sofre só de BDD verboso. O 12 proposto no diagnóstico reprovava essa também. O corte tem que ficar entre 13 e 14, e 14 deixa passar uma que precisava quebrar.
+
+### Aba conta como item (`px-epic` B3)
+
+- Tela com **3 ou mais abas independentes** entra no backlog **já quebrada**, uma linha por aba. Aba que só reordena a mesma lista não conta.
+- `Modal conta como item` passou a dizer **explicitamente** "inclusive modal com abas próprias" — a regra já existia e não estava sendo lida assim.
+- ⛔ **"G" virou estado proibido no fechamento do épico.** O campo Tamanho (P/M/G) existia desde sempre e **nada o consumia**: no projeto auditado, "Detalhe com 5 sub-abas" foi classificado **M**, mesmo bucket de um catálogo simples. Agora item G volta ao recorte antes de virar `px-request`.
+
+### ID de regra de negócio: quatro convenções viraram uma
+
+O achado mais grave do diagnóstico, e o único que já contaminou entrega. O repo tinha **quatro** convenções concorrentes:
+
+| Onde | Convenção | Escopo |
+|---|---|---|
+| `px-request` Bloco 9 | `RN-01` | **nenhum** — reiniciava a cada tela |
+| `px-request` Bloco 9b | `RN-UI-01` | **nenhum** |
+| `px-request` template | `RN-01` na tabela pronta | **nenhum** — replantava a colisão |
+| `px-epic` consolidação | `RN-[SIGLA]-001` | projeto |
+
+A `px-request` roda **uma vez por tela**, então `RN-01` reiniciava em cada tela. Resultado medido no projeto: **10 IDs com até 5 significados incompatíveis** (`RN-02` era lifecycle de status, entrada de aba, clique em linha, busca em tempo real e ausência de botão, dependendo do fluxo). E o inverso: dark mode existia com **5 IDs diferentes**; o lifecycle de status, com **3**, escrito por extenso em 3 histórias. Uma história fechou com **18 de 18 CA sem âncora**, resolvendo rastreabilidade com a faixa `RN-02 a RN-16`.
+
+**Convenção única agora, em todo o repo:** `RN-<SIGLA>-<DOMÍNIO>-<NN>` (ex: `RN-VIT-STATUS-01`), num **único** `regras-negocio.md` por iniciativa. É a extensão da que a `px-epic` já declarava, não foi inventada aqui. `RN-UI-…` está **aposentado**: regra de variante de UI é regra de negócio como outra qualquer.
+
+- ⛔ **RN numerada por tela ou por fluxo é proibida.**
+- **Consultar antes de criar:** se a regra já existe, cita-se o ID; não se redige de novo.
+- **`px-handoff` mudou o arquivamento:** era `regras-negocio.md` **por fluxo**, o que fazia a mesma regra ser reescrita em N arquivos que divergem na primeira correção. Agora é **um** arquivo na raiz do pacote, e o arquivo por fluxo fica opcional — se existir, **lista só os IDs** que aquele fluxo usa. Dois itens novos no portão de saída: nenhum ID repetido apontando para regras diferentes, e nenhuma regra repetida apontando para IDs diferentes.
+
+### O que foi deliberadamente NÃO mudado
+
+O diagnóstico testou e **refutou** três hipóteses que pareciam óbvias. Registrar isso evita "consertar" o que funciona:
+
+- **Recorte por público:** ausente no projeto. A regra da 1.12.0 foi cumprida integralmente, nenhuma tela virou duas histórias por persona. Não foi reforçada.
+- **Granularidade de CA:** os CA estão em granularidade de comportamento/estado, não de campo. Um deles descreve um modal de 6 campos em **um** CA. O problema é o oposto do suspeitado: CA densos, não numerosos.
+- **Recorte por camada técnica:** ausente. As fronteiras de integração estão marcadas **dentro** da história, que é o comportamento correto.
+
+### Sobre a 1.12.0
+
+A regra ⛔ `Não use o fluxo como ID` (`px-handoff`) nasceu **da** entrega auditada, não antes dela. O `mapa-de-telas.md` daquele projeto usa o formato hoje proibido porque foi escrito antes de a regra existir. Não é descumprimento: é a evidência que produziu a regra.
+
+Arquivos: `px-story/SKILL.md`, `px-epic/SKILL.md`, `px-epic/templates/spec.md`, `px-request/SKILL.md`, `px-request/templates/request.md`, `px-handoff/SKILL.md`, `px-handoff/templates/px-handoff.md`, `px-handoff/templates/handoff-manifest.md`.
+
+**Ficou de fora (diagnosticado, não aplicado):** âncora de RN por CA proibindo faixa; destino declarado para item de épico de delta; disciplina de `Contexto:` no BDD; registro de emenda no cabeçalho da história; verificação de saída do `mapa-de-telas.md`.
+
+---
+
+## 1.12.0 — 2026-08-26
+
+**A unidade de recorte da história era ambígua no texto, e o ID da história colidia.** Duas regras que já estavam certas na prática, mas escritas de um jeito que autorizava história do tamanho de um fluxo.
+
+**O que estava escrito:**
+- `px-epic`, regra de ouro do recorte: "fatia vertical de valor = **tela/fluxo** observável". Tela e fluxo tratados como sinônimos, na frase que define o recorte do backlog inteiro.
+- `px-handoff`, coluna `ID`: "identificador estável **por fluxo** (ex: `VIT-CAT`, `VIT-DET`)". Mas a tabela é **uma linha por tela** e tem coluna `Fluxo` separada. Os exemplos só funcionavam porque ali fluxo e tela coincidiam. No primeiro fluxo com duas telas, as duas histórias recebem o mesmo ID — quebrando exatamente a rastreabilidade história ↔ código que a 1.11.0 introduziu a tabela para dar.
+
+**O que fica:**
+- **Uma história = uma tela** (ou um modal com lógica própria). **Fluxo é agrupamento, não unidade de recorte**: fluxo com três telas navegáveis são três itens no backlog. **Público também não é recorte**: tela que serve dois públicos continua uma história, com um passo a passo por público (`px-story` S4b) — duplicar por persona faz a mesma UI ser especificada duas vezes, com divergência garantida.
+- **ID por tela**, formato `<PROD>-<FLUXO>-<TELA>` (`VIT-CAT-LISTA`, `VIT-CAT-DET`); com um fluxo só, o segmento do meio cai (`VIT-LISTA`). O ID nasce com a tela e nunca é renumerado nem reaproveitado; tela quebrada em duas depois gera ID novo para a nova e mantém o da antiga.
+- **Trava nova em `px-story` S2 (Granularidade):** teste explícito antes de perguntar ao líder — se a história atravessa duas telas navegáveis, é fluxo, não história, e quebra. Fluxo virando história é a causa número um de história grande demais para fechar num ciclo, que foi o feedback que chegou.
+- **Template da história ganhou o cabeçalho de ID.** A S7 exigia "cabeçalho com ID estável, ordem de implementação e arquivo da UI" desde a 1.11.0, mas o `templates/px-story.md` não tinha nenhum dos três campos — o item da Definition of Ready não tinha onde ser cumprido.
+
+Arquivos: `px-epic/SKILL.md`, `px-handoff/SKILL.md`, `px-story/SKILL.md`, `px-story/templates/px-story.md`.
+
+---
+
 ## 1.11.1 — 2026-08-25
 
 **O comando que a 1.11.0 acrescentou ao portão executável foi publicado quebrado, e o arquivo da skill saiu com 95 linhas duplicadas.** Correção de defeito. Nenhuma regra nova.
