@@ -3,6 +3,53 @@
 Todas as versões instaláveis via `npx github:DiogoRother-it/px-skills` / `npx @centralit/px-skills`.
 O instalador imprime só a versão mais recente no terminal — o histórico completo vive aqui.
 
+## 1.15.0 — 2026-08-27
+
+A 1.14.0 fez a cadeia **recusar** base fora do padrão. Mas quem está com skills velhas não tem esse portão — e não tem como saber que ele existe. Esta versão fecha o degrau anterior: o repo passa a **avisar sozinho**, sem ninguém precisar lembrar de rodar o instalador.
+
+### Hook `SessionStart`
+
+O instalador planta `.claude/hooks/check-versao.mjs` e declara o hook em `.claude/settings.json`. Ao abrir o Claude Code no repo, três checagens rodam:
+
+| Checagem | Como | Custo |
+|---|---|---|
+| Skills atrás da versão atual | `raw.githubusercontent.com` — o `px-skills` é **público**, não precisa de token | rede, cache de 6h |
+| Sandbox sem `boilerplate-upstream` | `git remote` | local |
+| `CENTRALIT_TOKEN` ausente | variável de ambiente | local |
+
+As duas últimas só rodam se o repo for um sandbox do PX — detectado pelo bloco `registries.@centralit` no `components.json`. Num repo qualquer o hook fica quieto.
+
+A saída alimenta os dois lados: `systemMessage` para a pessoa ver, e `additionalContext` para o assistente saber que precisa oferecer a atualização antes de rodar qualquer skill da cadeia.
+
+### As quatro regras do arquivo
+
+Escritas no topo dele porque cada uma corrige uma forma conhecida de o hook virar problema:
+
+- **Silêncio quando está tudo certo.** Aviso que aparece toda sessão vira ruído, e as pessoas aprendem a ignorar — que é exatamente a falha que ele existe para evitar.
+- **Nunca quebra a sessão.** Tudo dentro de `try/catch`; offline, VPN ou GitHub fora do ar terminam em silêncio.
+- **Nunca chama `process.exit()`.** Com o `fetch` ainda em voo isso derruba o libuv no Windows (assertion em `async.c`) — aconteceu no teste, e o script passou a terminar sozinho.
+- **Nunca faz `git fetch`.** Rede no `SessionStart` trava a abertura e pode pedir credencial de repo privado. A medição de idade da base continua sendo do `px-proto` Passo 3A, que roda quando ela importa.
+
+### O `settings.json` do time não é sobrescrito
+
+O instalador lê, mescla e grava — preservando `permissions` e qualquer `SessionStart` que já exista, e sem duplicar o hook quando roda de novo. Se o arquivo estiver **malformado**, ele **não grava**: avisa e segue. Um `settings.json` quebrado desliga todas as configurações daquele arquivo, e clobberar apagaria trabalho do time.
+
+### Escopo, decidido explicitamente
+
+Notificação **só local**, e audiência **só UX/PX** — quem roda as skills e pode agir. Sem webhook, sem canal, sem secret, sem GitHub Action.
+
+Os devs não entram aqui de propósito: eles não rodam skills, e a informação que lhes serve (sobre qual base o pacote foi construído) já viaja no `procedencia.md` desde a 1.14.0.
+
+### Limite conhecido
+
+O hook só existe onde o instalador rodou. Quem nunca mais rodar `npx github:DiogoRother-it/px-skills` não o recebe — a primeira instalação a partir daqui é que o planta, e dali em diante ele se mantém. Não há como alcançar retroativamente um repo que ninguém toca.
+
+**Achado não resolvido:** o `.claude/skills/` do **boilerplate** tem as 38 skills e **nenhum** `.px-skills-version`. Foram copiadas à mão, então o boilerplate distribui skills velhas sem stamp para todo mundo que clona. O hook não corrige isso: sem stamp, a checagem de versão nem roda. Precisa de uma passada no boilerplate.
+
+Arquivos: `assets/hooks/check-versao.mjs` (novo), `install.mjs`, `package.json`.
+
+---
+
 ## 1.14.0 — 2026-08-27
 
 **Um UX ficou dois meses sem acesso ao boilerplate e a cadeia não sinalizou.** Ele seguiu especificando, prototipando e entregando handoff normalmente. As entregas chegaram ao dev com regra de negócio correta, visual divergente e um documento de anatomia que afirmava a procedência errada de cada valor. Nenhum passo falhou, nenhum aviso apareceu, e os problemas no dev pareciam aleatórios porque a causa não estava no pacote — estava na base sobre a qual o pacote foi construído.
