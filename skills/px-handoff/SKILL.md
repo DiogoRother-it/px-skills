@@ -145,6 +145,7 @@ Segue `Skill Prompting Conventions` do `CLAUDE.md`. Estruturada pra decisões en
 ## BLOCO 3 — Definition of Done (checklist interna — não vai no pacote do dev)
 **Por que importa:** a régua que o PX usa pra confirmar que o pacote está completo *antes* de fechar.
 **Verificar antes de avançar pro BLOCO 4:**
+- [ ] **`procedencia.md` presente na raiz do pacote** (ver abaixo). Sem ele o pacote não sai.
 - [ ] **Forma do protótipo decidida** (mesma stack → fonte · stack diferente → visual + anatomia). Ver "Forma do protótipo".
 - [ ] **Mesma stack: `proto/` com o FONTE** (`src/proto/**` + `index.css` com os tokens) presente no pacote, e o README dizendo de onde vem cada import e que não há dependência nova.
 - [ ] Referência visual navegável presente (HTML unificado single-file **ou** build em `prototipo/`) — na mesma stack ela é **complemento** do fonte, não substituta.
@@ -160,6 +161,33 @@ Segue `Skill Prompting Conventions` do `CLAUDE.md`. Estruturada pra decisões en
 - [ ] Nomes de arquivo sem prefixos numéricos (`historia-nome.md`, não `01-...`) **e a ordem expressa no `mapa-de-telas.md`**. As duas coisas andam juntas: número em nome de arquivo envelhece na primeira história que entra no meio e passa a mentir, mas tirar o número sem colocar a ordem em outro lugar deixa o dev sem saber por onde começar. Foi exatamente essa a reclamação que chegou do time de desenvolvimento.
 - [ ] Critérios de aceite em **ordem crescente** dentro de cada história (ver o comando no portão executável). Quando um delta acrescenta critérios a uma história já escrita, eles tendem a entrar no fim da numeração mas no meio da tabela. **Reordenar sem renumerar:** o identificador é referenciado pelos cenários BDD e pelas regras de negócio, então renumerar quebra rastreabilidade.
 - [ ] Copy sem travessão (— / –) e sem caixa alta total em toda a referência visual e nos `.md`.
+
+### Procedência — `procedencia.md` (obrigatório em todo pacote)
+
+**Por que importa:** este portão tem mais de 40 itens e, até a 1.14.0, **nenhum** verificava de onde a base veio. Todos conferem a coerência *interna* do pacote — refs mortas, IDs de RN, lint de copy, nomes de arquivo. Um pacote construído inteiramente fora do padrão passa em todos eles. Foi assim que meses de entrega saíram sobre componentes do shadcn público em vez do registry `@centralit`, sem que nada apitasse: o dev recebia regra de negócio correta, visual divergente e uma `anatomia-visual.md` que afirmava a procedência errada de cada valor.
+
+O `procedencia.md` é a linha que torna isso **detectável na entrega** e **auditável depois**. Sem ele, quando um problema visual aparece três sprints à frente, não existe forma de saber sobre qual base aquele pacote foi construído.
+
+**Conteúdo (todos os campos preenchidos com valor real, nunca "atual" nem "última"):**
+
+| Campo | Origem | Exemplo |
+|---|---|---|
+| Commit da base | `git rev-parse --short HEAD` no sandbox | `a1b3f9c` |
+| Data da base | `git log -1 --format=%cd HEAD` | `2026-08-14` |
+| Distância do `main` | `git log --oneline HEAD..boilerplate-upstream/main | wc -l` | `7 commits atrás` |
+| Registry | Alcançado no `px-proto` Passo 3A? | `@centralit — alcançado` |
+| Componentes | Instalados via `@centralit/*`? Listar os que não | `todos via registry` |
+| Versão das skills | `.claude/skills/.px-skills-version` | `1.14.0` |
+| Tokens | `src/index.css` do UI Kit do projeto ou `@centralit/theme` | `UI Kit do projeto` |
+
+**Origem dos dados:** o `px-proto` apura no Passo 3A e registra no `PX-PROGRESS`. Aqui você **transcreve e valida**, não investiga do zero.
+
+**Estados que bloqueiam a saída:**
+- ⛔ **Procedência indeterminável** (sandbox sem `boilerplate-upstream`) → declare `Procedência: NÃO AUDITÁVEL` **em destaque no `handoff.md`**, com dono, e avise o líder. Não omita: um pacote sem procedência que não se declara é indistinguível de um pacote conforme.
+- ⛔ **Componente instalado fora do registry** → listar quais. O dev precisa saber exatamente onde a anatomia não é confiável.
+- ⛔ **`anatomia-visual.md` com `Origem: NÃO APURADA`** em qualquer linha → resolver ou registrar como Pergunta em aberto com dono.
+
+**Base velha não bloqueia** — só precisa estar escrita. A distância do `main` é informação para o dev, não veto.
 
 ### Anatomia visual — obrigatória quando o handoff cruza tecnologia
 
@@ -329,6 +357,13 @@ Toda linha da saída precisa aparecer na tabela, com a origem (registry, boilerp
 
 **Qualquer item com ✗ bloqueia** — resolver ou declarar como Pergunta em aberto com dono.
 
+**Procedência (novo na 1.14.0 — nenhum outro item deste portão verifica origem)**
+- [ ] `procedencia.md` na **raiz do pacote**, com os 7 campos preenchidos com valor real
+- [ ] Commit e data da base são valores concretos — `grep -E "atual|última|latest|TBD|<" procedencia.md` = **zero**
+- [ ] Registry `@centralit` declarado como alcançado **ou** a exceção listada componente a componente
+- [ ] Nenhuma linha da `anatomia-visual.md` com `Origem: NÃO APURADA` — ou pendência com dono registrada
+- [ ] Se a procedência é indeterminável: `Procedência: NÃO AUDITÁVEL` **em destaque no `handoff.md`**, com dono
+
 **Self-contained (o coração da otimização)**
 - [ ] `grep` por caminhos internos (`planning/`, `epics/`, `requests/`, e `src/proto` como *referência de import*) no pacote = **zero** referência morta. Não confundir com os arquivos do proto copiados para `proto/`, que **devem** estar lá no caminho do fonte.
 - [ ] `grep` pelos termos de terminologia superada = **zero**
@@ -375,7 +410,7 @@ Toda linha da saída precisa aparecer na tabela, com a origem (registry, boilerp
 
 ## Eco final
 
-Antes de fechar, repita em 3–4 linhas: *"Handoff **<label>**: **N** histórias em **M** fluxos, cada fluxo com regras de negócio e specs referenciadas incluídas, referência visual = **<HTML single-file | build em prototipo/>**, UI Kit incluído, **X** fronteiras de integração. Pacote self-contained (0 referência morta). Perguntas em aberto: `<N ou nenhuma>`. **<Push via branch órfã `ux/<label>` no repo do dev | Sem repo ainda: organizado localmente, push pendente>**. **<Repo central: rodar px-sync em seguida | Sem repo central>** — confirma?"*. Só então feche.
+Antes de fechar, repita em 3–4 linhas: *"Handoff **<label>**: **N** histórias em **M** fluxos, cada fluxo com regras de negócio e specs referenciadas incluídas, referência visual = **<HTML single-file | build em prototipo/>**, UI Kit incluído, **X** fronteiras de integração. Pacote self-contained (0 referência morta). Base: **<commit> de <data>, <N> commits atrás do main, registry alcançado | ⚠️ NÃO AUDITÁVEL>**. Perguntas em aberto: `<N ou nenhuma>`. **<Push via branch órfã `ux/<label>` no repo do dev | Sem repo ainda: organizado localmente, push pendente>**. **<Repo central: rodar px-sync em seguida | Sem repo central>** — confirma?"*. Só então feche.
 
 ## Onde salvar
 
@@ -384,6 +419,7 @@ Antes de fechar, repita em 3–4 linhas: *"Handoff **<label>**: **N** histórias
 ## Regras
 
 - **Nada sai sem o portão executável passar.** Presença de arquivo não é verificação.
+- **Nada sai sem procedência.** Coerência interna do pacote não diz nada sobre a base em que ele foi construído — foram as duas coisas confundidas que deixaram meses de entrega divergirem em silêncio. Se a procedência não é apurável, ela é **declarada como não apurável**; o que não existe é sair sem dizer.
 - **A UI vai com instrução de copiar; o andaime com instrução de descartar.** Se o dev precisar editar um arquivo da camada de UI para rodar no projeto dele, é defeito nosso e conserta-se na origem.
 
 - **Pacote self-contained.** Nenhuma referência a caminho fora do pacote — refs mortas são reescritas para relativas ou removidas na sanitização (BLOCO 6).
