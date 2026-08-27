@@ -45,12 +45,38 @@ O PX sempre começa no boilerplate — independentemente de o repo do dev existi
 **Executar (a skill roda; não peça pro UX digitar):**
 1. Pedir um nome pra pasta (livre; ex: a ideia do projeto).
 2. Clonar o boilerplate: `git clone https://github.com/DiogoRother-it/centralit-boilerplate.git <pasta>`
-3. Entrar na pasta e **desconectar do git** pra não empurrar rascunho no boilerplate do time: `rm -rf .git`
+3. Entrar na pasta e **preservar a procedência, desabilitando o push** (⛔ **nunca** `rm -rf .git` — ver abaixo):
+   - `git remote rename origin boilerplate-upstream`
+   - `git remote set-url --push boilerplate-upstream no-push`
 4. Instalar: `npm install`
-5. Adicionar as skills: `npx github:DiogoRother-it/px-skills`
-6. Avisar pra **recarregar a sessão** (as skills aparecem no menu `/` só depois) e **começar por `/px-start`**.
+5. **Configurar o token do registry** (Passo 2b) — sem ele o sandbox não puxa componente novo.
+6. Adicionar as skills: `npx github:DiogoRother-it/px-skills`
+7. Avisar pra **recarregar a sessão** (as skills aparecem no menu `/` só depois) e **começar por `/px-start`**.
 
-**Pré-requisito:** a pessoa precisa ter acesso ao repo privado `centralit-boilerplate` (login normal do GitHub; sem token).
+> ⛔ **Por que não `rm -rf .git`.** Cortar o git deixa o sandbox **inauditável**: sem commit de origem, sem `git fetch`, sem idade. Um sandbox que envelhece meses passa a divergir do boilerplate **sem sinal nenhum** — e a cadeia inteira produz entrega plausível sobre base errada. O remote renomeado com push desabilitado resolve as duas coisas: protege o boilerplate do time (era a intenção original) **e** mantém a procedência medível pelo `px-proto`.
+
+## Passo 2b — Token do registry `@centralit` (uma vez por máquina)
+
+**Por que importa:** a biblioteca de componentes **não** vem só do clone. Ela é distribuída como registry shadcn privado (`@centralit`, 52 itens), declarado no `components.json` do boilerplate e autenticado por `Authorization: Bearer ${CENTRALIT_TOKEN}`. Clone e registry são **dois acessos distintos**: dá pra ter o clone e não ter o registry. Nesse estado, `npx shadcn add` cai no shadcn **público** — que responde com sucesso e entrega o default `new-york`, não o componente da Central IT. Silencioso, plausível e errado.
+
+**Verificar (a skill executa):**
+1. `CENTRALIT_TOKEN` está no ambiente? (`echo $CENTRALIT_TOKEN` / `$env:CENTRALIT_TOKEN`)
+2. O `components.json` da pasta tem o bloco `registries` com `@centralit`?
+3. Teste de alcance real: puxar um item conhecido do registry e confirmar que a resposta veio de `api.github.com`, não de `ui.shadcn.com`.
+
+**Se qualquer um falhar — ⛔ pare e resolva antes de seguir.** Não contorne com shadcn público, não hand-rolle componente, não siga "por enquanto".
+
+**Como resolver:** pedir ao dono do repositório um **Personal Access Token** do GitHub com leitura em `DiogoRother-it/centralit-boilerplate`, e persistir:
+
+```bash
+export CENTRALIT_TOKEN=<token>
+```
+
+No Windows (PowerShell): `$env:CENTRALIT_TOKEN = "<token>"`. Para persistir, adicionar ao perfil (`~/.bashrc`, `~/.zshrc` ou `$PROFILE`).
+
+Se o `components.json` não tiver o bloco `registries`, o procedimento completo está em `docs/registry.md` no boilerplate.
+
+**Pré-requisitos, os dois:** acesso de leitura ao repo privado `centralit-boilerplate` (login normal do GitHub, para o `git clone`) **e** o `CENTRALIT_TOKEN` no ambiente (para o registry). Confirme os dois; um sem o outro não sustenta a cadeia.
 
 ## Eco final
 
@@ -62,7 +88,9 @@ Antes de executar, repita em 2–3 linhas: *"Então: projeto **X**, vou montar o
 - **Não faz a entrega.** Branch, push e MR são responsabilidade do `px-handoff`.
 - **Nunca `git` na mão pro UX.** A skill executa; o UX só confirma.
 - **Sandbox é o ateliê, não o produto.** Depois de entregue e mergeado, pode ser apagado.
-- **Sem token no fluxo de sandbox.** O acesso ao repo privado é o login normal do GitHub.
+- **Dois acessos, não um.** O `git clone` usa o login normal do GitHub; o registry `@centralit` exige `CENTRALIT_TOKEN`. Confirmar os dois no Passo 2b — ter um só é o estado que produz entrega errada em silêncio.
+- **Procedência preservada.** ⛔ Nunca `rm -rf .git` no sandbox. Remote renomeado com push desabilitado; é o que permite ao `px-proto` medir a idade da base.
+- **Falhar fechado.** Acesso ausente **bloqueia** o setup. Nunca cair no shadcn público como alternativa.
 
 ## Relação com o fluxo
 

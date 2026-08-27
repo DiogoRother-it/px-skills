@@ -3,6 +3,65 @@
 Todas as versões instaláveis via `npx github:DiogoRother-it/px-skills` / `npx @centralit/px-skills`.
 O instalador imprime só a versão mais recente no terminal — o histórico completo vive aqui.
 
+## 1.14.0 — 2026-08-27
+
+**Um UX ficou dois meses sem acesso ao boilerplate e a cadeia não sinalizou.** Ele seguiu especificando, prototipando e entregando handoff normalmente. As entregas chegaram ao dev com regra de negócio correta, visual divergente e um documento de anatomia que afirmava a procedência errada de cada valor. Nenhum passo falhou, nenhum aviso apareceu, e os problemas no dev pareciam aleatórios porque a causa não estava no pacote — estava na base sobre a qual o pacote foi construído.
+
+Esta versão não acrescenta capacidade. Ela fecha os quatro pontos onde a cadeia **falhava em aberto**.
+
+### A causa: duas linhas de suprimento, uma delas invisível
+
+A biblioteca de componentes não vem do clone. Vem de um **registry shadcn privado** (`@centralit`, 52 itens), declarado no `components.json` e autenticado por `Authorization: Bearer ${CENTRALIT_TOKEN}`. Clone e registry são acessos **distintos** — dá pra ter um e não ter o outro.
+
+O `CENTRALIT_TOKEN` **não era mencionado em nenhuma skill**. E o `px-setup` afirmava o oposto: *"Sem token no fluxo de sandbox. O acesso ao repo privado é o login normal do GitHub."* Verdadeiro para o `git clone`, falso para o registry. As duas coisas estavam conflacionadas.
+
+### O gatilho: uma linha sem prefixo
+
+O `px-proto` mandava `npx shadcn add <componente>`. Sem `@centralit/`, isso resolve no shadcn **público** — e **funciona**. Retorna 200, escreve o arquivo, entrega o default `new-york`. Sem token, todo componente que faltava entrava por esse caminho.
+
+- Agora é `npx shadcn@latest add @centralit/<componente>`, com o prefixo **obrigatório**.
+- ⛔ **A forma sem prefixo é proibida.** Falha do `add` do registry (401/404) é **acesso**, não componente faltando: bloqueia e volta pro `px-setup`.
+- Componente ausente no registry é decisão de design system, não de proto — vira Pergunta em aberto com dono. Não se inventa primitiva.
+
+### O que apagava o rastro: `rm -rf .git`
+
+O `px-setup` cortava o git do sandbox pra não empurrar rascunho no boilerplate do time. A intenção era certa; o efeito colateral foi deixar o sandbox **inauditável** — sem commit de origem, sem `git fetch`, sem idade. Um sandbox que envelhece meses divergia sem sinal nenhum.
+
+Agora: `git remote rename origin boilerplate-upstream` + `git remote set-url --push boilerplate-upstream no-push`. Protege o boilerplate (a intenção original) **e** mantém a procedência medível. O push do `px-handoff` continua por branch órfã, como já era.
+
+### Os portões que não pegaram
+
+O `px-proto` Passo 3 conferia três coisas: servidor rodando, tokens no `index.css`, componentes em `src/components/ui/`. **Todas as três são verdadeiras** num projeto Vite qualquer com componentes vanilla. Existência não é procedência.
+
+Passo 3 virou **Portão de procedência e ambiente**, e falha fechado:
+- **Base auditável?** `boilerplate-upstream` presente e apontando pro repo certo.
+- **Idade da base?** `> 30 dias` ou `> 20 commits` atrás → ⚠️ avisa com o número exato. Não bloqueia; base velha só precisa ser **dita** — é o que separa "decidimos assim" de "ninguém sabia".
+- **Registry alcançável?** Token + bloco `registries` → ⛔ bloqueia.
+- **Catálogo do DS presente?** `ds-components_v4.md` é consultado no Passo 4. Ausente, o proto improvisava de memória.
+
+O `px-handoff` tinha **mais de 40 itens de portão e nenhum verificava origem.** Todos conferem coerência *interna*: refs mortas, IDs de RN, lint de copy, nomes de arquivo. Um pacote construído inteiramente fora do padrão passa em todos.
+
+### O documento que mentia
+
+O achado mais grave. A `anatomia-visual.md` tem a coluna **"Origem: Boilerplate (default já correto — não customizar) × Override do projeto"**. Essa classificação exige comparar com o componente real do registry. Sem ele, preenchida por dedução, a coluna **não fica vazia — fica afirmativamente errada**, instruindo o dev a preservar exatamente o que ele precisa substituir.
+
+- Sem o Passo 3A verde, cada linha vai como `Origem: NÃO APURADA` com pendência e dono. **É pior errar aqui do que deixar em branco.**
+- Linha `NÃO APURADA` no fechamento bloqueia a aprovação do proto e a saída do handoff.
+
+### `procedencia.md` — obrigatório em todo pacote
+
+Sete campos, todos com valor real (nunca "atual" ou "última"): commit da base, data, distância do `main`, registry alcançado, componentes fora do registry, versão das skills, origem dos tokens. O `px-proto` apura no Passo 3A; o `px-handoff` transcreve e valida.
+
+Procedência indeterminável **não impede a entrega** — obriga a declarar `Procedência: NÃO AUDITÁVEL` em destaque no `handoff.md`, com dono. Um pacote sem procedência que não se declara é indistinguível de um pacote conforme; era exatamente esse o estado anterior.
+
+### Sem regressão
+
+Decisão explícita do líder: **os handoffs já entregues não serão reauditados.** O ajuste vale a partir daqui. Sandbox montado antes desta versão não tem `boilerplate-upstream` — o Passo 3A detecta, avisa que a base não é auditável e oferece remontar pelo `px-setup`.
+
+Arquivos: `px-setup/SKILL.md`, `px-proto/SKILL.md`, `px-handoff/SKILL.md`, `px-handoff/templates/handoff-manifest.md`, `install.mjs`, `package.json`.
+
+---
+
 ## 1.13.0 — 2026-08-26
 
 **Diagnóstico num projeto real (5 histórias entregues) mostrou que a 1.12.0 consertou o eixo errado.** A 1.12.0 proibiu fluxo e público como unidade de recorte. As duas regras **foram cumpridas** naquele projeto — e as histórias estavam grandes de qualquer forma. O que faltava era teto: uma tela de **uma rota só**, com 6 abas e um modal de 3 abas, passa em todos os testes de recorte e chega ao dev com **18 critérios de aceite**.

@@ -92,6 +92,14 @@ log(`${c.d}  estar no repo — ela vem no bundle do design system, não neste pa
 // Ao publicar uma versão nova: acrescente a chave aqui, 1 a 3 linhas de ~74 colunas.
 // Isto é o resumo de leitura rápida; a íntegra vive no CHANGELOG.md.
 const HIGHLIGHTS = {
+  "1.14.0": [
+    "Componente instala SEMPRE via registry: npx shadcn add @centralit/<nome>.",
+    "  A forma sem prefixo baixa o shadcn publico e nao da erro — virou proibida.",
+    "Portao de procedencia no px-proto: base auditavel, idade da base e token do",
+    "  registry conferidos antes de codar. Falha fechado, nao segue 'por enquanto'.",
+    "px-setup nao corta mais o git do sandbox, e o px-handoff exige procedencia.md",
+    "  no pacote: commit da base, registry e versao das skills. Sem ele, nao sai.",
+  ],
   "1.13.0": [
     "Teto de tamanho: a história fecha com no máximo 13 CA e 13 cenários BDD,",
     "  ou justifica por escrito. Pega a tela funda que o teste de rota não pegava.",

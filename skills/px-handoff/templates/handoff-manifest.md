@@ -23,6 +23,7 @@ ruído interno pro dev e infla a entrega. Este manifesto fixa o recorte, de form
 ### ✅ Dev-facing (entra no pacote)
 | Categoria | Exemplo de artefato | Papel |
 |---|---|---|
+| Procedência da base | `procedencia.md` **na raiz** (commit/data do boilerplate, registry, versão das skills) | Diz sobre qual base o pacote foi construído — sem isso, divergência visual é indiagnosticável |
 | Referência visual navegável | `prototipo/` — HTML unificado single-file (`#view-*`/`data-story`) **ou** build do protótipo | Referência de fidelidade (visual + comportamento) |
 | UI Kit / tokens | `ui-kit.md`, tokens reais do projeto | Valores reais de identidade |
 | Histórias de negócio | `stories/*.md` (CA + BDD + rastreabilidade) | **O contrato** do que fazer |
@@ -43,7 +44,7 @@ ruído interno pro dev e infla a entrega. Este manifesto fixa o recorte, de form
 | Memória do assistente + scratchpad | `~/.claude/...`, arquivos temporários | Nunca sai |
 | Build compilado, quando há fonte | `dist/`, `standalone.html`, bundle single-file | O `proto/` roda. Bundle é o arquivo mais pesado e mais irreversível no repo do dev, e no caminho do fonte não acrescenta nada. Vai publicado, com link no README |
 | Config de build | `vite.config`, `tsconfig`, `package.json`, `.env` | Ambiente é do repo do dev |
-| Biblioteca de componentes | `src/components/ui/**` | Vem do registry `@centralit`, versionada — cópia no pacote duplica biblioteca |
+| Biblioteca de componentes | `src/components/ui/**` | Vem do registry `@centralit` (privado, exige `CENTRALIT_TOKEN`), versionada — cópia no pacote duplica biblioteca. O `procedencia.md` declara se o proto usou o registry ou não |
 
 > Alinhado ao GATE do `SKILL.md`. O pacote é **self-contained**: além de referência visual + UI Kit +
 > stories, entram as **regras de negócio por fluxo** e as **specs referenciadas** (extraídas do interno e

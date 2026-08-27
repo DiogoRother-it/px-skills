@@ -58,7 +58,10 @@ Liste todos os widgets da spec e mapeie cada um a um componente em `src/componen
 
 **Regras:**
 - Se existe em `src/components/ui/` → usar obrigatoriamente, nunca reimplementar.
-- Se não existe → `npx shadcn add <componente>` antes de codar.
+- Se não existe → `npx shadcn@latest add @centralit/<componente>` antes de codar. **O prefixo `@centralit/` é obrigatório.**
+- ⛔ **`npx shadcn add <componente>` sem o prefixo é proibido.** A forma sem prefixo resolve no shadcn **público** e **funciona** — entrega o default `new-york` em vez do componente da Central IT. Não dá erro, não dá aviso: o proto inteiro nasce sobre a base errada e a `anatomia-visual.md` do Passo 8b registra os valores vanilla como se fossem "default do boilerplate — não customizar", instruindo o dev a preservar o que ele deve substituir. Foi exatamente esse o mecanismo do incidente do sandbox sem token.
+- **Se o `add` do registry falhar** (401/404) → ⛔ **pare**. É acesso, não é componente faltando. Volte ao `px-setup` Passo 2b. Nunca instale a versão pública como contorno, nunca implemente o componente à mão.
+- **Componente que não existe no registry** (52 itens em `public/r/`) → é decisão de design system, não de proto. Registre como Pergunta em aberto com dono; não invente primitiva.
 - Se é ambíguo (mais de um componente possível) → vai para o Passo 2.
 - `<table>` HTML nativo, `<span>` com classes manuais, `<button>` sem primitiva shadcn → **proibidos** quando existe equivalente no catálogo.
 
@@ -93,11 +96,28 @@ Use `AskUserQuestion` para esses casos — 2–4 opções com a recomendada marc
 
 ---
 
-## Passo 3 — Verificar o ambiente
+## Passo 3 — Portão de procedência e ambiente
 
-1. Servidor rodando? Se não, `npm run dev` em background.
-2. `src/index.css` tem os tokens do UI KIT? Se não, avise que o `px-kickoff` precisa materializar primeiro.
-3. Todos os componentes do inventário (Passo 1) estão em `src/components/ui/`? Se não, instale os que faltam agora.
+**Este passo falha fechado.** Qualquer item com ✗ **bloqueia o proto** — não existe "seguir por enquanto". Presença de arquivo não é procedência: um projeto Vite qualquer, com componentes vanilla e tokens escritos à mão, passa em todo teste de existência e reprova em todo teste de origem. Verificar de onde a base veio é o único jeito de a cadeia perceber que está construindo fora do padrão.
+
+**A — Procedência da base (novo)**
+
+1. **É uma cópia do boilerplate?** `git remote -v` deve mostrar `boilerplate-upstream` apontando pra `centralit-boilerplate`.
+   - ✗ Sem remote nenhum → sandbox montado antes da 1.14.0 (quando o `px-setup` fazia `rm -rf .git`) **ou** projeto que nunca veio do boilerplate. Nos dois casos a procedência é indeterminável: **avise explicitamente** que a base não é auditável e ofereça remontar o sandbox pelo `px-setup`.
+   - ✗ Remote de outro repo → não é o ateliê do PX. Pare.
+2. **Qual a idade da base?** `git fetch boilerplate-upstream` e depois `git log --oneline HEAD..boilerplate-upstream/main | wc -l` + `git log -1 --format=%cd HEAD`.
+   - **> 30 dias ou > 20 commits atrás** → ⚠️ avise o líder com o número exato antes de codar. Base velha não bloqueia, mas **precisa ser dita**: é o que distingue "decidimos trabalhar assim" de "ninguém sabia".
+3. **Registry alcançável?** `CENTRALIT_TOKEN` no ambiente **e** bloco `registries.@centralit` no `components.json`.
+   - ✗ → ⛔ **bloqueia.** Sem o token, todo `add` do Passo 1 cai no shadcn público em silêncio. Encaminhe pro `px-setup` Passo 2b.
+
+**B — Ambiente**
+
+4. Servidor rodando? Se não, `npm run dev` em background.
+5. `src/index.css` tem os tokens do UI KIT? Se não, avise que o `px-kickoff` precisa materializar primeiro. (Os tokens também chegam por `npx shadcn@latest add @centralit/theme` — ver `docs/registry.md` no boilerplate.)
+6. `docs/design-system/ds-components_v4.md` existe? O Passo 4 consulta esse catálogo. Se faltar, rode `npx github:DiogoRother-it/px-skills` — o instalador o entrega. **Nunca improvise a anatomia de memória**: catálogo ausente produz componente plausível e anatomia errada.
+7. Todos os componentes do inventário (Passo 1) estão em `src/components/ui/`? Se não, instale os que faltam **pelo registry** (`@centralit/<nome>`), respeitando as regras do Passo 1.
+
+**Registrar o resultado.** Anote no `PX-PROGRESS` a linha de procedência apurada aqui: commit da base, data, distância do `main` e versão das skills. É o dado que o `px-handoff` estampa no pacote — e sem ele nenhuma entrega é rastreável depois.
 
 ---
 
@@ -325,6 +345,7 @@ Cada ajuste é aplicado direto, sem perguntar. O PX vê e manda mais ou aprova.
 | **Região/componente** | header, moldura da tabela, linha, drawer, dropdown, card de KPI, chart… |
 | **Valores exatos** | altura, padding, gap, raio, sombra, fonte/peso, largura. Números, não adjetivos. |
 | **Origem** | **Boilerplate** (default da lib já correto — *não customizar*) × **Override do projeto** (identidade própria — *aplicar*) |
+| **Base apurada** | Commit do `boilerplate-upstream` e data, conforme o Passo 3A. Preencher com o valor real, nunca "atual" |
 | **Componente da lib** | qual componente/hook cobre a região (`Table variant="spaced"`, `sheet.tsx`, `useTableSort`…) |
 | **Intenção**, quando não for óbvia | *ex: "body do drawer em `--surface-soft` e footer em `--surface` separa conteúdo de ações — não uniformizar"* |
 
@@ -333,6 +354,8 @@ Cada ajuste é aplicado direto, sem perguntar. O PX vê e manda mais ou aprova.
 - **Gambiarra de protótipo que NÃO deve ser replicada** — workaround de contexto de empilhamento, delay artificial de skeleton, valor fora da escala de 8px. Diga explicitamente o que normalizar.
 - **Equivalência de biblioteca** quando a do proto difere da do dev (ícones, por exemplo): equivalência **semântica**, nunca cópia de glifo.
 
+> ⛔ **A coluna "Origem" é indeterminável sem o registry.** Classificar um valor como "Boilerplate — não customizar" exige comparar com o componente real de `@centralit`. Se o Passo 3A não passou, você não tem esse referencial: preenchida por dedução, a coluna não fica vazia — fica **afirmativamente errada**, e manda o dev preservar exatamente o que ele precisa substituir. Sem o Passo 3A verde, marque cada linha como `Origem: NÃO APURADA` e registre a pendência com dono. É pior errar aqui do que deixar em branco.
+>
 > **Trava:** componente no inventário do Passo 1 sem entrada na anatomia **bloqueia a aprovação**. A `px-handoff` cobra a completude deste arquivo no DoD dela — se ficar para lá, já é tarde.
 >
 > **Dispensa:** se a entrega ao dev for de **componentes reais na mesma stack** dele, registre "N/A — entrega em componentes" e siga. Nesse caso o componente **é** a spec.
@@ -342,7 +365,8 @@ Cada ajuste é aplicado direto, sem perguntar. O PX vê e manda mais ou aprova.
 Quando aprovado:
 
 1. Adicione no topo: `// Aprovado em: YYYY-MM-DD`
-2. Confirme que a anatomia do Passo 8b está completa para todos os componentes do inventário
+2. Confirme que a anatomia do Passo 8b está completa para todos os componentes do inventário, **com a coluna "Origem" apurada** (não `NÃO APURADA`)
+2b. Confirme que a procedência do Passo 3A está registrada no `PX-PROGRESS` — commit da base, data, distância do `main`, versão das skills
 3. Atualize `PX-PROGRESS.md` — proto aprovado, caminho `src/proto/<slug>.tsx`
 4. **Lint de copy:** rodar `npm run lint:travessao` e `npm run lint:caixa-alta` e confirmar que não há violação em texto novo. Copy nova de UI — onboarding, tooltip, empty/error, título — é o ponto de maior risco.
 5. Eco:
