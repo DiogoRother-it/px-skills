@@ -57,6 +57,46 @@ for (const f of readdirSync(dsSrc)) {
 }
 ok(`${nDocs} docs de design system em docs/design-system/${nSkipped ? ` (${nSkipped} já existiam, mantidos)` : ""}`)
 
+// 2b. Hook de sessão → <target>/.claude/hooks/ + SessionStart no settings.json
+// Avisa o UX quando as skills estão atrás, o sandbox não tem procedência ou falta
+// o CENTRALIT_TOKEN. O hook é o que faz o aviso chegar sem ninguém precisar lembrar
+// de rodar o instalador.
+const hooksDest = join(TARGET, ".claude", "hooks")
+mkdirSync(hooksDest, { recursive: true })
+cpSync(join(PKG, "assets", "hooks", "check-versao.mjs"), join(hooksDest, "check-versao.mjs"))
+
+const settingsPath = join(TARGET, ".claude", "settings.json")
+const CMD = "node .claude/hooks/check-versao.mjs"
+let settings = {}
+let settingsOk = true
+if (existsSync(settingsPath)) {
+  try {
+    settings = JSON.parse(readFileSync(settingsPath, "utf8"))
+  } catch {
+    // settings.json malformado: NÃO sobrescrever. Um settings quebrado desliga todas
+    // as configurações daquele arquivo, e clobberar apagaria trabalho do time.
+    settingsOk = false
+    warn(".claude/settings.json existe mas não é JSON válido — hook não instalado")
+    warn("  corrija o arquivo e rode o instalador de novo")
+  }
+}
+if (settingsOk) {
+  settings.hooks ||= {}
+  settings.hooks.SessionStart ||= []
+  const jaTem = settings.hooks.SessionStart.some((g) =>
+    (g?.hooks || []).some((h) => h?.command === CMD),
+  )
+  if (!jaTem) {
+    settings.hooks.SessionStart.push({
+      hooks: [{ type: "command", command: CMD, timeout: 10 }],
+    })
+    writeFileSync(settingsPath, JSON.stringify(settings, null, 2) + "\n")
+    ok("hook de sessão em .claude/hooks/ (avisa quando as skills ficam atrás)")
+  } else {
+    ok("hook de sessão atualizado em .claude/hooks/")
+  }
+}
+
 // 3. Protocolo → <target>/docs/px-protocol.md
 const protoDest = join(TARGET, "docs", "px-protocol.md")
 if (!existsSync(protoDest)) {
@@ -92,6 +132,12 @@ log(`${c.d}  estar no repo — ela vem no bundle do design system, não neste pa
 // Ao publicar uma versão nova: acrescente a chave aqui, 1 a 3 linhas de ~74 colunas.
 // Isto é o resumo de leitura rápida; a íntegra vive no CHANGELOG.md.
 const HIGHLIGHTS = {
+  "1.15.0": [
+    "Hook de sessao: ao abrir o Claude Code, o repo avisa se as skills estao",
+    "  atras, se o sandbox perdeu a procedencia ou se falta CENTRALIT_TOKEN.",
+    "Silencio quando esta tudo certo — aviso todo dia vira ruido e e ignorado.",
+    "  O instalador planta o hook sozinho; nao ha nada para configurar.",
+  ],
   "1.14.0": [
     "Componente instala SEMPRE via registry: npx shadcn add @centralit/<nome>.",
     "  A forma sem prefixo baixa o shadcn publico e nao da erro — virou proibida.",
