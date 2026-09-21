@@ -45,6 +45,8 @@ e2e/flows/<slug-da-jornada>.md
 
 `slug` kebab-case da jornada (não da tela) — ex: `aprovar-pedido-gestor.md`. Se o produto já tem `PX-PROGRESS.md`, registre o caminho do flow lá.
 
+**O flow vai pro dev.** No fechamento, o `px-handoff` copia pra `flows/` do pacote cada jornada que cobre as telas entregues, com os ponteiros reescritos pra dentro do pacote — é o artefato que o **Playwright do dev automatiza** e o que a persona percorre na revalidação. Duas consequências pra quem escreve o flow aqui: **passo em rota interna não sobrevive** (o dev não tem como automatizar o que não se clica), e **passo sem ponto de verificação observável chega inútil** dos dois lados. As regras 1 e 3 abaixo deixam de ser higiene nossa e viram contrato de entrega.
+
 ## Quando NÃO usar
 
 - **Uma tela isolada, sem jornada multi-tela** e sem necessidade de walkthrough qualitativo → o BDD do `px-story` já cobre; não crie um flow de um passo só.
@@ -53,6 +55,8 @@ e2e/flows/<slug-da-jornada>.md
 ## Encadeamento
 
 Com o flow salvo, ofereça: "Quer rodar o `ux-persona` nesse flow agora, com qual persona?" Se ainda não há persona definida pro público, aponte para os 6 personas bundled do `ux-persona` (ou "criar próprio").
+
+Se todas as telas do flow já têm `px-story` com proto aprovado, ofereça também: "Quer gerar o onboarding guiado dessa jornada com o `px-tour`?" Um flow, um tour: é a unidade que o `px-tour` consome.
 
 ## Relação com o fluxo
 

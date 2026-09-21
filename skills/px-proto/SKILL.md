@@ -1,6 +1,6 @@
 ---
 name: px-proto
-description: Cria a tela do protótipo dentro do boilerplate (Vite + localhost) usando os componentes reais do shadcn, os tokens reais do UI KIT e mock data do px-request. Constrói em DUAS pastas obrigatoriamente: a UI, que é destinada à produção e o dev copia sem editar, e o andaime do protótipo (seletores de papel e estado, dados de exemplo), que é descartável. O PX trabalha no localhost com HMR — vê, ajusta, aprova. Obrigatório após o px-request e antes do px-story. Use quando o líder disser "gera o proto", "quero ver como fica", "prototipar a tela", "visualizar a spec", ou ao fechar um px-request.
+description: Cria a tela do protótipo dentro do boilerplate (Vite + localhost) usando os componentes reais do shadcn, os tokens reais do UI KIT e mock data do px-request. Constrói em DUAS pastas obrigatoriamente: a UI, que é destinada à produção e o dev copia sem editar, e a demo do protótipo (seletores de papel e estado, dados de exemplo), que é descartável. O PX trabalha no localhost com HMR — vê, ajusta, aprova. Obrigatório após o px-request e antes do px-story. Use quando o líder disser "gera o proto", "quero ver como fica", "prototipar a tela", "visualizar a spec", ou ao fechar um px-request.
 compatibility: claude-code
 metadata:
   audience: px-ux
@@ -11,13 +11,15 @@ metadata:
 
 Esta skill cria o protótipo da tela **dentro do boilerplate**, usando os componentes reais do shadcn/ui, os tokens reais do `src/index.css` e o servidor de desenvolvimento Vite. O PX vê a tela no localhost com HMR — ajusta em tempo real, aprova — e só então a tela vira história (`px-story`).
 
-**A tela nasce em duas pastas, e a distinção importa mais que qualquer outra regra desta skill:** `src/<produto>/` guarda a **UI, que é destinada à produção** e é entregue ao dev com a instrução de copiar sem editar; `src/proto/` guarda o **andaime**, que é descartável. Tratar o protótipo inteiro como descartável é o que produz código que o dev não consegue reaproveitar, e é a causa raiz da divergência visual entre protótipo e implementação.
+**A tela nasce em duas pastas, e a distinção importa mais que qualquer outra regra desta skill:** `src/<produto>/` guarda a **UI, que é destinada à produção** e é entregue ao dev com a instrução de copiar sem editar; `src/proto/` guarda o **demo**, que é descartável. Tratar o protótipo inteiro como descartável é o que produz código que o dev não consegue reaproveitar, e é a causa raiz da divergência visual entre protótipo e implementação.
 
-**Por que no boilerplate:** componentes reais, tokens reais, HMR. Standalone HTML via CDN é uma aproximação — aqui é o mesmo stack do produto, só com mock data e diretório separado.
+**Por que no boilerplate:** componentes reais, tokens reais, HMR. Aqui é o mesmo stack do produto, só com mock data e diretório separado.
+
+> ⛔ **HTML standalone (vanilla ou via CDN) não é aproximação aceitável: é a causa raiz medida da divergência.** Em 2026-09-18 o time de dev do SmartCity mostrou o que recebia: HTML de 3.407 linhas sem uma classe Tailwind e sem uma fronteira de componente, enquanto o repo deles tinha a nossa biblioteca inteira, byte a byte. A LLM do dev precisou reinterpretar cada região, e cada dev obteve um resultado diferente. Uma tela que existe só como `.html` **não é protótipo desta skill e não é aprovável** (Passo 9). Se o líder pedir "gera um HTML", a resposta é: o proto nasce em TSX aqui; o HTML pra PO sai depois pelo `px-preview`.
 
 > **Este fonte vai ser COPIADO por outro time, não lido.** Quando o dev implementa na mesma stack, a `px-handoff` entrega `src/<produto>/` com a instrução de copiar sem editar. Escreva pensando nisso: nome de variável que se explica, `// INTEGRATION BOUNDARY:` nas fronteiras, e nenhum truque que você não queira ver rodando em produção. É o que permite fidelidade 1:1 sem ninguém redesenhar a partir de screenshot, e sem ninguém redigitar centenas de decisões visuais.
 >
-> **Se o dev precisar editar um arquivo da camada de UI para rodar no projeto dele, é defeito nosso** e conserta-se na origem. O andaime é outra história: `src/proto/` não é biblioteca, não é pacote, não vai para produção, e o PX não mantém. A fronteira de propriedade está registrada na `px-handoff`.
+> **Se o dev precisar editar um arquivo da camada de UI para rodar no projeto dele, é defeito nosso** e conserta-se na origem. A demo é outra história: `src/proto/` não é biblioteca, não é pacote, não vai para produção, e o PX não mantém. A fronteira de propriedade está registrada na `px-handoff`.
 
 **Por que obrigatório:** spec textual não substitui revisão visual. Erros de hierarquia, densidade, estados e copy só aparecem quando você vê a tela. Corrigir aqui é grátis; corrigir depois do dev é caro.
 
@@ -44,25 +46,78 @@ Se o `px-request` não existir ou estiver sem Definition of Ready, **pare**: rod
 
 ## Passo 1 — Inventário de componentes (obrigatório antes de escrever qualquer linha)
 
-Liste todos os widgets da spec e mapeie cada um a um componente em `src/components/ui/`. Este mapeamento é **público** — mostre ao PX antes de codar.
+> **Por que este passo mudou.** Ele já existia e mesmo assim deixou passar um accordion
+> reimplementado à mão, uma paginação sem elipse, um chevron duplo e uma busca difusa,
+> todos com componente canônico disponível. A causa não foi desleixo: o inventário antigo
+> perguntava **se** o componente existe, nunca **o que ele já entrega**. Existir e ser usado
+> como o design system manda são duas verificações diferentes, e só a primeira estava aqui.
+> As skills protegiam contra o que não está no catálogo; contra o que está e é usado errado,
+> não havia nada.
 
-**Formato:**
+### 1a — Varredura de candidatos (antes de escolher qualquer coisa)
 
-| Widget da spec | Componente em src/components/ui/ | Instalar? |
-|---|---|---|
-| Tabela de feed | `table.tsx` → `Table, TableBody...` | não |
-| Badge de severidade | `badge.tsx` → `Badge` | não |
-| Seletor de período | ⚠️ ambíguo — ver Passo 2 | — |
-| Botão icon-only com tooltip | `button.tsx` + `tooltip.tsx` | não |
-| Skeleton de loading | `skeleton.tsx` → `Skeleton` | não |
+Para **cada** widget da spec, varra `src/components/ui/` de duas formas e liste **todos** os
+candidatos que casam o comportamento, não só o primeiro que serve:
 
-**Regras:**
+1. **Por nome** — `ls src/components/ui/` e case pelo nome óbvio.
+2. **Por palavra-chave de comportamento** — `grep -ril "<comportamento>" src/components/ui/`
+   com o verbo do widget (*abrir/fechar, colapsar, expandir, buscar, filtrar, selecionar
+   vários, paginar, empilhar, arrastar*). É esta varredura que acha o candidato cujo nome
+   você não conhecia.
+
+⛔ **Achou um que serve e parou de procurar? O passo não foi cumprido.** A regra "componente
+existente se usa" é satisfeita formalmente por **qualquer** componente existente, inclusive
+o errado. "Grupo colapsável" foi mapeado para `collapsible.tsx`, que existe, e a regra ficou
+cumprida no papel enquanto o `accordion.tsx` — o certo, com anatomia de linha de tabela
+comentada decisão por decisão — nunca entrou na conversa.
+
+**Dois ou mais candidatos → o Passo 2 é obrigatório**, e a escolha vai registrada com o
+motivo. Não é o construtor que decide se o caso é ambíguo: **a contagem de candidatos
+decide.** Ambiguidade auto-declarada é o mesmo que ambiguidade não declarada.
+
+Pares que já produziram defeito e que quase sempre aparecem juntos na varredura:
+
+| Widget que você tem | Candidatos que a varredura precisa devolver |
+|---|---|
+| Bloco que abre e fecha | `accordion` **e** `collapsible` |
+| Lista com busca | `combobox`, `multi-select` **e** `select` |
+| Menu de opções | `dropdown-menu` **e** `navigation-menu` |
+| Overlay lateral | `sheet` **e** `responsive-dialog` |
+| Confirmação | `dialog` **e** `alert-dialog` |
+| Grupo de botões alternáveis | `toggle-group` **e** `button-group` |
+
+### 1b — O inventário lê o COMPONENTE, não a doc
+
+Este mapeamento é **público** — mostre ao PX antes de codar.
+
+| Widget da spec | Candidatos (1a) | Escolhido | O que o `.tsx` já entrega | O que os comentários dele já decidiram | O que a doc acrescenta | Instalar? |
+|---|---|---|---|---|---|---|
+| Bloco colapsável de tarefa | `accordion`, `collapsible` | `accordion.tsx` | `AccordionItem/Trigger/Content`, `type="single"`, `collapsible` | "cada item é um card idêntico a uma row da tabela (variante spaced)"; "corpo clicável = a row: px-4, py-4" | sem entrada própria → **o componente é a spec** | não |
+| Rodapé de paginação | `pagination` | `pagination.tsx` → `TablePagination` | contagem, seletor de itens por página, elipse, anatomia por variant | "no card do spaced a borda sai: o card já é a moldura" | §Pagination: elipse obrigatória, default 10, texto "Mostrando X a Y de Z" | não |
+| Seleção múltipla com busca | `multi-select`, `combobox` | `multi-select.tsx` | `variant`, `countLabel`, `maxVisible`, **`filter`**, `readOnly`, `aria-label` | "o `cmdk` filtra por correspondência difusa: passe `filter` quando a lista for grande" | sem entrada própria → **o componente é a spec** | não |
+
+**Como preencher as três colunas do meio (é aqui que o passo tem valor):**
+
+- **O que o `.tsx` já entrega** — abra o arquivo e liste as **props e os subcomponentes
+  exportados**. Não resuma: nomeie. Uma prop que existe e você não viu vira reimplementação
+  à mão, e reimplementação à mão é divergência com aparência de trabalho.
+- **O que os comentários dele já decidiram** — os componentes desta biblioteca são
+  comentados decisão por decisão, e **essas decisões não estão em lugar nenhum além do
+  arquivo**. É a régua mais precisa que existe, e ela é invisível para quem lê só a doc.
+- **O que a doc acrescenta** — o "quando usar / não usar", a variação, o proibido. **Se não
+  houver entrada no `ds-components_v4.md`, escreva literalmente "sem entrada própria → o
+  componente é a spec"** e siga. Metade da biblioteca está nessa situação, e tratar ausência
+  de entrada como ausência de régua foi exatamente o buraco por onde os defeitos passaram.
+
+⛔ **Trava:** linha com qualquer das três colunas do meio vazia **reprova o inventário**.
+"Não li o arquivo" não é preenchimento válido, e "é óbvio" também não.
+
+**Regras (as de sempre, mantidas):**
 - Se existe em `src/components/ui/` → usar obrigatoriamente, nunca reimplementar.
 - Se não existe → `npx shadcn@latest add @centralit/<componente>` antes de codar. **O prefixo `@centralit/` é obrigatório.**
 - ⛔ **`npx shadcn add <componente>` sem o prefixo é proibido.** A forma sem prefixo resolve no shadcn **público** e **funciona** — entrega o default `new-york` em vez do componente da Central IT. Não dá erro, não dá aviso: o proto inteiro nasce sobre a base errada e a `anatomia-visual.md` do Passo 8b registra os valores vanilla como se fossem "default do boilerplate — não customizar", instruindo o dev a preservar o que ele deve substituir. Foi exatamente esse o mecanismo do incidente do sandbox sem token.
 - **Se o `add` do registry falhar** (401/404) → ⛔ **pare**. É acesso, não é componente faltando. Volte ao `px-setup` Passo 2b. Nunca instale a versão pública como contorno, nunca implemente o componente à mão.
-- **Componente que não existe no registry** (52 itens em `public/r/`) → é decisão de design system, não de proto. Registre como Pergunta em aberto com dono; não invente primitiva.
-- Se é ambíguo (mais de um componente possível) → vai para o Passo 2.
+- **Componente que não existe no registry** (53 itens em `public/r/`) → é decisão de design system, não de proto. Registre como Pergunta em aberto com dono; não invente primitiva.
 - `<table>` HTML nativo, `<span>` com classes manuais, `<button>` sem primitiva shadcn → **proibidos** quando existe equivalente no catálogo.
 
 Componentes que **sempre** existem no boilerplate e **nunca** devem ser reimplementados:
@@ -70,6 +125,7 @@ Componentes que **sempre** existem no boilerplate e **nunca** devem ser reimplem
 | Elemento | Usar |
 |---|---|
 | Tabela (qualquer variação) | `Table, TableHeader, TableBody, TableRow, TableHead, TableCell` |
+| Rodapé de paginação de tabela | `TablePagination` (de `pagination.tsx`) — nunca compor à mão |
 | Badge / status / chip | `Badge` com `variant` ou `className` |
 | Botão icon-only | `Button size="icon"` + `Tooltip` obrigatório |
 | Loading de bloco | `Skeleton` |
@@ -81,7 +137,21 @@ Componentes que **sempre** existem no boilerplate e **nunca** devem ser reimplem
 
 ## Passo 2 — Gate de ambiguidade (antes de codar)
 
-Qualquer widget onde a variação de componente **não está explícita na px-request** gera uma pergunta — nunca uma escolha silenciosa. Elementos que tipicamente exigem confirmação:
+**O gate dispara por contagem, não por percepção.** Duas entradas o acionam, e nenhuma delas
+depende de alguém achar que o caso é difícil:
+
+1. **A varredura do Passo 1a devolveu dois ou mais candidatos** para o mesmo widget. Não
+   importa se um deles parece obviamente melhor: liste os dois, diga o que os distingue e
+   registre a escolha com o motivo.
+2. **A variação de componente não está explícita na px-request.**
+
+> **Por que a mudança.** Antes, ambiguidade era **auto-declarada**: quem inventariava
+> decidia se o caso era ambíguo, e a regra "componente existente se usa" ficava cumprida ao
+> escolher qualquer candidato existente. Foi assim que um grupo colapsável virou
+> `collapsible` sem que o `accordion` — o certo — fosse sequer citado. Quem escolhe em
+> silêncio não sabe que escolheu.
+
+Elementos que tipicamente exigem confirmação:
 
 | Padrão ambíguo | Pergunta obrigatória |
 |---|---|
@@ -92,7 +162,13 @@ Qualquer widget onde a variação de componente **não está explícita na px-re
 | Header de tela | Breadcrumb com navegação ou só H1 (sem router nesta tela)? |
 | Chips / pills | Display apenas ou filtros clicáveis? Se clicáveis, o que filtram? |
 
-Use `AskUserQuestion` para esses casos — 2–4 opções com a recomendada marcada. Resolva todos antes de escrever a primeira linha de código. **Ambiguidade resolvida em silêncio = retrabalho garantido.**
+Use `AskUserQuestion` para esses casos — 2–4 opções com a recomendada marcada. Resolva todos
+antes de escrever a primeira linha de código. **Ambiguidade resolvida em silêncio =
+retrabalho garantido.**
+
+**Registrar a escolha.** Toda resolução deste passo entra no inventário do Passo 1b (coluna
+"Escolhido") **com o motivo**, e não só no chat. Escolha sem motivo escrito não sobrevive à
+próxima sessão, e é ela que o `px-story` e o `px-handoff` vão citar.
 
 ---
 
@@ -114,32 +190,107 @@ Use `AskUserQuestion` para esses casos — 2–4 opções com a recomendada marc
 
 4. Servidor rodando? Se não, `npm run dev` em background.
 5. `src/index.css` tem os tokens do UI KIT? Se não, avise que o `px-kickoff` precisa materializar primeiro. (Os tokens também chegam por `npx shadcn@latest add @centralit/theme` — ver `docs/registry.md` no boilerplate.)
-6. `docs/design-system/ds-components_v4.md` existe? O Passo 4 consulta esse catálogo. Se faltar, rode `npx github:DiogoRother-it/px-skills` — o instalador o entrega. **Nunca improvise a anatomia de memória**: catálogo ausente produz componente plausível e anatomia errada.
+6. `docs/design-system/ds-components_v4.md` existe? O Passo 4 consulta esse catálogo. Se faltar, rode `npx github:DiogoRother-it/px-skills` — o instalador o entrega. **Nunca improvise a anatomia de memória**: catálogo ausente produz componente plausível e anatomia errada. ⚠️ **O catálogo é a fonte de comportamento, não de anatomia** — anatomia sai do `.tsx`, e 17 dos 53 componentes não têm entrada no catálogo (Passo 4). Ter o documento não dispensa abrir o arquivo.
 7. Todos os componentes do inventário (Passo 1) estão em `src/components/ui/`? Se não, instale os que faltam **pelo registry** (`@centralit/<nome>`), respeitando as regras do Passo 1.
 
 **Registrar o resultado.** Anote no `PX-PROGRESS` a linha de procedência apurada aqui: commit da base, data, distância do `main` e versão das skills. É o dado que o `px-handoff` estampa no pacote — e sem ele nenhuma entrega é rastreável depois.
 
 ---
 
-## Passo 4 — Mapear a variação no catálogo
+## Passo 4 — Mapear a variação: hierarquia de fontes
 
-Com a variação definida (px-request Bloco 6 + confirmações do Passo 2), consulte `docs/design-system/ds-components_v4.md`:
+**Cada pergunta tem uma fonte, e não é sempre a mesma.** Consultar só o
+`ds-components_v4.md` deixa você cego para metade do catálogo: **17 dos 53 componentes não
+têm entrada própria lá** (23, contando só entrada com o próprio nome), e entre eles estão
+`accordion`, `collapsible`, `multi-select`, `badge`, `dropdown-menu` e `toggle-group` — que
+é exatamente onde a cadeia errou.
+
+| A pergunta é sobre | A fonte é | Regra |
+|---|---|---|
+| **Anatomia** — partes, props, o que já vem pronto | o `.tsx` em `src/components/ui/` | É a fonte mais completa e a mais atual. Sem entrada na doc, **o componente É a spec** |
+| **Comportamento e regra** — quando usar, qual variação, o proibido | `docs/design-system/ds-components_v4.md` | É onde vivem as árvores "Qual usar?" e o "não usar" |
+| **Valor de cor** | `src/index.css` | O CSS real prevalece sobre a doc para valor visual |
+| **Exemplo de composição** | `src/showcase/` | **Auditável, nunca verdade** — ver abaixo |
+
+⚠️ **O `src/showcase/` é auditável, nunca verdade.** Ele é um exemplo escrito por alguém, não
+uma spec. **Ao copiar dele, confira contra a spec e contra o `.tsx` antes de colar.**
+Divergiu? **A spec ganha**, e a divergência do showcase vira débito externo registrado no
+`PX-PROGRESS` (é do boilerplate, não deste projeto). Isto não é formalidade: o
+`showcase/Dados.tsx` chegou a ter duas paginações que divergiam da spec e uma da outra, e é o
+arquivo que todo projeto novo copia. Copiar dele sem conferir propaga o defeito com cara de
+padrão da casa.
+
+**Do catálogo, extraia:**
 
 - **Anatomia:** partes do componente
 - **Estados:** quais são específicos desta variação
 - **Regras visuais:** sizing, spacing, comportamentos obrigatórios
 - **Overlay:** regras de empilhamento (se aplicável)
 
-**Variações do catálogo:**
+### Como saber se a família tem variação (critério, não lista)
+
+⛔ **Não existe lista fechada de famílias com variação.** A lista que ficava aqui (Table,
+Card, Select, Date Picker, Upload, Overlay) fazia o passo se cumprir **vazio** sempre que o
+componente não estava nela: Accordion e Pagination não estavam, então ninguém abriu a spec da
+paginação, que existe no `ds-components_v4.md` desde sempre e nunca tinha sido lida.
+
+**O critério:** um componente tem variação a decidir quando **qualquer** destas for verdade:
+
+1. O `.tsx` expõe prop de forma (`variant`, `size`, `density`, `type`, `mode`, `collapsible`)
+   — o default dela **é uma decisão**, e decisão por omissão é decisão não declarada.
+2. A varredura do Passo 1a devolveu mais de um candidato para o mesmo trabalho.
+3. A entrada na doc tem seção "Variações" ou árvore "Qual usar?".
+4. O componente aceita composição com outro (rodapé de tabela, campo com máscara, overlay
+   que dispara overlay).
+
+Nenhuma sendo verdade, escreva **"sem variação a decidir"** na linha do inventário. O passo
+se cumpre com uma frase escrita, nunca com silêncio.
+
+**Exemplos de famílias com variação** (é exemplo, não inventário — o critério acima é que manda):
 
 | Família | Variações |
 |---|---|
-| Table | Básica · Com Interações (sort/select) · Com Expansão · Data Grid avançada |
+| Table | Básica · Com Interações (sort/select) · Com Expansão · Data Grid avançada · variant `spaced`/`divided` · densidade |
+| Pagination | Números · setas prev/next · com seletor de itens por página · rodapé por variant da tabela (`TablePagination`) |
 | Card | Resumo · Informativo · Interativo |
 | Select | Base · Com Busca · Multi · Async · Combobox |
+| Accordion / Collapsible | Item de lista com anatomia de row (`accordion`) · primitivo cru (`collapsible`) |
 | Date Picker | Single · Range · Date Time |
 | Upload | Campo simples · Dropzone · Multi-arquivo |
 | Overlay | Drawer · Modal · Dialog · AlertDialog · Popover |
+
+---
+
+## Passo 4b — Divergências do design system (obrigatório, mesmo que seja "nenhuma")
+
+**Toda divergência do DS é declarada com motivo, ou é defeito.** Não existe terceira
+categoria. Este bloco espelha o `Bloco 11b` do `px-request`, que já existe para divergências
+do **legado** e funciona: num redesign recente cinco divergências do legado foram declaradas
+e nenhuma virou defeito, enquanto seis divergências do **design system** passaram inteiras
+pela cadeia porque não havia onde declará-las.
+
+Conta como divergência do DS, e por isso precisa de linha:
+
+- **Default trocado** — usar 20 por página quando a spec diz 10, `variant="divided"` quando o
+  default é `spaced`, densidade compacta onde a spec não pede.
+- **Anatomia alterada** — remover borda, trocar padding, mudar altura de um componente do
+  catálogo.
+- **Parte omitida** — rodapé sem elipse, sem seletor de itens por página, sem contagem.
+- **Composição à mão** onde existe componente pronto (`TablePagination` é o caso conhecido).
+- **Hierarquia de ação** invertida — primária à esquerda, duas primárias no mesmo contexto.
+- **Ícone fora da convenção** da casa (chevron duplo onde o DS usa simples).
+- **Tooltip de seção** onde a regra pede tooltip por campo, e vice-versa.
+
+**Formato — escreva no `px-request` da tela, no Bloco 11c**, e ecoe aqui:
+
+| # | O DS manda | Aqui faz | Por quê | Quem decidiu / quando |
+|---|---|---|---|---|
+
+**Se não houver nenhuma, escreva literalmente "nenhuma divergência do design system".** Bloco
+em branco não é "não houve": é "ninguém olhou", e os dois são indistinguíveis depois.
+
+⛔ **Trava:** divergência encontrada na revisão do líder que **não** está neste bloco é
+defeito da cadeia, não ajuste de gosto — e volta como correção, não como pedido novo.
 
 ---
 
@@ -151,11 +302,11 @@ Com a variação definida (px-request Bloco 6 + confirmações do Passo 2), cons
 | Arquivo | O que contém | Destino |
 |---|---|---|
 | `src/<produto>/tela-<slug>.tsx` | **A UI.** Recebe dados, papel de usuário, estado de carga e navegação por parâmetro | Vai para produção. O dev copia e **não edita** |
-| `src/proto/page-<slug>.tsx` | **O andaime.** Seletor de papel, seletor de estado, tema, dados de exemplo, navegação de protótipo | Descartável |
+| `src/proto/page-<slug>.tsx` | **A demo.** Seletor de papel, seletor de estado, tema, dados de exemplo, navegação de protótipo | Descartável |
 
-**Por que:** enquanto UI e andaime moram no mesmo arquivo, o dev é obrigado a **editar** para extrair a interface, e quem edita reescreve. Toda reescrita muda um espaçamento, uma variante, uma ordem. É a causa raiz da divergência visual entre protótipo e implementação, e revisão humana não pega isso de forma confiável.
+**Por que:** enquanto UI e demo moram no mesmo arquivo, o dev é obrigado a **editar** para extrair a interface, e quem edita reescreve. Toda reescrita muda um espaçamento, uma variante, uma ordem. É a causa raiz da divergência visual entre protótipo e implementação, e revisão humana não pega isso de forma confiável.
 
-**A dependência é direcional:** o andaime conhece a UI; a UI nunca conhece o andaime. Declare a camada criando `src/<produto>/README.md` com a linha `camada: ui`, e `npm run lint:camadas` passa a barrar qualquer import da UI para `proto/`.
+**A dependência é direcional:** a demo conhece a UI; a UI nunca conhece a demo. Declare a camada criando `src/<produto>/README.md` com a linha `camada: ui`, e `npm run lint:camadas` passa a barrar qualquer import da UI para `proto/`.
 
 ### 5a — A UI
 
@@ -231,10 +382,10 @@ Todo conteúdo de exemplo em **um módulo só**, `src/proto/fixtures.ts`, de dad
 
 Isso não é organização, é pré-requisito do aceite visual: se protótipo e implementação renderizarem conteúdo diferente, o diff acusa diferença de **dado** em vez de diferença de **implementação**, em toda tela cujo layout dependa do tamanho do conteúdo. O desfecho previsível é alguém subir a tolerância até o teste calar.
 
-### 5d — O andaime
+### 5d — A demo
 
 ```tsx
-// ANDAIME DO PROTÓTIPO — <nome da tela>.
+// DEMO DO PROTÓTIPO — <nome da tela>.
 // Este arquivo NÃO é a UI. A UI está em @/<produto>/*. Aqui vive só o que existe
 // para demonstrar: seletor de papel, seletor de estado, tema e dados de exemplo.
 
@@ -282,7 +433,7 @@ export function ProtoPageNome() {
 }
 ```
 
-> **Sinal de que a separação está certa:** o arquivo do andaime fica curto, na ordem de 100 a 150 linhas, independente do tamanho da tela. Se ele passar disso, tem UI vazando para dentro dele.
+> **Sinal de que a separação está certa:** o arquivo da demo fica curto, na ordem de 100 a 150 linhas, independente do tamanho da tela. Se ele passar disso, tem UI vazando para dentro dele.
 
 ### Regras de implementação
 
@@ -295,6 +446,7 @@ export function ProtoPageNome() {
 - **Switcher de estado obrigatório** — cobrir todos os estados do B7.
 - **Sem scroll horizontal** — colapsar colunas secundárias se necessário.
 - **Um overlay por vez** — drawer pode abrir modal; nunca empilhar overlay sobre overlay.
+- **Âncoras de onboarding (`data-onb`)** — toda candidata a âncora do B5 do request recebe `data-onb="<id>"` no **invólucro visível**, nunca no controle nativo (Input com ícone, Select e Combobox repassam `data-*` ao elemento interno e o recorte do guia abraçaria só ele: envolva num `<div data-onb>` do tamanho do controle). Sem âncora no proto, o `px-tour` não tem alvo.
 - **Copy sem travessão nem caixa alta.** Todo texto novo ou alterado — labels, placeholders, mensagens de estado vazio/erro, títulos — deve respeitar: proibido `—` (em dash) e `–` (en dash); proibida caixa alta total em labels/títulos. Verificar antes de marcar o proto como aprovado.
 
 ---
@@ -334,7 +486,7 @@ Cada ajuste é aplicado direto, sem perguntar. O PX vê e manda mais ou aprova.
 
 ## Passo 8b — Registrar a anatomia do que foi construído (obrigatório antes de aprovar)
 
-**Por que importa:** o protótipo é entregue como **referência visual**, e o dev reimplementa na stack dele. Todo valor que você decidiu enquanto construía — altura, padding, sombra, espessura de anel, largura de drawer, se um componente é o default da lib ou um override — existe **só no seu código** até ser escrito. Se não for registrado agora, alguém terá que fazer engenharia reversa do CSS depois, sob pressão de entrega e sem o contexto da decisão. Foi exatamente o que custou a correção da entrega SmartCity semana-33.
+**Por que importa (só no caminho de referência visual, legado sem shadcn; no caminho do fonte, ver a Dispensa abaixo):** quando o protótipo é entregue como **referência visual**, o dev reimplementa na stack dele. Todo valor que você decidiu enquanto construía — altura, padding, sombra, espessura de anel, largura de drawer, se um componente é o default da lib ou um override — existe **só no seu código** até ser escrito. Se não for registrado agora, alguém terá que fazer engenharia reversa do CSS depois, sob pressão de entrega e sem o contexto da decisão. Foi exatamente o que custou a correção da entrega SmartCity semana-33.
 
 **Este é o momento barato de registrar.** A informação está na sua mão; depois ela vira arqueologia.
 
@@ -364,13 +516,15 @@ Cada ajuste é aplicado direto, sem perguntar. O PX vê e manda mais ou aprova.
 
 Quando aprovado:
 
+0. ⛔ **A tela existe como `.tsx` em `src/<produto>/`, com imports de `@/components/ui/`?** Tela que existe só como `.html` (vanilla ou CDN), ou só dentro de `src/proto/`, **não é aprovável**: volte ao Passo 5. É este item que impede a entrega de sair como HTML pro dev.
 1. Adicione no topo: `// Aprovado em: YYYY-MM-DD`
 2. Confirme que a anatomia do Passo 8b está completa para todos os componentes do inventário, **com a coluna "Origem" apurada** (não `NÃO APURADA`)
+2a. Confirme que o inventário do Passo 1b tem as três colunas do meio preenchidas em **todas** as linhas, e que o Passo 4b tem veredito (uma divergência declarada por linha, ou "nenhuma divergência do design system" por extenso)
 2b. Confirme que a procedência do Passo 3A está registrada no `PX-PROGRESS` — commit da base, data, distância do `main`, versão das skills
 3. Atualize `PX-PROGRESS.md` — proto aprovado, caminho `src/proto/<slug>.tsx`
 4. **Lint de copy:** rodar `npm run lint:travessao` e `npm run lint:caixa-alta` e confirmar que não há violação em texto novo. Copy nova de UI — onboarding, tooltip, empty/error, título — é o ponto de maior risco.
 5. Eco:
-   > *"Proto de [tela] aprovado. Arquivo em `src/proto/<slug>.tsx` — referência visual pro dev. Anatomia registrada em `anatomia-visual.md` ([N] componentes). Rota `/proto/<slug>` pode ser removida após implementação. Próximo passo: `px-story` — quer seguir?"*
+   > *"Proto de [tela] aprovado. UI em `src/<produto>/tela-<slug>.tsx` (é o fonte que atravessa pro dev) e demo em `src/proto/page-<slug>.tsx`. Anatomia registrada em `anatomia-visual.md` ([N] componentes). Rota `/proto/<slug>` pode ser removida após implementação. Próximo passo: `px-story` — quer seguir?"*
 
 ---
 
@@ -378,7 +532,7 @@ Quando aprovado:
 
 - `src/<produto>/tela-<slug>.tsx` — a UI (vai para produção)
 - `src/<produto>/tipos.ts` — os contratos de dado
-- `src/proto/page-<slug>.tsx` — o andaime (descartável)
+- `src/proto/page-<slug>.tsx` — a demo (descartável)
 - `src/proto/fixtures.ts` — o conteúdo de exemplo, fonte única
 
 ---
@@ -386,15 +540,18 @@ Quando aprovado:
 ## Regras consolidadas
 
 - **Nunca gerar sem px-request aprovado.**
-- **Inventário de componentes antes da primeira linha** (Passo 1) — público, mostrado ao PX.
-- **Ambiguidade de variação → pergunta, nunca escolha silenciosa** (Passo 2).
+- **Inventário de componentes antes da primeira linha** (Passo 1) — público, mostrado ao PX, e **lendo o `.tsx`**: props, decisões comentadas e o que a doc acrescenta. Coluna vazia reprova o inventário.
+- **Varredura de candidatos antes de escolher** (Passo 1a) — por nome **e** por comportamento. Dois ou mais candidatos → Passo 2 obrigatório. Ambiguidade é decidida pela contagem, nunca auto-declarada.
+- **Ambiguidade de variação → pergunta, nunca escolha silenciosa** (Passo 2), com a escolha e o motivo registrados no inventário.
+- **Hierarquia de fontes** (Passo 4): anatomia no `.tsx` · comportamento no `ds-components_v4.md` · cor no `index.css` · exemplo no `showcase/`, que é **auditável, nunca verdade**. Sem entrada na doc, **o componente é a spec**.
+- **Divergência do design system declarada com motivo, ou é defeito** (Passo 4b) — inclusive "nenhuma", escrita por extenso.
 - **Componente shadcn disponível → uso obrigatório**, nunca reimplementação manual.
 - **Ícone em contexto** → sempre perguntar se é decorativo (muted) ou funcional (primary/destructive).
 - **Elemento que parece clicável mas spec não define ação** → sinalizar, não inventar comportamento.
 - **Borda, cor de destaque, visual de alerta em cards** → confirmar se aplica a todos ou só aos que têm condição.
 - **Header de tela** → confirmar se tem breadcrumb/router ou só H1.
 - **Switcher de estado obrigatório** — todos os estados do B7.
-- **A UI é código destinado à produção; o andaime é descartável.** Não trate o protótipo inteiro como descartável: a pasta de UI é entregue com a instrução "copie, não edite", e é isso que elimina a divergência visual. Só `src/proto/` é jogado fora.
+- **A UI é código destinado à produção; a demo é descartável.** Não trate o protótipo inteiro como descartável: a pasta de UI é entregue com a instrução "copie, não edite", e é isso que elimina a divergência visual. Só `src/proto/` é jogado fora.
 - **Contrato de dado pela forma do contrato, nunca `typeof MOCK[0]`.** Ausente não é vazio; variante é união discriminada.
 - **Uma fixture só**, em `src/proto/fixtures.ts`, de dados puros. Tela não declara mock próprio.
 - **`npm run lint:camadas` verde** antes de considerar o proto pronto.
@@ -407,7 +564,8 @@ Quando aprovado:
 px-request (spec aprovada)
     ↓
 px-proto  ←  você está aqui
-    │   inventário → gate de ambiguidade → implementação → HMR → aprovação
+    │   inventário (lê o .tsx) → gate de ambiguidade por contagem → hierarquia de fontes
+    │   → divergências do DS declaradas → implementação → HMR → aprovação
     │
     └── [aprovado]
           ↓

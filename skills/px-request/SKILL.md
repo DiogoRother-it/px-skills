@@ -23,7 +23,7 @@ Contexto inicial via slash: `$ARGUMENTS` (o pedido do líder). Se vazio, pergunt
 4. **Enumerou? Use pergunta estruturada.** Se as respostas são conhecidas, use `AskUserQuestion` com 2–4 opções e a recomendada marcada `(Recomendado)`. Texto livre só para nomes/valores que não dá pra listar.
 5. **"Não sei / tanto faz" não trava.** Proponha o default, **registre como Premissa** no artefato (marcada, pra revisão depois) e siga. O fluxo nunca para por indecisão — só o gate ⚠️ do "Outro" (Bloco 6) exige decisão humana.
 6. **Eco ao fim de cada bloco.** Antes de virar de bloco, repita com suas palavras o que capturou: *"Então até aqui: ... — confirma?"*. Isso pega mal-entendido cedo, não no handoff.
-7. **Nunca pule um bloco em silêncio.** Todo bloco é respondido ou marcado **N/A com justificativa**. No fim, o checklist de *Definition of Ready* (Bloco 12) não pode ter campo vazio.
+7. **Nunca pule um bloco em silêncio.** Todo bloco é respondido ou marcado **N/A com justificativa**. No fim, o checklist de *Definition of Ready* (Bloco 12) não pode ter campo vazio. Isso vale em especial para os blocos 11b e 11c: **"nenhuma divergência" é uma resposta e precisa estar escrita** — em branco é indistinguível de "ninguém olhou".
 
 ## Abrangência (vale para TODO componente, sem exceção)
 
@@ -44,7 +44,7 @@ Segue `Skill Prompting Conventions` do `CLAUDE.md`. Estruturada para decisões e
 
 ---
 
-# Os 12 blocos da entrevista
+# Os 12 blocos da entrevista (14 com os dois de divergência)
 
 > Avance na ordem. Cada bloco abaixo diz: **o que decidir**, **por que importa**, e **como perguntar** (com exemplo + default). Registre tudo no template `templates/request.md`.
 
@@ -71,6 +71,7 @@ Segue `Skill Prompting Conventions` do `CLAUDE.md`. Estruturada para decisões e
 - "Como a pessoa chega aqui? Vem de qual tela ou menu?" — *ex: menu lateral → 'Usuários'.*
 - "O que ela estava fazendo antes? Já traz algum dado no bolso?" — *ex: veio de um cliente específico → a lista já vem filtrada por ele.*
 - "Quando ela termina o que veio fazer, pra onde vai?" — *default: continua na mesma tela com feedback de sucesso.*
+- "Qual a rota (URL) desta tela no produto?" — *ex: `/contratos/novo`.* Registre como **Rota**. É o que o `mapa-de-telas.md` e o `px-tour` consomem; sem rota, o onboarding guiado não atravessa telas.
 
 ## BLOCO 4 — Conteúdo e dados (o que aparece)
 **Decidir:** exatamente quais informações a tela mostra e de onde vêm.
@@ -91,10 +92,20 @@ Segue `Skill Prompting Conventions` do `CLAUDE.md`. Estruturada para decisões e
 - "Alguma é destrutiva (apaga/desativa)?" — se sim, exige confirmação (Dialog/AlertDialog).
 - "Tem ação em lote (selecionar vários e agir)?" — *default: não, salvo se o volume pedir.*
 - "Algum público NÃO pode fazer alguma dessas?" — *ex: auditor não vê a coluna de ações.*
+- "Qual a chave de permissão de cada ação, na convenção `<recurso>.<ação>`?" — *ex: `contratos.gerenciar`.* Se o produto já tem `rbac-*.md`, aponte a linha; se não, proponha a chave e registre como Premissa. É o que o `px-tour` usa para filtrar o onboarding em runtime: com RBAC granular, perfis compostos não existem na hora de escrever o tour.
+- **Candidatas a âncora de onboarding:** a ação principal e os pontos de entrada da tela (busca, filtro, menu de ações) recebem um id `data-onb` sugerido, `<id-da-historia>-<acao>` em kebab-case (ex: `vit-lista-filtrar`). O `px-proto` coloca o atributo no invólucro visível; o `px-tour` só ancora no que existe.
 
 ## BLOCO 6 — Variação do componente + gate "Outro"
 **Decidir:** qual item da biblioteca atende, usando a árvore **"Qual usar?"** do `ds-components_v4.md`.
 **Por que importa:** é o Passo 1–3 do Protocolo. Reusar sempre antes de criar; nada fora do catálogo sem aval.
+
+> ⚠️ **A doc não é o catálogo inteiro.** **17 dos 53 componentes não têm entrada própria** no
+> `ds-components_v4.md` — entre eles `accordion`, `collapsible`, `multi-select`, `badge`,
+> `dropdown-menu` e `toggle-group`. Não achar entrada **não** significa que o componente não
+> existe nem que não há régua: significa que **o `.tsx` em `src/components/ui/` é a spec**.
+> Antes de concluir que a família não tem variação, liste os arquivos que casam o
+> comportamento. O `px-proto` Passo 1a faz essa varredura formalmente; aqui basta não
+> afirmar ausência sem ter olhado.
 **Fazer:**
 0. **O comando já definiu a variação?** Se o líder já nomeou (ex: "quero um **Multi** Select", "um Card **interativo**", "uma tabela **com expansão**"), **não re-pergunte** — confirme em eco ("entendi: Multi Select, certo?") e siga direto pro Bloco 7. A recomendação/pergunta abaixo (passos 1–3) só roda quando o pedido é **ambíguo** ("quero um select", "um card", "uma tabela"). Regra dura: ambíguo ou não, o artefato só fecha com a variação **registrada**.
 1. Com o propósito + dados + ações na mão, abra a árvore "Qual usar?" da família (ex: Tabela → Data Table / Interações / Expansão / Data Grid).
@@ -183,25 +194,145 @@ Segue `Skill Prompting Conventions` do `CLAUDE.md`. Estruturada para decisões e
 - "Precisa funcionar por teclado? Tem algo que dependa só de cor?" — *default: sim ao teclado; status sempre com rótulo + cor, nunca só cor.*
 - "Modo escuro é necessário?" — *default: seguir o UI KIT do projeto.*
 
-## BLOCO 11 — Fora de escopo / não-metas
-**Decidir:** o que essa entrega explicitamente **não** faz.
-**Por que importa:** delimitar evita scope creep e cobra clareza. O que fica de fora hoje é tão importante quanto o que entra.
-**Perguntar:**
+## BLOCO 11 — Fora de escopo, com veredito item a item
+**Decidir:** o que essa entrega explicitamente **não** faz — e, em redesign, **o veredito de
+cada item numerado da auditoria**.
+**Por que importa:** delimitar evita scope creep. Mas lista livre não basta em redesign:
+**o que não é citado não vira decisão, vira ausência silenciosa.** Foi assim que 3 ações de
+linha, 2 status e 1 coluna do legado sumiram de um redesign sem ninguém decidir nada — o
+request escreveu "as 13 do menu Mais Opções" onde a auditoria documentava **16 em dois
+níveis**, e o resumo comeu a diferença.
+
+**Perguntar (sempre):**
 - "O que a gente NÃO vai fazer agora, de propósito?" — *ex: "exportar pra Excel fica pra depois".*
+
+**11.1 — Portão de cobertura da auditoria (obrigatório quando a tela vem de um `px-audit`)**
+
+Abra a auditoria da tela e percorra **cada item numerado** dela: telas do inventário (B2),
+achados de usabilidade (B4), componentes do mapa de lacunas (B5) e itens do backlog (B6).
+Cada um recebe **um veredito explícito**, numa tabela — nunca em prosa:
+
+| Item da auditoria | Veredito | Motivo / para onde vai |
+|---|---|---|
+| `A-B5-07` menu de ações da linha, **16 ações em dois níveis** | Em escopo | As 16, uma a uma, listadas no B5 desta spec |
+| `A-B5-11` coluna "Origem do chamado" | Fora de escopo | Dado não existe na API da fase 1. Volta na fase 2 (`PR-14`) |
+| `A-B4-03` achado de contraste no cabeçalho | Fora de escopo | É do design system, não desta tela. Vira débito externo |
+
+**Regras deste portão, e as três nasceram do mesmo erro:**
+
+1. **Contagem literal, nunca resumo.** Se a auditoria diz "16 ações em dois níveis", a spec
+   escreve **as 16**. "As 13 do menu" é a forma que o buraco assume.
+2. **Item sem veredito reprova a Definition of Ready.** Não existe item que "não se aplica"
+   sem alguém escrever por quê.
+3. **Fora de escopo tem destino.** Fase 2, débito externo, ou decisão de não fazer nunca.
+   "Fora de escopo" sozinho é o mesmo que esquecer, só que por escrito.
+4. **Pendência aberta sobre o item é insumo obrigatório do veredito.** Antes de concluir
+   qualquer coisa sobre uma região da tela, **leia as `PR-*` abertas sobre ela** no
+   `decisoes-pendentes.md` da iniciativa (ou nas *Perguntas em aberto* do `PX-PROGRESS.md`).
+   Isto não é conselho, é passo: a pergunta é **"existe `PR-*` aberta sobre este item? se sim,
+   ela entra no veredito"**. Num redesign recente a resposta certa **já estava escrita** numa
+   `PR-*` nossa, e a conferência foi à fonte sem lê-la — concluiu paridade sobre uma capacidade
+   que o legado não tem. Pendência não lida é trabalho já pago sendo jogado fora, com o risco
+   extra de contradizê-lo.
+
+> Se a tela **não** vem de um `px-audit` (produto novo), escreva **"N/A — tela nova, sem
+> auditoria de origem"**. Não deixe o bloco meio preenchido.
+
+## BLOCO 11b — Divergências declaradas do legado (só em redesign)
+**Decidir:** onde esta tela **de propósito** faz diferente do produto que ela substitui.
+**Por que importa:** num redesign, o default é sempre **o que o legado faz**. Divergir pode
+ser certo, e frequentemente é — mas divergir sem declarar é indistinguível de errar. Este
+bloco é o que permite ao líder decidir com o custo na mão, em vez de descobrir na revisão.
+
+| # | O legado faz | Aqui faz | Por quê | Quem decidiu / quando |
+|---|---|---|---|---|
+
+- Cada linha ganha (ou cita) um **ID de regra** na convenção do Bloco 9, `RN-<SIGLA>-<DOMÍNIO>-<NN>`.
+- **Divergência que acrescenta capacidade** (o legado não faz, aqui passa a fazer) vai
+  **marcada como tal** — ela muda escopo, não só forma.
+- Nenhuma? Escreva **"nenhuma divergência do legado"**. Bloco em branco é ambíguo entre "não
+  houve" e "ninguém olhou".
+
+**Trava de origem (o bloco funciona; o que faltava era o insumo).** Este bloco é uma lista
+preenchida a partir do que quem escreve **já acredita** — e quem acredita que uma capacidade é
+nativa do legado nunca a escreve aqui. Foi assim que a abstenção numa tela de aprovação
+atravessou auditoria, spec e revisão como "paridade": o placar do legado **exibia** o resultado
+e o enum do domínio o conhecia, mas **nenhuma função do cliente o produzia**. Duas regras
+fecham o buraco, e a segunda é a que falhou:
+
+1. **Toda linha de "acrescenta capacidade" cita a evidência da ausência no legado** — arquivo e
+   linha da função que não existe, ou da lista de constantes de ação que não a contém. Sem
+   evidência, não é declaração: é afirmação.
+2. **Todo item que esta spec trata como paridade de AÇÃO ou de ESTADO cita o caminho que o
+   produz no legado** — `arquivo:linha` do handler, da função ou da constante que dispara a
+   ação, ou da superfície que grava o estado. **Não citou, não é paridade:** é `PROPOSTA` (e
+   vira linha deste bloco) ou `NÃO VERIFICADO` (e vira Pergunta em aberto com dono, sem poder
+   ser citado como paridade em nenhum artefato seguinte).
+
+> **Fonte de exibição não responde.** Template, diretiva, partial, JSP, componente e árvore de
+> DOM dizem o que é **desenhado** — provam que o dado pode chegar do servidor, não que a
+> interface sabe gerá-lo. Quem responde é o **controller, o handler ou a constante de ação**.
+> **Enum não é capacidade:** o valor existir no enum e ser contado num placar prova que o
+> domínio o conhece, não que a interface o cria.
+>
+> Quando a tela vem de um `px-audit`, os vereditos de capacidade já vêm prontos de lá (bloco
+> 2.1 e B5 da auditoria): todo `PROPOSTA` de lá **é linha obrigatória aqui**.
+
+## BLOCO 11c — Divergências declaradas do design system (sempre)
+**Decidir:** onde esta tela **de propósito** faz diferente do que o design system manda.
+**Por que importa:** este bloco existe porque o 11b funciona e o DS não tinha o equivalente.
+Num redesign recente, cinco divergências do legado foram declaradas e **nenhuma virou
+defeito**; no mesmo projeto, seis divergências do design system atravessaram `px-request`,
+`px-proto` e duas rodadas de `ux-persona` **sem nada apitar** — todas em componentes que
+estavam **dentro** do catálogo. O gate ⚠️ protege contra o que não existe no catálogo; este
+bloco protege contra o que existe e é usado divergente.
+
+**Conta como divergência do DS, e por isso precisa de linha:**
+
+| Classe | Exemplo real que passou batido |
+|---|---|
+| **Default trocado** | paginação em 20 por página quando a spec diz 10 |
+| **Escala trocada** | escala de itens por página diferente da 10/25/50/100 do DS |
+| **Parte omitida** | rodapé sem elipse, sem contagem, ou com o seletor virando texto fixo |
+| **Anatomia alterada** | rodapé com a anatomia do variant errado da tabela |
+| **Composição à mão** onde existe componente pronto | rodapé montado peça a peça em vez de `TablePagination` |
+| **Ícone fora da convenção** | chevron duplo (`ChevronsUpDown`) onde o DS usa o simples |
+| **Padrão de ajuda trocado** | tooltip de seção onde a regra pede tooltip por campo |
+| **Hierarquia de ação invertida** | ação primária à esquerda no rodapé de um drawer |
+
+**Formato:**
+
+| # | O DS manda | Aqui faz | Por quê | Quem decidiu / quando |
+|---|---|---|---|---|
+
+- **Se não houver nenhuma, escreva literalmente "nenhuma divergência do design system".**
+- **Divergência descoberta depois, na revisão do líder, é defeito da cadeia**, não pedido
+  novo: volta como correção e o motivo entra aqui retroativamente, para a próxima tela não
+  repetir.
+- Divergência que na verdade é **defeito do design system** (a spec se contradiz, o
+  componente não faz o que a doc diz) não se resolve aqui: vira **débito externo** no
+  `PX-PROGRESS`, com o caminho do arquivo no boilerplate. Regra de componente nasce no
+  boilerplate; a skill e a spec absorvem.
 
 ## BLOCO 12 — Definition of Ready (eco final + trava)
 **Fazer:** revise o artefato inteiro e confirme com o líder que **nenhum campo está vazio**. Cada item abaixo é `[x]` (respondido) ou `N/A com motivo`:
 - [ ] Propósito e critério de sucesso (B1)
 - [ ] Público(s) e prioridade (B2)
-- [ ] Entrada/saída da tela (B3)
+- [ ] Entrada/saída da tela + rota (B3)
 - [ ] Todos os campos/colunas + origem + volume (B4)
-- [ ] Todas as ações + primária + destrutivas + permissões (B5)
+- [ ] Todas as ações + primária + destrutivas + chave de permissão por ação + candidatas a âncora `data-onb` (B5)
 - [ ] Variação escolhida (ou "Outro" aprovado) (B6)
 - [ ] Os 7 estados definidos, com mensagens (B7)
 - [ ] Copy literal (B8)
 - [ ] Regras de negócio com ID (B9)
 - [ ] Responsivo + acessibilidade (B10)
 - [ ] Fora de escopo (B11)
+- [ ] **Todo item numerado da auditoria com veredito** — em escopo, ou fora de escopo com motivo e destino (B11.1). Em produto novo, "N/A — tela nova, sem auditoria de origem"
+- [ ] **Divergências do legado declaradas** (B11b) — ou "nenhuma", por extenso. Só em redesign
+- [ ] **Toda linha de "acrescenta capacidade" com a evidência da ausência no legado** (B11b) — arquivo e linha da função que não existe ou da lista de constantes que não a contém
+- [ ] **Toda paridade de ação ou de estado com o caminho que a produz no legado citado** (B11b) — sem citação não é paridade: é `PROPOSTA` ou `NÃO VERIFICADO`
+- [ ] **`PR-*` abertas sobre as regiões desta tela lidas antes dos vereditos** (B11.1) — ou "nenhuma pendência aberta", por extenso
+- [ ] **Divergências do design system declaradas** (B11c) — ou "nenhuma divergência do design system", por extenso
 - [ ] Premissas registradas (tudo que foi "não sei" + default)
 - [ ] Copy sem travessão (— / –) (B8)
 - [ ] Copy sem caixa alta total (B8)

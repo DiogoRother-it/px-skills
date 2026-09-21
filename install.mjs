@@ -8,11 +8,27 @@
 import { fileURLToPath } from "node:url"
 import { dirname, join, relative } from "node:path"
 import {
-  cpSync, existsSync, mkdirSync, readFileSync, writeFileSync, readdirSync, statSync,
+  copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync, readdirSync, statSync,
 } from "node:fs"
 
 const PKG = dirname(fileURLToPath(import.meta.url))
 const TARGET = process.cwd()
+
+// Cópia recursiva própria. NÃO usar fs.cpSync aqui: no Node 24 (Windows) a versão
+// nativa e recursiva do cpSync corrompe o encoding do destino quando o caminho tem
+// caractere fora do ASCII ("Relatórios" virava "RelatÃ³rios"), sem lançar erro —
+// o instalador contava as skills, e elas iam parar numa pasta irmã com nome quebrado.
+// copyFileSync passa pelo mesmo caminho de writeFileSync, que nunca teve o problema.
+// copyFileSync também sobrescreve por padrão, então reinstalar não lança exceção.
+const copyDir = (src, dest) => {
+  mkdirSync(dest, { recursive: true })
+  for (const entry of readdirSync(src, { withFileTypes: true })) {
+    const s = join(src, entry.name), d = join(dest, entry.name)
+    if (entry.isDirectory()) copyDir(s, d)
+    else copyFileSync(s, d)
+  }
+}
+const fail = (m) => { console.error(`\x1b[31m✖\x1b[0m ${m}`); process.exit(1) }
 
 // Versão: fonte única é o package.json. Nunca escreva o número à mão aqui.
 const VERSION = JSON.parse(readFileSync(join(PKG, "package.json"), "utf8")).version
@@ -35,11 +51,21 @@ mkdirSync(skillsDest, { recursive: true })
 const stampPath = join(skillsDest, ".px-skills-version")
 const prev = existsSync(stampPath) ? readFileSync(stampPath, "utf8").trim() : null
 let nSkills = 0
+const faltando = []
 for (const name of readdirSync(skillsSrc)) {
   const src = join(skillsSrc, name)
   if (!statSync(src).isDirectory()) continue
-  cpSync(src, join(skillsDest, name), { recursive: true })
-  nSkills++
+  const dest = join(skillsDest, name)
+  copyDir(src, dest)
+  // Verificação pós-cópia: contar só o que chegou de fato no destino. "N skills
+  // instaladas" sem conferir o arquivo é o falso verde que a 1.17.1 corrigiu.
+  if (existsSync(join(dest, "SKILL.md"))) nSkills++
+  else faltando.push(name)
+}
+if (faltando.length) {
+  fail(`${faltando.length} skill(s) não chegaram ao destino: ${faltando.join(", ")}\n` +
+       `  esperado em ${skillsDest}\n` +
+       `  nada foi marcado como instalado; verifique o caminho e rode de novo`)
 }
 ok(`${nSkills} skills instaladas em ${relative(TARGET, skillsDest) || ".claude/skills"}`)
 writeFileSync(stampPath, VERSION + "\n")
@@ -52,7 +78,7 @@ let nDocs = 0, nSkipped = 0
 for (const f of readdirSync(dsSrc)) {
   const dest = join(dsDest, f)
   if (existsSync(dest)) { nSkipped++; continue }
-  cpSync(join(dsSrc, f), dest)
+  copyFileSync(join(dsSrc, f), dest)
   nDocs++
 }
 ok(`${nDocs} docs de design system em docs/design-system/${nSkipped ? ` (${nSkipped} já existiam, mantidos)` : ""}`)
@@ -63,7 +89,9 @@ ok(`${nDocs} docs de design system em docs/design-system/${nSkipped ? ` (${nSkip
 // de rodar o instalador.
 const hooksDest = join(TARGET, ".claude", "hooks")
 mkdirSync(hooksDest, { recursive: true })
-cpSync(join(PKG, "assets", "hooks", "check-versao.mjs"), join(hooksDest, "check-versao.mjs"))
+// copyFileSync sobrescreve o hook existente; o cpSync antigo lançava exceção não
+// tratada na segunda instalação (cpSyncOverrideFile) e abortava o instalador aqui.
+copyFileSync(join(PKG, "assets", "hooks", "check-versao.mjs"), join(hooksDest, "check-versao.mjs"))
 
 const settingsPath = join(TARGET, ".claude", "settings.json")
 const CMD = "node .claude/hooks/check-versao.mjs"
@@ -100,7 +128,8 @@ if (settingsOk) {
 // 3. Protocolo → <target>/docs/px-protocol.md
 const protoDest = join(TARGET, "docs", "px-protocol.md")
 if (!existsSync(protoDest)) {
-  cpSync(join(PKG, "assets", "px-protocol.md"), protoDest)
+  mkdirSync(dirname(protoDest), { recursive: true })
+  copyFileSync(join(PKG, "assets", "px-protocol.md"), protoDest)
   ok("protocolo em docs/px-protocol.md")
 } else {
   warn("docs/px-protocol.md já existe — mantido (revise manualmente se precisar atualizar)")
@@ -124,7 +153,7 @@ if (existsSync(claudeMd)) {
 
 log(`\n${c.g}Pronto.${c.x} Abra o Claude Code neste repo e as skills aparecem no menu \`/\`:`)
 log(`${c.d}  /px-setup · /px-start · /px-audit · /px-intake · /px-kickoff · /px-epic · /px-proto${c.x}`)
-log(`${c.d}  /px-request · /px-change · /px-story · /px-handoff · /px-preview · /px-sync${c.x}`)
+log(`${c.d}  /px-request · /px-change · /px-story · /px-tour · /px-handoff · /px-preview · /px-sync${c.x}`)
 log(`${c.d}  /ux-flows · /ux-persona${c.x} ${c.y}(execução — rodam sobre o produto ao vivo)${c.x}`)
 log(`\n${c.y}Pré-requisito de UI:${c.x} a biblioteca de componentes (src/components/ui + tokens) precisa`)
 log(`${c.d}  estar no repo — ela vem no bundle do design system, não neste pacote de skills.${c.x}`)
@@ -132,6 +161,35 @@ log(`${c.d}  estar no repo — ela vem no bundle do design system, não neste pa
 // Ao publicar uma versão nova: acrescente a chave aqui, 1 a 3 linhas de ~74 colunas.
 // Isto é o resumo de leitura rápida; a íntegra vive no CHANGELOG.md.
 const HIGHLIGHTS = {
+  "1.18.0": [
+    "Nova skill px-tour: onboarding guiado por fluxo logico, sobre o",
+    "  componente Onboarding Guiado do DS. Um flow, um tour; o global junta",
+    "  todos. Passo por evidencia, permissao filtrada em runtime.",
+  ],
+  "1.17.1": [
+    "Instalador: em pasta com acento no caminho (Windows, Node 24) as skills iam",
+    "  parar numa pasta irma com nome corrompido e o terminal dizia 'instaladas'.",
+    "  Copia reescrita, cada skill conferida no destino, e reinstalar nao aborta.",
+  ],
+  "1.17.0": [
+    "O pacote do dev passa a levar personas/: quem julgou a tela e com que",
+    "  regua. Criterio de usabilidade sem a persona vira preferencia de quem",
+    "  escreveu, e cai na primeira refatoracao que simplifica a tela.",
+    "Junto vai flows/: a jornada que a persona percorreu e que o Playwright",
+    "  do dev automatiza. Persona e a regua, flow e a travessia; vao em par.",
+    "Cada persona viaja com a customizacao de contexto declarada. Relatorio",
+    "  do walkthrough fica interno. Nenhuma rodou? A ausencia e declarada.",
+    "Persona cetica ganha o eixo privacidade: por que pedem este dado, quem",
+    "  enxerga o que eu preenchi, da pra seguir sem entregar.",
+  ],
+  "1.16.0": [
+    "Divergencia do design system agora e declarada ou e defeito: bloco novo no",
+    "  px-request (11c) e no px-proto (4b). O gate ja existia so para o legado.",
+    "px-proto le o COMPONENTE, nao so a doc: o inventario lista props e decisoes",
+    "  do .tsx, e 17 dos 53 componentes nao tem entrada no ds-components_v4.md.",
+    "Ambiguidade deixa de ser auto-declarada — a varredura conta os candidatos.",
+    "  Auditoria numerada, e o request da veredito item a item. Nada some calado.",
+  ],
   "1.15.0": [
     "Hook de sessao: ao abrir o Claude Code, o repo avisa se as skills estao",
     "  atras, se o sandbox perdeu a procedencia ou se falta CENTRALIT_TOKEN.",

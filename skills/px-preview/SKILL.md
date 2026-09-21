@@ -1,6 +1,6 @@
 ---
 name: px-preview
-description: Opcional. Avalia o projeto e decide o melhor formato para compartilhar as telas construídas com PO e stakeholders que não têm acesso ao localhost — HTML standalone (duplo clique), deploy em Netlify/Vercel, ou Artifact do claude.ai. Detecta a stack e executa o caminho correto. Quem constrói sempre usa o localhost (Vite); o px-preview é só sobre como levar o que foi construído para fora. Use quando o líder disser: "quero mandar pro PO ver", "gerar o HTML pro PO", "subir numa URL", "link pro product owner", "empacotar pra revisão".
+description: Opcional. Avalia o projeto e decide o melhor formato para compartilhar as telas construídas com PO e stakeholders que não têm acesso ao localhost — HTML standalone (duplo clique), deploy em Netlify/Vercel, ou Artifact do claude.ai. Detecta a stack e executa o caminho correto. Quem constrói sempre usa o localhost (Vite); o px-preview é só sobre como levar o que foi construído para fora. ⛔ Não é entrega para engenharia: o artefato é um build, não é implementável, e o dev recebe o FONTE pela px-handoff. Use quando o líder disser: "quero mandar pro PO ver", "gerar o HTML pro PO", "subir numa URL", "link pro product owner", "empacotar pra revisão".
 compatibility: claude-code
 metadata:
   audience: px-ux
@@ -21,6 +21,12 @@ Três formatos possíveis, dependendo do projeto e do contexto:
 
 A skill detecta a stack do projeto para saber qual caminho técnico é viável, e pergunta o contexto de entrega para recomendar o formato certo.
 
+> ⛔ **O público desta skill é PO, stakeholder, cliente e usuário. Engenharia NUNCA recebe daqui.**
+>
+> O artefato desta skill é um **build**: HTML compilado, com o Tailwind virado regra de CSS e os nomes minificados. Serve para uma pessoa abrir e navegar, e não serve para um dev implementar. Medido em 2026-09-21: um protótipo de 4,7 MB chegou ao dev por chat, com 9.859 chamadas `jsx` compiladas e o fonte completo parado no repo do PX. Isso é da ordem de um milhão de tokens, não cabe na janela de contexto de nenhum modelo, e a IA do dev lê pedaços e infere o resto. Cada dev infere diferente.
+>
+> **Entrega para engenharia é `px-handoff`, sempre, e o que atravessa é o fonte da UI.** Não existe atalho de "mando o HTML enquanto isso": HTML por chat, e-mail ou Teams para o dev é o formato errado no canal errado, sem versão, sem branch e sem procedência.
+
 **Público desta skill:** o líder UX/PX. Seja direto: pergunte só o que muda a decisão, execute o resto. Nunca peça pra ele digitar comando na mão.
 
 **Por que funciona:** nesta fase o app roda com **dados mockados em memória** (sem back-end). Logo, ele consegue rodar 100% no navegador — basta tirar qualquer SSR do caminho e inlinar tudo num arquivo só (ou fazer deploy estático).
@@ -32,6 +38,19 @@ Contexto inicial via slash: `$ARGUMENTS` (nome do projeto, formato desejado, ou 
 Segue `Skill Prompting Conventions` do `CLAUDE.md`. Estruturada pra decisões enumeráveis (formato de entrega, stack detectada); livre pra nome do projeto e URL de deploy. Toda pergunta traz o porquê + default recomendado; eco antes de executar.
 
 ## Passo 0 — Decidir o formato de entrega
+
+### 0.1 — Portão de destinatário (antes de gerar qualquer coisa)
+
+**"Quem vai receber este arquivo?"** (`AskUserQuestion`)
+
+| Resposta | O que fazer |
+|---|---|
+| PO, stakeholder, cliente, usuário, revisão interna de produto | seguir para 0.2 |
+| **Dev, engenharia, time de desenvolvimento, "vou mandar pro dev ver"** | ⛔ **pare aqui.** Não gere o arquivo. Explique em duas linhas que o build não é implementável e que a entrega de engenharia é o fonte, e ofereça rodar a `px-handoff`. Se o líder insistir porque o dev quer só *olhar*, gere, mas o nome do arquivo e o aviso do Passo 6 são obrigatórios, e diga na cara que aquilo não substitui o handoff |
+
+**Por que este portão existe:** a tabela de formatos acima cita "envio por e-mail/Drive/Teams", e durante meses isso foi lido como autorização para mandar o protótipo ao dev por chat. A skill nunca dizia para quem **não** podia ir. Dizia só como empacotar.
+
+### 0.2 — Formato
 
 Pergunte (`AskUserQuestion`) — porque o caminho técnico muda completamente:
 
@@ -95,7 +114,9 @@ Antes de entregar, sirva o arquivo e confira: renderiza? console sem erros? nave
 ## Passo 6 — Entregar no formato escolhido no Passo 0
 
 **Arquivo `.html` standalone:**
-Copie para um nome apresentável (ex: `release/<Projeto>-Preview.html`) e instrua o PX a enviar por e-mail/Drive/Teams. O PO abre por duplo clique. Independe de conta ou servidor.
+Copie para **`release/<Projeto>-Preview-PO-<AAAA-MM-DD>.html`** e instrua o PX a enviar por e-mail, Drive ou Teams. O PO abre por duplo clique. Independe de conta ou servidor.
+
+⚠️ **O nome carrega o público de propósito, e a data substitui o versionamento na mão.** Arquivo solto viaja mais longe do que a conversa em que nasceu: um dev que recebe `Agility-Preview-PO-2026-09-21.html` sabe na hora que não é entrega para ele, enquanto `agility 11.html` não diz nada e ainda esconde que existiram dez antes. Nunca entregue com nome genérico, e nunca numere à mão.
 
 **Deploy em Netlify (URL pública):**
 1. Confirme que o build standalone foi gerado em `dist-standalone/`
@@ -117,6 +138,8 @@ Antes de executar, repita em 3–4 linhas: *"Stack detectada: **X**. Vou gerar *
 - **Inlinar imagens** (importar como asset) — caminho absoluto `/img.jpg` não existe num arquivo solto.
 - **Nunca tocar no build/deploy/dev normais** — o standalone é sempre um caminho **paralelo** (config + env dedicados).
 - **Sempre validar no navegador** antes de entregar.
+- **Público é PO, stakeholder, cliente e usuário. Engenharia nunca.** O portão do Passo 0.1 roda antes de gerar arquivo. Entrega para dev é `px-handoff`, e o que atravessa é o fonte da UI, nunca o build.
+- **O nome do arquivo declara o público e a data** (`<Projeto>-Preview-PO-<AAAA-MM-DD>.html`). O arquivo sobrevive à conversa; o nome é a única coisa que viaja junto com ele.
 - **Avisar as limitações ao UX:** fonte via CDN cai pro fallback sob CSP; URLs usam `#`; dados são demo e somem ao recarregar.
 
 ## Relação com o fluxo

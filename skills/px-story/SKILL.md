@@ -101,6 +101,8 @@ Para cada dimensão, pergunte/proponha o critério desta tela:
 - **Autenticidade de dados** — "mostra dado real do usuário, nunca mock/lorem em produção?" *ex: após editar, a linha reflete o valor salvo.*
 Marque N/A com motivo qualquer dimensão que não se aplique — nunca some em silêncio.
 
+**Registre a origem de cada critério** (coluna "Origem" da tabela): a **persona** que travou nesse ponto num walkthrough do `ux-persona`, ou `rubrica` quando o critério veio da régua sem rodada. Duas razões: o critério deixa de parecer preferência de quem redigiu, e é essa coluna que o `px-handoff` lê pra montar o `personas/` do pacote do dev. Origem em branco não reprova a história, mas chega ao handoff como buraco que alguém vai ter que reconstituir de memória.
+
 ## S4b — Fluxo principal (passo a passo) — a espinha legível
 **Decidir:** a jornada em passos numerados que o humano (líder/PO/stakeholder) lê num relance pra confirmar o fluxo **antes** de mergulhar no BDD.
 **Por que importa:** o BDD é preciso mas verboso e orientado a teste. O passo a passo é o mapa de revisão rápida — pega fluxo errado cedo. É **complementar** ao BDD, nunca substituto.
@@ -142,6 +144,8 @@ Escreva os cenários, mostre, e confirme a cobertura acima antes de fechar.
 ## S6 — Rastreabilidade
 **Fazer:** amarrar a história às fontes, para o dev navegar:
 - Request de origem · Variação de componente (`ds-components_v4.md`) · Público-alvo (`publico-alvo.md`) · UI KIT · Flow sugerido do `ux-flows` (com o persona de cada público).
+- **Personas que percorreram esta tela** (slug + arquivo, custom em `e2e/personas/<slug>.md`), ou "nenhuma ainda". É o que o `px-handoff` copia pro `personas/` do pacote — persona que só existiu no prompt de uma Fase 1 não chega no dev.
+- **RBAC (triggers):** chave(s) de permissão das ações desta tela, na convenção `<recurso>.<ação>`, apontando para a linha do `rbac-*.md` quando existir (`RBAC (triggers): <chave> · <chave>, ver <arquivo>.md`). É a fonte do filtro de permissão do `px-tour`; sem chave, o passo do tour vira pendência para o dev.
 
 ## S7 — Definition of Ready (trava + eco final)
 - [ ] Narrativa ancorada num público real (S1)

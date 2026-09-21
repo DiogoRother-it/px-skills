@@ -65,6 +65,109 @@ Segue `Skill Prompting Conventions` do `CLAUDE.md`. Estruturada pra decisões en
 
 ---
 
+## Numeração dos itens (obrigatória, e é o que torna a auditoria cobrável)
+
+**Todo item que esta auditoria levanta recebe um ID, e o ID é o que o `px-request` vai
+percorrer um a um.** Sem ID, o request cita a auditoria por resumo, e resumo come item:
+num redesign recente a auditoria documentava **16 ações em dois níveis** e o request escreveu
+"as 13 do menu Mais Opções". As 3 que faltavam não foram recusadas nem adiadas — elas
+simplesmente deixaram de existir, e ninguém percebeu porque não havia o que conferir contra.
+
+**Convenção:** `A-<bloco>-<NN>`, sequencial dentro do bloco.
+
+| Prefixo | O que numera | Exemplo |
+|---|---|---|
+| `A-B2-NN` | tela ou fluxo do inventário AS-IS | `A-B2-03` tela de detalhe do chamado |
+| `A-B4-NN` | achado de usabilidade | `A-B4-07` ação primária compete com 3 botões de mesmo peso |
+| `A-B5-NN` | componente do mapa de lacunas | `A-B5-11` menu de ações da linha, 16 ações em dois níveis |
+| `A-B6-NN` | item do backlog de redesign | `A-B6-02` reformar o filtro avançado |
+
+**Três regras de numeração, e as três nasceram de perda real:**
+
+1. **Contagem literal no enunciado do item.** Se o menu tem 16 ações em dois níveis, o item
+   diz "16 ações em dois níveis" e as **lista**. "Vários itens", "as principais" e "o menu de
+   ações" são formas de perder a diferença sem deixar rastro.
+2. **Composto se decompõe.** Toolbar, card com ações, form multi-campo, drawer com seções e
+   nav recebem ID **por sub-elemento**, não só pelo container. Container inteiro num ID só é
+   como o resumo se instala.
+3. **ID nunca é reciclado nem renumerado.** O `px-request`, o `px-story` e o `PX-PROGRESS`
+   vão citar esses IDs; renumerar quebra a citação de todo mundo depois.
+
+> **O que o ID cobra, e onde.** No `px-request` da tela, o **Bloco 11.1** exige veredito
+> explícito para cada ID desta auditoria: *em escopo*, ou *fora de escopo com motivo e
+> destino*. Item sem veredito **reprova a Definition of Ready** do request. É a única forma
+> de "não entrou" virar decisão em vez de ausência.
+
+---
+
+## A segunda pergunta — o legado exibe, mas ele PRODUZ?
+
+Inventariar responde *"o legado mostra isso?"*. É metade. A outra metade, que é onde a
+paridade com o legado se perde, é **"o legado produz isso, e por qual caminho?"**
+
+> Um dado **exibido** prova que ele pode chegar do servidor.
+> **Não prova** que a interface sabe **gerá-lo**.
+
+Nasceu de perda real. Num redesign de ITSM, a tela de aprovação mostrava um placar com quatro
+resultados: aprovaram, reprovaram, **abstiveram-se** e ainda não votaram. A conferência foi
+feita **na fonte**, item a item, contra a diretiva que desenha o bloco, e deu tudo certo. E
+estava errada: `ABSTAINED` existe no enum do domínio e é contado no placar, mas **nenhuma
+função do cliente o produz** — o controller do ticket declara só `APPROVAL_ACTION` e
+`REJECT_ACTION`, e existem `approveRequest()` e `rejectRequest()` e **nenhum
+`abstainRequest`**. A abstenção era **proposta nossa**, sem estar declarada como tal. Passou
+pela auditoria, pela `px-request` e por uma revisão explícita; só foi pega pelo líder na
+terceira leitura.
+
+**Por item inventariado que seja uma AÇÃO ou um ESTADO**, as duas perguntas, nesta ordem:
+
+| Pergunta | Se falha |
+|---|---|
+| O legado **exibe**? | furo de leitura — o item nem entrou no inventário |
+| **O legado PRODUZ? por qual caminho?** | **é PROPOSTA nossa**, e vira entrada obrigatória do Bloco 11b da `px-request` |
+
+**As cinco regras do veredito de capacidade:**
+
+1. **Evidência nomeada, não impressão.** Para uma **ação**, o caminho é a função/handler que a
+   dispara, com **arquivo e linha**. Para um **estado**, é a superfície que o **grava**. "Vi na
+   tela" não é evidência de capacidade: a tela pode estar exibindo o que o servidor mandou.
+2. **Fonte de exibição nunca responde à segunda pergunta.** Template, diretiva, partial, JSP,
+   componente e árvore de DOM dizem o que é **desenhado**. Quem responde é o **controller, o
+   handler ou a constante de ação**.
+3. **Enum não é capacidade.** O valor existir no enum e ser contado num placar prova que o
+   **domínio** o conhece, **não** que a **interface** o cria. É exatamente o caso que passou.
+4. **Exibe e não produz é marcado na hora**, no próprio inventário, com veredito **`PROPOSTA`**
+   e não `PARIDADE` — e vira linha obrigatória do Bloco 11b da `px-request` daquela tela.
+5. **Não determinável é `NÃO VERIFICADO`**, nunca `PARIDADE`. Fonte fora do checkout, módulo
+   não clonado, código do desenhador de fluxo inacessível: o veredito é `NÃO VERIFICADO`, vira
+   Pergunta em aberto com dono, e **o item não pode ser citado como paridade em nenhum artefato
+   seguinte**.
+
+**Isto não é varredura do legado inteiro.** A segunda pergunta se faz **por item, no momento em
+que ele é inventariado**, e **só para ações e estados**. Campo de leitura pura (um nome, uma
+data, um número que só é lido) recebe `N/A — leitura` e segue.
+
+> **Três vereditos, e só três:** **`PARIDADE`** (produz, com a evidência citada) ·
+> **`PROPOSTA`** (exibe, ou o domínio conhece, mas nenhum caminho do cliente produz) ·
+> **`NÃO VERIFICADO`** (fonte indisponível). Não existe um quarto, e não existe célula vazia.
+>
+> *Paridade aqui é com o **legado**.* Não confunda com a paridade **visual** do `px-handoff`
+> (protótipo × implementação): são portões diferentes.
+
+## Pendência aberta sobre o item é insumo obrigatório do veredito
+
+A segunda falha daquele caso é independente da primeira, e mais barata de evitar: **a resposta
+já estava escrita na nossa própria pendência.** A `PR-31` do projeto dizia, com todas as
+letras, que `ABSTAINED` existe no enum e nos contadores e que não há caminho no cliente que a
+produza. A conferência foi à fonte e **não leu as perguntas em aberto** sobre aquela região
+antes de concluir.
+
+**Passo explícito, não conselho.** Antes de dar veredito sobre um item, pergunte: **"existe
+`PR-*` aberta sobre este item?"** — no `decisoes-pendentes.md` da iniciativa, ou nas
+*Perguntas em aberto* do `PX-PROGRESS.md`. Se existe, **ela é insumo obrigatório do veredito**:
+é resposta parcial já paga. Concluir sem lê-la é refazer trabalho e arriscar contradizê-lo.
+
+---
+
 # Os 7 blocos da entrevista
 
 > Avance na ordem. Cada bloco diz **o que decidir**, **por que importa** e **como perguntar** (com exemplo + default). Registre tudo em `templates/audit.md`.
@@ -85,7 +188,8 @@ Segue `Skill Prompting Conventions` do `CLAUDE.md`. Estruturada pra decisões en
   - **Se a fonte já veio óbvia, não re-pergunte** (espelha a regra do "já definido no comando" do `px-request`): o líder anexou prints/PDF ou passou uma URL/caminho de repo junto com o pedido → **confirme em eco e siga** ("recebi 4 telas em PDF, sigo em modo documento?"). O balão de fonte só aparece quando a origem do material **não está clara**. Exceção: se só vieram documentos mas o produto claramente roda em algum lugar, vale **oferecer** o tempo real uma vez ("consegue me dar o repo/URL? o diagnóstico fica muito mais completo") antes de aceitar o fallback.
 - **Se repo ou URL:** confirme como rodar/acessar (comando de dev, ambiente, credencial de teste ou Chrome logado) — o inventário sai navegando.
 - **Se documentos:** leia cada print/página/frame e monte a lista de telas a partir deles. Para cada artefato, confirme com o líder: "Este print é a tela **X**, certo? É o estado normal (`default`) ou é um estado específico (vazio/erro)?". Um mesmo print pode ser uma tela; vários prints podem ser estados diferentes da mesma tela — não confunda.
-- Consolide a lista. Para cada tela: **nome** + **o que faz em 1 linha** + **de qual artefato veio** (ex: `pág. 3 do PDF`, `print login.png`). *ex: `login`, `lista de pedidos`, `detalhe do pedido`.*
+- Consolide a lista. Para cada tela: **ID `A-B2-NN`** + **nome** + **o que faz em 1 linha** + **de qual artefato veio** (ex: `pág. 3 do PDF`, `print login.png`). *ex: `A-B2-01 login`, `A-B2-02 lista de pedidos`, `A-B2-03 detalhe do pedido`.*
+- **Segunda pergunta, por ação e por estado que a tela tiver** (ver "A segunda pergunta"): além de *"o legado exibe?"*, responda *"o legado **produz**? por qual caminho?"* e registre o **veredito de capacidade** com a evidência (`arquivo:linha` do handler, da função ou da constante de ação). `PARIDADE` só com a evidência escrita; exibe e não produz é `PROPOSTA`; fonte indisponível é `NÃO VERIFICADO`. Campo de leitura pura recebe `N/A — leitura`. **Antes de fechar o veredito, leia as `PR-*` abertas sobre aquela região** — pendência aberta é insumo obrigatório.
 - Marque quais são **prioritárias** pro redesign (nem tudo precisa entrar na v1).
 - Se o material tiver **buracos** (fluxo com telas faltando, print de baixa resolução, PDF cortado), registre como Pergunta em aberto — não preencha o vão com suposição.
 
@@ -99,7 +203,7 @@ Segue `Skill Prompting Conventions` do `CLAUDE.md`. Estruturada pra decisões en
 ## BLOCO 4 — Diagnóstico de usabilidade (por documento e/ou ao vivo)
 **Decidir:** os problemas reais de usabilidade das telas/jornadas priorizadas, por severidade.
 **Por que importa:** é o coração da parte "melhoria de usabilidade". Sem diagnóstico, o redesign é palpite estético.
-**Rubrica (as duas modalidades usam a mesma):** **Descoberta · Clareza · Feedback · Fricção · Sem beco sem saída · Fidelidade · Autenticidade de dados**. Cada achado é **observável** ("o botão de ação primária compete com 3 outros do mesmo peso") e nunca genérico ("está feio").
+**Rubrica (as duas modalidades usam a mesma):** **Descoberta · Clareza · Feedback · Fricção · Sem beco sem saída · Fidelidade · Autenticidade de dados**. Cada achado é **observável** ("o botão de ação primária compete com 3 outros do mesmo peso") e nunca genérico ("está feio"). Cada achado recebe **ID `A-B4-NN`** e, sempre que houver quantidade, ela vai **literal** no enunciado ("16 ações em dois níveis", não "vários itens no menu").
 
 **Modo documento (prints / PDF / Figma):**
 - Analise cada tela **a partir da imagem/página**, uma por vez. Descreva o que vê e confronte com a rubrica.
@@ -118,9 +222,10 @@ Segue `Skill Prompting Conventions` do `CLAUDE.md`. Estruturada pra decisões en
 **Decidir:** para cada tela prioritária, como os componentes atuais se mapeiam ao design system e o que fazer com cada um.
 **Por que importa:** é onde "adotar o DS" vira ação concreta — a versão de produto inteiro do "antes × depois de anatomia". Sem isso, o dev não sabe o que trocar.
 **Fazer, tela a tela (registrar na tabela do template):**
-- Liste os **componentes atuais** de cada tela. **Componentes compostos** (toolbar, card com ações, form multi-campo, drawer com seções, nav) exigem inspeção de cada sub-elemento individualmente — não só do container. Para cada um (e para cada filho de compostos):
+- Liste os **componentes atuais** de cada tela, **um ID `A-B5-NN` por linha**. **Componentes compostos** (toolbar, card com ações, form multi-campo, drawer com seções, nav) exigem inspeção de cada sub-elemento individualmente — não só do container — e **cada sub-elemento tem ID próprio**: container inteiro num ID só é exatamente por onde o resumo entra e o item some. Para cada um (e para cada filho de compostos):
   - **Variação canônica do DS** correspondente (via árvore "Qual usar?" do `ds-components_v4.md`). *ex: tabela caseira → Data Table.*
   - **Divergência de anatomia** observada: fora do grid de 8px, cor em hex, radius solto, estrutura própria, estado faltando. *ex: botão com radius 6px e hex hardcoded.* Marque também as duas divergências de comportamento mais comuns: **tabela com rolagem horizontal** (deveria reduzir colunas) e **overlay empilhado** (modal sobre modal, popover abrindo modal/drawer — deveria ser switch; só Drawer→Modal é aceito). Ver `ds-components_v4.md`.
+  - **Veredito de capacidade** (obrigatório quando o sub-elemento é **ação** ou **estado**; `N/A — leitura` quando é exibição pura): o legado **produz** isto, e por qual caminho? Cite a evidência — `arquivo:linha` do handler/função/constante que dispara a ação, ou da superfície que grava o estado. Diretiva, template e DOM **não respondem** a esta pergunta; enum e contador tampouco. Sem evidência, o veredito é `PROPOSTA` (é nossa, e vira linha do Bloco 11b da `px-request`) ou `NÃO VERIFICADO` (fonte fora de alcance, com dono). Consulte as `PR-*` abertas sobre o item antes de concluir.
   - **Ação:** `AskUserQuestion` — *Reestilizar pro DS (Recomendado se o comportamento serve) · Trocar pela variação do DS · Compor com primitivas · Outro ⚠️ REQUER VALIDAÇÃO UX/PX*.
 - **Gate "Outro":** componente sem equivalente no catálogo → marque **⚠️ REQUER VALIDAÇÃO UX/PX** e **pare** nesse item; não avança sem aprovação do líder.
 
@@ -130,7 +235,7 @@ Segue `Skill Prompting Conventions` do `CLAUDE.md`. Estruturada pra decisões en
 **Perguntar / propor:**
 - Cruze **severidade dos achados (B4)** com **tamanho da lacuna (B5)** e proponha: *quick wins* (alto impacto, baixo esforço) primeiro; reestruturações pesadas depois.
 - "O que PRECISA entrar na primeira leva do redesign? O que dá pra deixar de propósito pra fase 2?" — delimita o escopo.
-- Cada tela priorizada vira item do **backlog de redesign** (semente do `px-epic`), já com AS-IS (o que é) → TO-BE (o que vira).
+- Cada tela priorizada vira item do **backlog de redesign** (semente do `px-epic`), com **ID `A-B6-NN`**, já com AS-IS (o que é) → TO-BE (o que vira) e **os IDs de B4/B5 que ele resolve**. É esse rastro que permite ao `px-request` conferir cobertura sem reler a auditoria inteira.
 
 ## BLOCO 7 — Definition of Ready da auditoria (eco final + trava)
 **Fazer:** revise o artefato e confirme com o líder que **nenhum campo está vazio**. Cada item é `[x]` ou `N/A com motivo`:
@@ -140,6 +245,10 @@ Segue `Skill Prompting Conventions` do `CLAUDE.md`. Estruturada pra decisões en
 - [ ] Diagnóstico de usabilidade com achados + severidade (B4)
 - [ ] Mapa de lacunas atual→DS por tela, com ação por componente (B5)
 - [ ] Backlog de redesign priorizado, AS-IS→TO-BE (B6)
+- [ ] **Todo item de B2, B4, B5 e B6 com ID `A-<bloco>-<NN>`**, contagem literal onde houver quantidade e composto decomposto em sub-elementos
+- [ ] **Veredito de capacidade em toda ação e todo estado inventariado** (B2/B5): `PARIDADE` com evidência `arquivo:linha`, `PROPOSTA` ou `NÃO VERIFICADO`. Exibição pura é `N/A — leitura`. Nenhuma célula vazia
+- [ ] **`PR-*` abertas das regiões auditadas lidas** antes dos vereditos — ou "nenhuma pendência aberta sobre estes itens", por extenso
+- [ ] **Todo `PROPOSTA` listado para virar linha do Bloco 11b** da `px-request` da tela correspondente
 - [ ] Premissas registradas
 - [ ] Perguntas em aberto com dono (inclui acesso ao produto, se faltou)
 
@@ -161,6 +270,14 @@ Ao fechar (com a DoR completa), roteie (`AskUserQuestion`, recomendada marcada):
 - **Produto sem identidade nos termos do DS** (sem públicos/UI KIT definidos) → **`px-kickoff`** primeiro (confirmar personas + gerar/atualizar o UI KIT), depois o abaixo.
 - **Identidade já ok** → **`px-epic`** (modo Decomposição) usando o backlog de redesign como entrada — cada tela sai com AS-IS→TO-BE.
 - Cada tela do backlog roteia: **`px-request`** (spec do redesign, ancorando os componentes divergentes no DS) → **`px-story`** (história + BDD) → px-handoff → dev.
+
+> **Avise o líder do que vem a seguir:** o `px-request` de cada tela vai percorrer **os IDs desta auditoria um a um** (Bloco 11.1 de lá) e exigir veredito explícito para cada um. Item sem veredito reprova a Definition of Ready do request. Por isso a numeração daqui não é burocracia: é o que a próxima skill usa como lista de conferência.
+
+> **E leve os vereditos de capacidade junto.** Todo item marcado `PROPOSTA` aqui já nasce como
+> linha do **Bloco 11b** da `px-request` daquela tela ("o legado não faz, aqui passa a fazer"),
+> com a evidência da ausência. Todo `NÃO VERIFICADO` vira Pergunta em aberto com dono e **não
+> pode ser citado como paridade** por nenhuma skill seguinte. Item que sai daqui como `PARIDADE`
+> sem evidência é o defeito que esta auditoria existe para não repetir.
 
 ## Relação com o fluxo
 

@@ -3,6 +3,268 @@
 Todas as versões instaláveis via `npx github:DiogoRother-it/px-skills` / `npx @centralit/px-skills`.
 O instalador imprime só a versão mais recente no terminal — o histórico completo vive aqui.
 
+## 1.20.0 — 2026-09-21
+
+**A entrega chegava ao dev como HTML vanilla, e a cadeia autorizava isso.** Em call com o time de dev do SmartCity (Robson Bezerra, Dener Almeida), o arquiteto mostrou o que recebia: `secretarias_cidadao.html` com 3.407 linhas, zero classe Tailwind, zero componente; CIT Contracts, 34.126 linhas. O `handoff.md` da semana-37 declarava "stack diferente → referência visual". Verificado na `main` do `smart-gov-next` no mesmo dia: React 19, Tailwind v4, `radix-ui`, 57 componentes shadcn em `packages/shared`, `button.tsx` idêntico ao nosso fora o alias. **A stack era a mesma.** A LLM do dev reinterpretava o HTML inteiro e cada dev saía com um resultado.
+
+Três portas laterais, todas fechadas nesta versão:
+
+- **`docs/px-protocol.md`** dizia que a `px-proto` "gera um HTML standalone, React via CDN + Babel, não toca no boilerplate", o contrário da própria skill. Reescrito: proto nasce no boilerplate em duas pastas; HTML é preview. Regra não negociável nova; `Alvo de build` do `PX-PROGRESS` deixa de oferecer "Protótipo HTML" e ganha `Stack do dev (verificada)`.
+- **`px-handoff`** perguntava "é a mesma stack?" e aceitava a resposta. Agora **inspeciona o repo do dev** (`package.json`, `components/ui`, alias, CSS de tokens), cola a evidência no `handoff.md` (seção 2a nova no template) e só admite referência visual com a frase literal `Stack do dev verificada: sem shadcn`. Ganha o passo de **reescrever o alias de import pro do dev** (ex.: `@/` → `@smart-gov/shared/`) e um **portão de forma** executável que reprova pacote sem `.tsx` e sem prova de ausência de shadcn.
+- **`px-proto`** ganha o item 0 do Passo 9: tela que existe só como `.html`, ou só dentro de `src/proto/`, não é aprovável. O eco de aprovação passa a apontar `src/<produto>/tela-<slug>.tsx` como o fonte que atravessa.
+
+- **"Andaime" virou "demo"** em toda a cadeia (px-proto, px-handoff, template, protocolo, mensagens do `check-camadas.mjs`). A pasta continua `proto/`. Motivo: o dev descarta o que soa como obra provisória e precisa rodar a demo no primeiro minuto; "demo" diz o que é e que não vai pra produção. Histórico deste CHANGELOG mantido com o termo antigo.
+
+- **Preview viaja junto, em pasta irmã, com instrução oposta.** A regra "build não entra no pacote, vai publicado" virou: `preview/<label>-proto.html` + `preview/README.md` na raiz da branch, fora de `handoff-ux/`, gerado por `build:standalone` (zero token, um arquivo para N telas via hash). O README diz que é referência visual e navegável e que não é código para copiar. Sem isso o dev não tem com o que comparar; dentro do pacote, ele trata o HTML como entrega. Template e manifesto atualizados.
+
+### O canal também entregava errado, e a `px-preview` autorizava
+
+Três dias depois, com o teste de paridade ainda em campo, o mesmo defeito apareceu em outro projeto e por outro caminho. Uma UX sem acesso ao GitLab mandou o protótipo do Agility e dez histórias **por chat**, e pediu ao dev que subisse por ela. O que viajou foi `agility 11.html`: **4,7 MB**, o build compilado do protótipo React, com 9.859 chamadas `jsx` e o Tailwind já virado regra de CSS. O fonte completo, um monorepo React 19 com 21 componentes próprios e 100 telas, estava pronto e parado no repo do PX.
+
+É pior que o HTML vanilla do SmartCity: aquele tinha 180 KB e era legível; este é da ordem de um milhão de tokens e não cabe na janela de contexto de nenhum modelo. A IA do dev lê pedaços e infere o resto.
+
+**E a UX não errou.** A cadeia não previa o caso dela, e a `px-preview` dizia, com todas as letras, que o HTML standalone serve para "envio por e-mail/Drive/Teams". Dizia como empacotar e nunca dizia para quem **não** podia ir.
+
+- **`px-preview` ganha portão de destinatário (Passo 0.1), antes de gerar arquivo.** Se a resposta for dev ou engenharia, a skill **para** e encaminha para a `px-handoff`. É o único gate que pega este caso, porque quem manda por chat não está rodando a `px-handoff`: gate em skill que não roda não pega nada. A `description` da skill passa a declarar a proibição, para o roteamento não trazer o pedido errado para cá.
+- **O arquivo passa a declarar o público no nome:** `<Projeto>-Preview-PO-<AAAA-MM-DD>.html`. Arquivo solto viaja mais longe que a conversa em que nasceu; o nome é a única coisa que vai junto. `agility 11.html` não diz nada e ainda esconde que existiram dez antes.
+- **`px-handoff` ganha o terceiro caso: "repo existe, mas o PX não tem acesso".** A skill só conhecia "tem repo" e "não tem repo". Falta de acesso passa a ser **impedimento com dono e data**, nunca canal alternativo: o pacote é montado igual, e se não puder esperar, vai inteiro e compactado com o `procedencia.md`, jamais um arquivo solto.
+- **`px-setup` ganha o Passo 2c: verificar o acesso ao repo do dev no começo do projeto**, com `git ls-remote`, junto do clone do boilerplate e do token do registry. Descobrir isso no dia da entrega transforma um ticket em improviso.
+- **O protocolo passa a dizer que cada artefato declara o público**, e que engenharia só recebe da `px-handoff`.
+
+### Correção de origem
+
+A regra do protocolo tinha sido escrita em `docs/px-protocol.md`, que é a **cópia instalada**. O `npx` distribui `assets/px-protocol.md`, e lá a contradição continuava de pé: a correção não teria chegado a ninguém. Movida para a fonte.
+
+Validação: o teste controlado de paridade com o time do SmartCity segue em campo (uma tela no `apps/public`, branch `ux/teste-paridade`, sem ajuste manual, screenshot lado a lado). Esta versão sai antes do resultado porque o defeito está acontecendo em produção em outros projetos, e o custo de esperar passou a ser maior que o de publicar. A simulação do lado do dev, feita no repo real, passou em `tsc`, `eslint` e `build` sem editar um arquivo da UI, com estilos computados idênticos.
+
+## 1.19.0 — 2026-09-16
+
+**A conferência de paridade verificava se o legado EXIBE, e nunca se ele PRODUZ.** Num redesign de ITSM, a tela de aprovação mostra um placar com quatro resultados: aprovaram, reprovaram, **abstiveram-se** e ainda não votaram. O líder pediu garantia de que o bloco estava contemplado no legado. A conferência foi feita **na fonte**, item a item, contra a diretiva que desenha o bloco, e deu tudo certo. E estava errada: `ABSTAINED` existe no enum do domínio (id 4) e é contado no placar, mas **nenhum caminho do cliente o produz** — o controller do ticket declara só `APPROVAL_ACTION` e `REJECT_ACTION`, existem `approveRequest()` e `rejectRequest()` e **nenhum `abstainRequest`**. A abstenção era proposta nossa, sem estar declarada como tal. Passou pela auditoria, pela `px-request` e por uma revisão explícita; só foi pega pelo líder na terceira leitura.
+
+O diagnóstico é de método. A conferência leu a diretiva de **exibição**, verificou que tudo o que o protótipo mostra o legado também mostra, passou no teste de *"o legado exibe isso?"* e **nunca fez a segunda pergunta**.
+
+> Um dado **exibido** prova que ele pode chegar do servidor. **Não prova** que a interface sabe **gerá-lo**.
+
+**Segunda falha, independente:** a resposta **já estava escrita** na nossa própria pendência `PR-31` ("`ABSTAINED` existe no enum e nos contadores, e não há caminho no cliente que a produza"). A conferência foi à fonte e não leu as perguntas em aberto sobre aquela região antes de concluir.
+
+**O mecanismo de declaração já existia e funciona.** O Bloco 11b do `px-request` já mandava marcar "divergência que acrescenta capacidade" como tal. O problema nunca foi o lugar de declarar: é que o 11b é uma lista preenchida a partir do que quem escreve **já acredita**, e quem acredita que a abstenção é nativa nunca a escreve ali. Nada no processo **descobria** que ela não é. Por isso **nenhum bloco novo foi criado** — o que entrou foi a verificação que **produz a entrada** do 11b.
+
+### A segunda pergunta, e o veredito de capacidade
+
+- **`px-audit`** ganha a doutrina e os hooks nos blocos. Por item inventariado que seja **ação** ou **estado** (B2 e B5), além de *"o legado exibe?"* vem *"o legado **PRODUZ**? por qual caminho?"*, com **três vereditos e só três**: **`PARIDADE`** (produz, com a evidência citada), **`PROPOSTA`** (exibe, ou o domínio conhece, mas nenhum caminho do cliente produz) e **`NÃO VERIFICADO`** (fonte indisponível). Exibição pura recebe `N/A — leitura`.
+- **Evidência nomeada, não impressão.** Para uma ação, o caminho é a função/handler que a dispara, com **arquivo e linha**; para um estado, é a superfície que o **grava**. "Vi na tela" não é evidência de capacidade.
+- **Fonte de exibição nunca responde à segunda pergunta.** Template, diretiva, partial, JSP, componente e árvore de DOM dizem o que é desenhado; quem responde é o controller, o handler ou a constante de ação. E **enum não é capacidade**: valor no enum contado num placar prova que o domínio o conhece, não que a interface o cria.
+- **`NÃO VERIFICADO` é resposta legítima**, e é o ponto inteiro da correção: vira Pergunta em aberto com dono, e **o item não pode ser citado como paridade** em nenhum artefato seguinte.
+- **Não é varredura do legado inteiro.** A segunda pergunta se faz por item, no momento em que ele é inventariado, e só para ações e estados.
+
+### Pendência aberta é insumo obrigatório do veredito
+
+- `px-audit` e `px-request` (B11.1) passam a ter o passo explícito: **"existe `PR-*` aberta sobre este item? se sim, ela entra no veredito"** — no `decisoes-pendentes.md` da iniciativa ou nas *Perguntas em aberto* do `PX-PROGRESS.md`. Concluir sem ler é refazer trabalho já pago, com o risco extra de contradizê-lo.
+
+### A trava de origem do Bloco 11b
+
+- **`px-request` B11b** continua como estava, e ganha duas regras de preenchimento. Toda linha de "acrescenta capacidade" **cita a evidência da ausência no legado** (arquivo e linha da função que não existe, ou da lista de constantes que não a contém). E o inverso, que é o que falhou: **todo item que a spec trata como paridade de ação ou de estado cita o caminho que o produz no legado**. Não citou, não é paridade: é `PROPOSTA` ou `NÃO VERIFICADO`.
+- **`px-change`** herda a mesma trava, como gate de B1 em redesign: ajuste que acrescenta ação ou estado responde às duas perguntas antes de ser tratado como paridade.
+
+### Templates, porque senão a skill pede e o artefato não tem onde receber
+
+- `px-audit/templates/audit.md`: nova sub-tabela **2.1 Capacidade — o legado PRODUZ?** (exibe · produz com evidência · veredito · `PR-*` consultada) e duas colunas novas no mapa de lacunas (B5).
+- `px-request/templates/request.md`: B11.1 ganha a coluna `PR-*` consultada; B11b ganha as colunas **Acrescenta capacidade?** e **Evidência no legado (`arquivo:linha`)**, mais a tabela de **paridade de ação e de estado** com o caminho que a produz.
+- Definition of Ready das três skills e dos dois templates atualizada.
+
+**Rodado contra o caso real**, como manda a regra: "o legado exibe um contador de abstenções e `ABSTAINED` existe no enum; nenhuma função do cliente o produz" leva agora, obrigatoriamente, a **`PROPOSTA`** (ou `NÃO VERIFICADO` se a fonte do desenhador de fluxo não estiver acessível), **nunca a `PARIDADE`** — e exige a linha correspondente no Bloco 11b.
+
+**Regra que fica:** exibir não é produzir. Enum não é capacidade. Paridade de ação ou de estado sem o caminho que a produz citado é proposta nossa esperando para ser descoberta na revisão do líder.
+
+---
+
+## 1.18.0 — 2026-09-10
+
+**O fluxo ficava pronto e ninguém ensinava o usuário a atravessá-lo.** A cadeia fechava com histórias, BDD, flow e persona, e o onboarding do produto era escrito depois, à mão, por quem não tinha passado pela descoberta: passo por tela "porque toda tela merece", copy inventada, tour para "o perfil gestor" num produto de RBAC granular onde o perfil composto não existe até alguém criá-lo. Enquanto isso o design system ganhou o componente **Onboarding Guiado** (boilerplate 0.4.0, substitui o `tour`), com jornada entre telas, passo de ação, espera de alvo e pesquisa de satisfação. Faltava a skill que liga uma coisa à outra.
+
+**Nova skill: `px-tour`.** Roda ao fechar cada **fluxo lógico**, depois da última `px-story` e do `ux-flows`, antes da `px-handoff`. Não é entrevista: **compila** os passos de artefatos que já existem e só pede confirmação.
+
+- **Um flow, um tour acionável** (`ux-flows` é a unidade). Por cima, um **tour global** que encadeia os fluxos na ordem da jornada do público e segue direto, sem pausa. Cada passo é escrito **uma vez**, no arquivo da tela, e serve às duas jornadas; tela repetida entra no global uma vez.
+- **Passo por evidência, não por tela.** Cada passo aponta para uma fricção de **Descoberta** registrada pelo `ux-persona` ou para a ação principal da jornada. De 3 a 7 por fluxo; fluxo com menos de 3 passos após o filtro fica sem gatilho próprio e só entra no global.
+- **Permissão em runtime, nunca tour por perfil.** Cada passo carrega a chave da ação que ensina (`<recurso>.<ação>`, modelo agnóstico de permissões); os passos da tela são uma função de `can` e o total da jornada é somado depois do filtro. O perfil que combina operador com duas ações de gestor vê exatamente os passos das ações que tem.
+- **Alvo só-com-dado, alvo condicional, interior de gaveta e tela de escrita** têm regra explícita, herdada da spec do componente: o tour de primeiro acesso roda sem dado; o que é condicional entra no passo do campo que decide; gaveta é passo de ação seguido de `aguardarAlvo`; formulário não pede clique que deixe alteração pendente.
+- **Decisões do UX responsável** por projeto, estruturadas: âncoras no layout mobile ou passos vazios abaixo do breakpoint; disparo automático do tour de fluxo; pesquisa de satisfação. O gatilho do **global** fica no menu de ajuda do shell, divergência declarada do DS (a spec põe a bússola ao lado do título da seção; o global não tem seção).
+- **Portão executável:** toda âncora `data-onb` referenciada nos passos existe no fonte, typecheck e lints de copy verdes, tour rodado no navegador, e `ux-persona` novato percorrendo o flow **com o tour ativo**. Fricção que persiste com o guia ligado é passo errado.
+- **Fonte ausente degrada declarada**, nunca em silêncio: sem flow chama `ux-flows`; sem relatório de persona os passos vêm da ação principal marcados como Premissa; sem chave de permissão o passo vira pendência para o dev em `pre-requisitos.md`.
+- Saída no alvo App React: `src/onboarding/` (passos por tela, registro de guias, hook que resolve a jornada em curso, bastão de continuação, gatilho global) e `e2e/tours/`. Sempre: `planning/<iniciativa>/tours/tours.md`, a spec legível. Modelo de código em `templates/onboarding-tela.md`.
+
+**O que mudou a montante para alimentar a skill sem inventar:**
+
+- `px-request` B3 passa a registrar a **rota** da tela; B5 pede a **chave de permissão por ação** e marca as **candidatas a âncora** (`data-onb` sugerido, `<id-da-historia>-<acao>`). Template e Definition of Ready acompanham.
+- `px-proto` coloca `data-onb` no **invólucro visível** das candidatas, nunca no controle nativo. Sem âncora no proto, não há tour.
+- `px-story` S6 ganha **RBAC (triggers)**: a chave de permissão da tela, apontando para o `rbac-*.md` quando existir. O modelo agnóstico de permissões já pedia isso; a skill não implementava.
+- `ux-flows` oferece o `px-tour` ao salvar o flow quando as telas já têm história.
+- `px-handoff` leva `tours/` no pacote (`tours.md` + `onboarding/` no caminho do fonte), com item na DoD, no GATE, no manifesto e no eco final. Ausência é declaração, como personas e flows.
+- `px-protocol.md`: `px-tour` entra na cadeia entre `ux-flows` e `px-handoff`.
+- `assets/design-system/ds-components_v4.md`: seção **Onboarding Guiado** propagada do boilerplate; **Tour Guiado** substituído por nota de descontinuação com a tabela de migração.
+
+**Regra que fica:** onboarding é artefato da cadeia, derivado do que a descoberta já provou (fricção de persona, ação principal, permissão mapeada), e é filtrado por permissão em runtime. Tour escrito para um perfil, ou passo escrito porque a tela existe, é o mesmo defeito de sempre: verde sem ter verificado nada.
+
+---
+
+## 1.17.1 — 2026-09-02
+
+**O instalador dizia "38 skills instaladas" e a pasta `.claude/skills/` ficava vazia.** Correção de defeito. Nenhuma regra nova.
+
+Reproduzido no Windows 11 com Node v24.14.1, rodando `npx github:DiogoRother-it/px-skills` dentro de `C:\...\Verytecnologia\Relatórios`. O caminho tem um "ó", e isso bastou. O passo 1 copiava cada skill com `fs.cpSync(src, dest, { recursive: true })`. No Node 24 a versão recursiva do `cpSync` é nativa e, no Windows, lê o destino em UTF-8 como se fosse Latin-1: as 38 pastas foram gravadas em `...\Verytecnologia\RelatÃ³rios\.claude\skills\`, uma pasta irmã com nome corrompido. Sem exceção, sem aviso. Já o stamp `.px-skills-version`, o `settings.json` e o `CLAUDE.md`, gravados por `writeFileSync`, foram para o caminho certo. O terminal mostrou tudo verde e o repo ficou sem skill nenhuma.
+
+É o mesmo tipo de defeito que a 1.11.1 e o `contexto-paridade-visual.md` (seção 6) já descrevem: **portão que fica verde sem ter verificado nada.** O contador somava iterações do laço, não arquivos no destino.
+
+Um segundo defeito apareceu ao reinstalar: no passo 2b, `cpSync` do hook `check-versao.mjs` por cima do arquivo existente lançava exceção não tratada em `cpSyncOverrideFile` e abortava o instalador antes do protocolo e do `CLAUDE.md`.
+
+**Correção:**
+- `cpSync` saiu do instalador. A cópia de diretório é uma função própria (`copyDir`) com `readdirSync` + `mkdirSync` + `copyFileSync`, que percorre o mesmo caminho de `writeFileSync` e nunca apresentou o problema de encoding. Arquivos avulsos (docs, hook, protocolo) também vão por `copyFileSync`.
+- **Verificação pós-cópia.** Cada skill só conta como instalada se `SKILL.md` existe no destino. Se alguma faltar, o instalador imprime quais, o caminho esperado, e sai com código 1 antes de gravar o stamp de versão. Não existe mais "N skills instaladas" sem o arquivo lá.
+- Reinstalar não aborta: `copyFileSync` sobrescreve o hook por padrão.
+- **Rodado contra o caso real**, como manda a regra: `node install.mjs` num diretório temporário com acento no nome, duas vezes seguidas. As 38 skills em `.claude/skills/<nome>/SKILL.md` no caminho correto, nenhuma pasta irmã corrompida, e a segunda execução termina com o resumo "já era a versão deste repo".
+
+**Regra que fica:** contador de instalação conta o que existe no destino, não o que o laço tentou copiar. E `fs.cpSync` recursivo não entra em código que roda no Windows com caminho de usuário até o Node corrigir o encoding.
+
+---
+
+## 1.17.0 — 2026-08-31
+
+**O dev recebia o critério de usabilidade sem saber quem o julgou.** Todo CA de usabilidade nasce de uma persona percorrendo a tela de verdade e travando em algum ponto (`ux-persona`, Fase 1). No pacote de handoff chegava só o resultado: "rótulo sem jargão técnico", "confirmação explícita antes de ação irreversível". A régua ficava do nosso lado. Na primeira refatoração que "simplifica a tela", o critério é o primeiro a cair — quem implementa não sabe o que ele protegia, e o CA vira preferência de quem escreveu a história.
+
+E o `px-protocol.md` **já prometia isso**: a linha que descreve o fechamento diz que a `px-handoff` monta o pacote com "escopo entregue, Definition of Done, **flows/personas**, fronteiras de integração". A skill nunca implementou. O `handoff-manifest.md` não classificava persona nem como dev-facing nem como interna, a árvore do pacote não tinha onde colocar, e o GATE não verificava. Protocolo que promete e skill que não entrega é o mesmo que não prometer.
+
+### `personas/` passa a ser pasta do pacote
+
+Na raiz do handoff, ao lado do `regras-negocio.md` — persona atravessa fluxo, não pertence a nenhum:
+
+```
+personas/
+├── personas.md          # índice: origem, público, fluxos, customização, fricção → CA
+└── <persona-slug>.md    # a persona no estado em que foi usada
+```
+
+| Entra | Fica de fora |
+|---|---|
+| A persona **como foi usada**, com o ajuste de contexto do projeto já aplicado no arquivo | O relatório da rodada (`e2e/reports/*.md`) — diário e diagnóstico são material interno |
+| O índice: origem (bundled ou custom), público real que ela representa, jornada percorrida, **o que foi customizado e por quê**, e cada fricção observada com o CA que nasceu dela | Nada além do relatório — o **flow** que a persona percorreu entra no pacote pela porta ao lado, ver a seção seguinte |
+
+**A customização é parte do artefato, não nota de rodapé.** Persona bundled ajustada ao contexto viaja com o ajuste aplicado **e declarado**; usada sem ajuste, escreve-se "usada sem ajuste". Ajuste que não está em arquivo (só no prompt da Fase 1) não chega no handoff — a `ux-persona` agora manda salvar em `e2e/personas/<slug>.md`.
+
+**Ausência é declaração, nunca silêncio.** Nenhum fluxo da leva passou por `ux-persona` → a linha dizendo isso, com motivo. Sem ela, o dev não distingue "não foi validado com persona" de "esqueceram de mandar" — a mesma lógica do "nenhuma", que precisa estar escrita, adotada na 1.16.0 para divergência do DS.
+
+**O que passa a bloquear a saída:** `personas/` presente com índice preenchido (ou a ausência declarada com motivo), e **zero** relatório de walkthrough no pacote. Na sanitização, o `origem:` do frontmatter de persona custom aponta pra `publico-alvo.md`, que não viaja — vira ref morta como qualquer outra, e é reescrito pro público por extenso.
+
+### Persona `skeptical` ganha o eixo de privacidade
+
+O cético cobria **consequência e reversibilidade** ("isso apaga ou desativa?", "salvou mesmo?") e era cego pra **dado pessoal**: campo que pede mais do que a tarefa exige, obrigatoriedade sem justificativa, e quem enxerga o que foi preenchido. É metade do que o mesmo público real questiona, e nenhuma das outras cinco personas cobria a outra metade.
+
+Agora ele repara em pedido de dado desproporcional ao serviço, procura na própria tela quem vê o que ele digitou, e — o comportamento que gera achado — **tenta seguir sem preencher o campo que considera invasivo**, abandonando em vez de entregar o dado quando nada explica o porquê. A rubrica das 7 dimensões não muda: o achado continua caindo em Clareza ou Fricção.
+
+A estrutura do arquivo permanece a mesma (Quem é · Como percebe a tela · Se travar · Vocabulário da narração). **Persona bundled não carrega lente de julgamento**: os critérios só entram na Fase 2, com a rubrica, e escrevê-los dentro da persona contaminaria a Fase 1, que é cega por construção.
+
+### `flows/` entra junto — a régua e a travessia são um par
+
+Persona diz **com que régua** a tela foi julgada; o flow diz **que jornada** foi percorrida. Entregar um sem o outro deixa a revalidação pela metade, e o flow tem um consumidor que a persona não tem: **é ele que o Playwright do dev automatiza**. O BDD das histórias cobre um comportamento por tela; o flow cobre a travessia entre elas, que é exatamente onde o defeito de fluxo aparece e onde o dev, hoje, tinha que reconstituir a jornada a partir de N arquivos de BDD.
+
+Duas regras que valem no momento de copiar:
+
+- **Ponteiros reescritos.** "Telas envolvidas" e o `origem:` do frontmatter do flow apontam pra `planning/<projeto>/stories/<slug>.md`; dentro do pacote viram `../<fluxo>/stories/<historia>.md`. `grep` por `planning/` dentro de `flows/` = zero.
+- **Passo de tela não entregue se marca, não se apaga.** Jornada que atravessa tela fora desta leva mantém o passo com a marca. Cortar faz a jornada mentir; deixar sem marca faz o dev procurar tela que não existe.
+
+Na `ux-flows`, isso reclassifica duas regras que já existiam: passo em rota interna e passo sem ponto de verificação observável deixam de ser higiene nossa e viram **contrato de entrega** — o dev não automatiza o que não se clica, nem verifica o que não se observa.
+
+### `px-story` — o critério de usabilidade passa a dizer de onde veio
+
+A tabela da rubrica tinha `Dimensão | Critério | OK?`. Ganhou a coluna **Origem**: a persona que travou naquele ponto num walkthrough, ou `rubrica` quando o critério veio da régua sem rodada. É o elo que faltava — sem ele, montar o `personas/` do pacote vira arqueologia de memória três sprints depois, e a rastreabilidade passa a listar as personas que percorreram a tela, com o arquivo de cada uma. **Persona que só existiu no prompt de uma Fase 1 não chega no dev.**
+
+Origem em branco **não** reprova a Definition of Ready: a coluna é rastreabilidade, não mais uma trava. Ela chega ao handoff como buraco visível, que é exatamente o comportamento desejado.
+
+Arquivos: `skills/px-handoff/SKILL.md`, `skills/px-handoff/templates/personas.md` (novo), `skills/px-handoff/templates/handoff-manifest.md`, `skills/px-handoff/templates/px-handoff.md`, `skills/px-story/SKILL.md`, `skills/px-story/templates/px-story.md`, `skills/ux-flows/SKILL.md`, `skills/ux-persona/SKILL.md`, `skills/ux-persona/templates/persona-skeptical.md`, `install.mjs`, `package.json`.
+
+---
+
+## 1.16.0 — 2026-08-28
+
+**Seis divergências do design system atravessaram a cadeia inteira sem nada apitar.** Num redesign de produto legado, o líder revisou a tela pronta e achou: um accordion reimplementado à mão existindo componente canônico, paginação com default e escala errados e sem elipse, rodapé de tabela com a anatomia do variant errado, chevron duplo num multiselect, tooltip de seção em vez de por campo, e hierarquia de botões invertida num drawer. Todas **dentro** do catálogo. Todas passaram pelo `px-request`, pelo `px-proto` e por duas rodadas de `ux-persona`.
+
+### O diagnóstico, e ele é de mecanismo, não de atenção
+
+**As skills protegiam contra o que NÃO existe no catálogo, e não contra o que existe e é usado de forma divergente.** No mesmo projeto, o gate ⚠️ de "componente fora do catálogo" funcionou duas vezes: Kanban e menu de contexto foram detectados, declarados e aprovados. O que está dentro do catálogo não tinha verificação nenhuma.
+
+Quatro causas, todas verificáveis no código das skills anteriores:
+
+| # | Causa | O que ela produzia |
+|---|---|---|
+| 1 | O Passo 4 do `px-proto` trazia uma **lista fechada de famílias** (Table, Card, Select, Date Picker, Upload, Overlay) | Accordion e Pagination não estavam nela, então o passo se cumpria **vazio**. A spec da paginação existe desde sempre e nunca tinha sido lida |
+| 2 | **Ambiguidade era auto-declarada** no Passo 1 | "Grupo colapsável" virou `collapsible`, que existe, e a regra "componente existente se usa" ficou cumprida no papel. Havia **dois** candidatos e nada obrigava a listar os dois |
+| 3 | O `src/showcase/` era tratado como **verdade** | E é onde estavam os defeitos: duas paginações que divergem da spec e uma da outra |
+| 4 | A cobertura da auditoria **não era verificada item a item** | O Bloco 11 era lista livre, então item não citado não virava decisão, virava ausência silenciosa. Foi assim que 3 ações de linha, 1 coluna e 2 status do legado sumiram do redesign |
+
+**E a régua existia, no código.** O `accordion.tsx` é comentado decisão por decisão. O `PaginationEllipsis` estava exportado e **sem nenhum consumidor**. O `MultiSelect` já tinha busca embutida que ninguém sabia que existia. Nada disso era alcançável pela documentação: **17 dos 53 componentes não têm entrada própria** no `ds-components_v4.md` (23 pela contagem estrita), e a cegueira cobria exatamente onde se errou.
+
+### `px-proto` Passo 1 — o inventário lê o COMPONENTE, não a doc
+
+A tabela era `Widget da spec | Componente | Instalar?`. Agora cada linha carrega o que o **arquivo** informa: **as props que ele já oferece**, **as decisões que os comentários dele já tomaram**, e **o que a doc acrescenta se houver entrada**. Linha com qualquer dessas colunas vazia reprova o inventário, e "não li o arquivo" não é preenchimento.
+
+Teria pego o accordion, a elipse, o chevron e a busca difusa.
+
+### `px-proto` Passo 1a — ambiguidade deixa de ser auto-declarada
+
+Antes de escolher, uma **varredura por nome e por palavra-chave de comportamento** lista **todos** os candidatos do diretório de componentes. **Dois ou mais → Passo 2 obrigatório**, com a escolha e o motivo registrados.
+
+O gate agora dispara por **contagem**, não por percepção: quem escolhe em silêncio não sabe que escolheu. A skill traz os pares que já produziram defeito (`accordion` × `collapsible`, `multi-select` × `combobox`, `sheet` × `responsive-dialog`, `dialog` × `alert-dialog`, `toggle-group` × `button-group`).
+
+### Bloco de divergência do DS — `px-request` 11c e `px-proto` 4b
+
+**É a mudança de maior rendimento e a mais barata**, porque o mecanismo já existia e funcionava: o Bloco 11b declara divergências do **legado**, e no mesmo projeto cinco foram declaradas e nenhuma virou defeito. Faltava apontá-lo também para o design system.
+
+Agora **toda divergência do DS é declarada com motivo, ou é defeito**: default trocado, escala trocada, parte omitida, anatomia do variant errado, composição à mão onde existe componente pronto, ícone fora da convenção, tooltip de seção em vez de por campo, hierarquia de ação invertida. Os dois blocos (11b legado, 11c design system) viraram estrutura formal da skill e do template, e a Definition of Ready cobra os dois — **inclusive "nenhuma", que precisa estar escrita**, porque em branco é indistinguível de "ninguém olhou".
+
+### `px-proto` Passo 4 — hierarquia de fontes explícita, e critério no lugar da lista
+
+| A pergunta é sobre | A fonte é |
+|---|---|
+| **Anatomia** | o `.tsx` em `src/components/ui/` |
+| **Comportamento e regra** | `ds-components_v4.md` |
+| **Valor de cor** | `src/index.css` |
+| **Exemplo** | `src/showcase/` — **auditável, nunca verdade** |
+
+Ao copiar do showcase, conferir contra a spec; divergiu, **a spec ganha** e o showcase vira débito externo.
+
+A lista fechada de famílias virou **critério**: um componente tem variação a decidir quando o `.tsx` expõe prop de forma, quando a varredura devolveu mais de um candidato, quando a doc tem árvore "Qual usar?", ou quando ele aceita composição com outro. Nenhuma sendo verdade, escreve-se **"sem variação a decidir"** — o passo se cumpre com uma frase, nunca com silêncio.
+
+A mesma hierarquia entrou no `px-protocol.md`, que listava cinco fontes e **não incluía o `.tsx`**, embora ele seja a mais completa e a mais atual.
+
+### `px-audit` + `px-request` — portão de cobertura da auditoria
+
+A auditoria passa a **numerar todo item** (`A-B2-NN` telas, `A-B4-NN` achados, `A-B5-NN` componentes do mapa de lacunas, `A-B6-NN` backlog), com **contagem literal** no enunciado e **composto decomposto em sub-elementos**. O `px-request` da tela dá **veredito explícito a cada ID** no Bloco 11.1: em escopo, ou fora de escopo com motivo **e destino**. Item sem veredito reprova a Definition of Ready.
+
+Lista livre não serve: as três ações perdidas vieram de o request escrever "as 13 do menu Mais Opções" onde a auditoria documentava **16 em dois níveis**.
+
+### O que teria pego cada um dos seis achados
+
+| Achado | Portão que o pega |
+|---|---|
+| Accordion reimplementado à mão | Varredura de candidatos (1a) lista `accordion` **e** `collapsible` |
+| Paginação sem elipse, default e escala errados | Inventário lê o `.tsx` (1b) + hierarquia de fontes (4) + Bloco 11c |
+| Rodapé com a anatomia do variant errado | Hierarquia de fontes (4) + `TablePagination` no boilerplate |
+| Chevron duplo no multiselect | Inventário lê o `.tsx` (1b) + Bloco 11c |
+| Tooltip de seção em vez de por campo | Bloco 11c (padrão de ajuda trocado) |
+| Hierarquia de botões invertida no drawer | Bloco 11c (hierarquia de ação invertida) |
+
+### No boilerplate, na mesma leva
+
+Regra de componente nasce no boilerplate e a skill absorve, nunca o contrário. Subiram para o `centralit-boilerplate`:
+
+- **`TablePagination`** em `pagination.tsx`: contagem, seletor de itens por página, elipse e a anatomia certa por variant da tabela (`spaced` → card compacto `w-fit`, borda interna fora para não virar moldura dupla; `divided` → faixa `border-t`). O `showcase/Dados.tsx` passou a usá-lo nas duas paginações. **Aí não sobra o que divergir.**
+- **`ds-components_v4.md`**: a spec da paginação mandava "Mostrando X–Y de Z" com **en dash**, e as regras do mesmo documento proíbem travessão em texto de interface — seguir a spec ao pé da letra violava o DS. Corrigido para "Mostrando 1 a 10 de 124 resultados". E o documento passou a declarar: **sem entrada, o componente é a spec**, com a lista dos 17.
+- **`multi-select.tsx`**: prop **`filter`** (o `cmdk` filtra por correspondência difusa — medido, buscar "teste" devolvia `Teste AAA` **e** `Aguardando Documentação Complementar do Solicitante`), **chevron simples** e `aria-label` no tipo. **`combobox.tsx`** herdava o mesmo chevron duplo e foi junto.
+- **Três débitos antigos**: `button.tsx` (o anel de foco não era pintado), `badge.tsx` (as quatro variantes semânticas reprovavam em WCAG AA, entre 1.91 e 3.10, corrigidas com quatro tokens de tinta) e `sheet.tsx` (nome acessível "Close" em produto pt-BR, e alvo de fechar de 16×16 contra os 24×24 da WCAG 2.5.8).
+
+Arquivos: `skills/px-proto/SKILL.md`, `skills/px-request/SKILL.md`, `skills/px-request/templates/request.md`, `skills/px-audit/SKILL.md`, `skills/px-audit/templates/audit.md`, `docs/px-protocol.md`, `assets/px-protocol.md`, `assets/design-system/ds-components_v4.md`, `install.mjs`, `package.json`.
+
+---
+
 ## 1.15.0 — 2026-08-27
 
 A 1.14.0 fez a cadeia **recusar** base fora do padrão. Mas quem está com skills velhas não tem esse portão — e não tem como saber que ele existe. Esta versão fecha o degrau anterior: o repo passa a **avisar sozinho**, sem ninguém precisar lembrar de rodar o instalador.

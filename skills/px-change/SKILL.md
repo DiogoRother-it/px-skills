@@ -46,7 +46,31 @@ Contexto inicial via slash: `$ARGUMENTS` (descrição do ajuste). Se vazio, perg
 
 **Gate de tamanho:** se o ajuste envolver mais de uma tela, novos fluxos ou componentes inteiramente novos, **pare e encaminhe** pro `px-request` (componente/fluxo novo) ou `px-epic` (várias telas). Este gate é obrigatório.
 
-**Eco:** *"Então: ajuste em [tela/arquivo], propósito [X] — confirma?"*
+**Gate de capacidade (só quando a tela substitui um legado — redesign):**
+
+Ajuste localizado em redesign é o lugar mais fácil de acrescentar capacidade sem perceber: um
+botão a mais, um estado a mais no filtro, uma opção a mais no select. Se o ajuste **acrescenta
+uma ação ou um estado**, pergunte as duas coisas, nesta ordem:
+
+1. *"O legado **exibe** isso?"* — metade da resposta.
+2. *"O legado **PRODUZ** isso, e por qual caminho?"* — a metade que pega proposta nossa
+   disfarçada de paridade. Vale `arquivo:linha` do handler, da função ou da constante de ação
+   (ou da superfície que grava o estado). **Template, diretiva, DOM, enum e contador não
+   respondem:** eles provam que o dado pode chegar do servidor, não que a interface sabe
+   gerá-lo. Foi exatamente assim que uma abstenção que o legado **contava** mas **não sabia
+   produzir** atravessou uma cadeia inteira como paridade.
+
+Sem o caminho citado, o ajuste **não é paridade**: é **proposta** (muda escopo, e vai declarada
+no artefato deste ajuste **e** no Bloco 11b do `px-request` da tela, se existir) ou é **`NÃO
+VERIFICADO`** (fonte fora de alcance: vira Pergunta em aberto com dono, e o item não pode ser
+citado como paridade depois). E **antes de concluir, leia as `PR-*` abertas sobre esta região**
+no `decisoes-pendentes.md` ou nas *Perguntas em aberto* do `PX-PROGRESS.md` — a resposta
+costuma já estar escrita lá.
+
+Ajuste que só mexe em exibição pura (label, ícone, cor, ordem de coluna) dispensa este gate:
+marque `N/A — não acrescenta ação nem estado`.
+
+**Eco:** *"Então: ajuste em [tela/arquivo], propósito [X], capacidade [paridade com evidência / proposta declarada / N/A] — confirma?"*
 
 ## BLOCO 2 — Estados de UI impactados (só os que mudam)
 **Decidir:** quais estados do componente afetado precisam ser revisados ou atualizados.
@@ -72,8 +96,17 @@ Marque N/A com motivo para os estados que não são afetados. **Nunca assuma que
 - Se sim: confirmar a variação exata.
 - Se não existe: **gate "Outro"** — marcar **⚠️ REQUER VALIDAÇÃO UX/PX** e **não avançar** sem aprovação explícita do líder. Nunca criar componente customizado em silêncio.
 - Se for só mudança de token/classe (ex: cor, spacing, label): confirmar que usa `var(--token)` ou classe Tailwind, nunca valor hardcoded.
+- **Abra o `.tsx` do componente antes de compor à mão.** A prop que resolve o ajuste costuma já existir e não estar documentada: **17 dos 53 componentes não têm entrada própria** no `ds-components_v4.md`, e nesses casos **o arquivo é a spec**. Um multiselect ganhou busca difusa reimplementada porque ninguém viu que o `CommandInput` já estava lá.
 
-**Eco:** *"Componente: [X], variação [Y] — confirma?"*
+**Gate de divergência do design system (o gate ⚠️ não cobre isto):**
+
+O gate ⚠️ acima protege contra componente que **não existe** no catálogo. O ajuste localizado erra pelo outro lado: usa um componente que **existe** de forma divergente. Pergunte, e registre a resposta:
+
+> *"Este ajuste faz algo diferente do que o design system manda?"* — default trocado (20 por página onde a spec diz 10), parte omitida (rodapé sem elipse ou sem contagem), anatomia alterada (borda ou padding fora do componente), composição à mão onde existe componente pronto (`TablePagination`), ícone fora da convenção, tooltip de seção onde a regra pede por campo, hierarquia de ação invertida.
+
+**Divergência do DS é declarada com motivo, ou é defeito.** Havendo alguma, registre a linha (o que o DS manda · o que faz aqui · por quê · quem decidiu) no artefato deste ajuste **e** no Bloco 11c do `px-request` da tela, se existir. Não havendo, escreva **"nenhuma divergência do design system"** — em branco é indistinguível de "ninguém olhou".
+
+**Eco:** *"Componente: [X], variação [Y], divergências do DS: [nenhuma / N declaradas] — confirma?"*
 
 ## BLOCO 4 — Copy dos textos novos ou alterados
 **Decidir:** o texto literal de qualquer elemento que muda.
@@ -94,8 +127,12 @@ Marque N/A com motivo para os estados que não são afetados. **Nunca assuma que
 ## BLOCO 5 — Checklist de fechamento
 **Fazer, antes de implementar:**
 - [ ] Propósito e escopo confirmados (B1) e dentro do limite de "ajuste localizado"
+- [ ] Gate de capacidade respondido (B1): ação/estado novo com o caminho que o legado usa para produzi-lo (`arquivo:linha`), ou declarado como proposta, ou `N/A — não acrescenta ação nem estado`
+- [ ] `PR-*` abertas sobre esta região lidas antes de concluir, ou "nenhuma" (B1)
 - [ ] Estados impactados mapeados, N/A justificados (B2)
 - [ ] Componente do catálogo confirmado ou gate ⚠️ aprovado (B3)
+- [ ] `.tsx` do componente aberto antes de compor à mão (B3)
+- [ ] Divergências do design system declaradas com motivo, ou "nenhuma" por extenso (B3)
 - [ ] Copy literal revisada: sem travessão (— / –) e sem caixa alta total (B4)
 - [ ] Lint de copy rodado após implementar: `npm run lint:travessao` e `npm run lint:caixa-alta`
 - [ ] Checkpoint atualizado: ajuste registrado em `planning/<iniciativa>/PX-PROGRESS.md`

@@ -1,6 +1,6 @@
 ---
 name: px-handoff
-description: Skill de FECHAMENTO da cadeia PX. Monta o pacote de handoff pro dev a partir das histórias já ready. Quando o dev implementa na MESMA stack do protótipo, entrega o FONTE em duas pastas com instrução oposta: a UI (copiar, não editar) e o andaime do protótipo (descartar), mais os tokens — é o que garante fidelidade visual, porque elimina a reescrita; quando a stack é diferente, entrega referência visual navegável + anatomia. Sempre acompanha o UI Kit do produto, as histórias de negócio (BDD), as regras de negócio por fluxo e as specs referenciadas, tudo self-contained e organizado por fluxo. Não envia config de build nem artefatos internos. Use ao fechar um lote de telas prontas pra levar pro dev — "fechar o handoff", "preparar a entrega pro dev", "empacotar pro desenvolvimento", "qual sprint essa entrega entra", "finalizar o fluxo".
+description: Skill de FECHAMENTO da cadeia PX. Monta o pacote de handoff pro dev a partir das histórias já ready. Quando o dev implementa na MESMA stack do protótipo, entrega o FONTE em duas pastas com instrução oposta: a UI (copiar, não editar) e a demo do protótipo (descartar), mais os tokens — é o que garante fidelidade visual, porque elimina a reescrita; quando a stack é diferente, entrega referência visual navegável + anatomia. Sempre acompanha o UI Kit do produto, as histórias de negócio (BDD), as regras de negócio por fluxo e as specs referenciadas, tudo self-contained e organizado por fluxo. Não envia config de build nem artefatos internos. Use ao fechar um lote de telas prontas pra levar pro dev — "fechar o handoff", "preparar a entrega pro dev", "empacotar pro desenvolvimento", "qual sprint essa entrega entra", "finalizar o fluxo".
 compatibility: claude-code
 metadata:
   audience: px-ux
@@ -12,9 +12,11 @@ metadata:
 Esta skill **fecha** o ciclo de uma entrega: pega as histórias que já estão *ready* (saíram do `px-story`) e monta o **pacote de handoff** que o dev vai consumir — referência visual navegável, UI Kit, histórias de negócio, regras de negócio e specs referenciadas, organizadas por fluxo.
 
 **Contrato de entrega:** o dev recebe um pacote **self-contained** (nada aponta para fora dele):
-- **Referência de implementação ou referência visual** — depende de uma pergunta só; ver "Forma do protótipo" abaixo. **Decida isto antes de montar o pacote.**
+- **Referência de implementação ou referência visual** — depende de uma **inspeção do repo do dev**, nunca de pergunta; ver "Forma do protótipo" abaixo. **Verifique isto antes de montar o pacote.**
 - **UI Kit** do produto (`ui-kit.md`, tokens reais).
 - **Histórias de negócio** por fluxo (`stories/`, BDD + CA + estados).
+- **Personas de usabilidade** (`personas/`) — quem julgou a tela e com que régua, no estado em que foram usadas (com os ajustes de contexto do projeto aplicados). Os critérios de usabilidade dos CA nasceram delas; entregar o critério sem a persona é entregar a regra sem a razão, e a primeira "simplificação" de implementação desfaz o que ela protegia.
+- **Flows de validação** (`flows/`) — a jornada multi-tela como o público real a percorre, em ações de interface. É o que o **Playwright do dev automatiza** e o que a persona percorre na revalidação. Sem o flow, o dev tem o BDD tela a tela e nenhuma descrição da travessia entre elas — e a jornada é justamente onde o defeito de fluxo aparece.
 - **Regras de negócio** — um **único** `regras-negocio.md` na **raiz do pacote**, com todas as RNs da entrega numeradas `RN-<SIGLA>-<DOMÍNIO>-<NN>`. As RNs NÃO podem ficar só no request interno, e também não podem ser **reescritas por fluxo** (ver BLOCO 5).
 - **Specs referenciadas** por qualquer história (ex.: spec de aba/componente) — copiadas para dentro do fluxo.
 - **README.md** do pacote (como ver, como está organizado), com a tabela **preservar versus reescrever**.
@@ -22,13 +24,45 @@ Esta skill **fecha** o ciclo de uma entrega: pega as histórias que já estão *
 
 Ela **não desenha tela** (isso é `px-request`/`px-story`): fecha o ciclo, monta o pacote e (quando há repo do dev) executa o push.
 
-### Forma do protótipo — a pergunta que define o pacote
+### Forma do protótipo — verificada no repo do dev, nunca perguntada
 
-> **O dev implementa na MESMA stack em que o protótipo foi construído?** (mesmo boilerplate, mesma biblioteca de componentes, mesmos aliases de import)
+> ⛔ **Isto já foi pergunta, e a resposta errada custou meses.** Na SmartCity semana-37 o `handoff.md` declarou "stack diferente" e entregou HTML vanilla de 3.407 linhas sem uma classe Tailwind; na CIT Contracts, 34 mil linhas. O dev usava a **mesma biblioteca que nós**, componente por componente (o `button.tsx` deles é o nosso, byte a byte fora o alias de import). A LLM do dev leu o HTML inteiro, reinterpretou cada região, e cada dev obteve um resultado diferente. **A forma da entrega sai de uma inspeção, com a evidência colada no `handoff.md`.**
 
-**Sim → entregue o FONTE do protótipo.** Copie `src/proto/**` para `proto/` no pacote, junto com o `src/index.css` (tokens aplicados).
+**Inspecionar, no repo do dev** (clone local, ou `git show <remote>/<branch>:<arquivo>` e `git ls-tree` sem precisar de checkout):
 
-> ⛔ **O build compilado NÃO entra no pacote quando há fonte.** Ele continua existindo para visualizar e para o PO revisar, mas **publicado** (`px-preview`), com o link no `README.md` do pacote. Bundle é o artefato mais pesado e mais irreversível que a gente coloca no repo do dev, e no caminho do fonte ele não acrescenta nada: o `proto/` roda. Se não houver onde publicar ainda, registre como pendência no `handoff.md` — nunca como arquivo no pacote.
+1. **Primitiva e utilitários** — em todo `package.json` de app e pacote:
+   `grep -E '"(tailwindcss|radix-ui|@radix-ui/react-[a-z-]+|@base-ui-components/react|@base-ui/react|class-variance-authority|tailwind-merge)"'`
+2. **Biblioteca** — `find . -type d -path "*components/ui" -not -path "*/node_modules/*"`, contar os `.tsx` e comparar a lista com `src/components/ui/` do sandbox (`comm -3`). Anotar o que falta de um lado e do outro.
+3. **Alias de import** — `resolve.alias` no `vite.config.*` ou `paths` no `tsconfig`: por qual prefixo o app de destino importa `components/ui` (ex.: `@/`, `@smart-gov/shared/`, `~/`).
+4. **CSS de tokens** — qual arquivo importa `tailwindcss` e declara o `:root` (ex.: `packages/shared/src/styles/globals.css`), e se há tema por app sobrepondo (ex.: `tema-cidadao.css`). É onde os tokens do pacote precisam ser conferidos.
+
+**Veredito, e só há dois:**
+
+| Achado | Forma | O que muda no pacote |
+|---|---|---|
+| Tailwind **e** shadcn (Radix ou Base UI) **e** pasta `components/ui` com a biblioteca | **FONTE, obrigatório** | UI em TSX com os imports reescritos pro alias do dev. Primitiva diferente da nossa (Base UI × Radix) **não muda a forma**: entra em `pre-requisitos.md` com a lista de props que mudam (`asChild` → `render`) |
+| Sem Tailwind ou sem shadcn (legado, outra stack) | Referência visual + anatomia | Único caso. A evidência (as linhas do `package.json` que provam a ausência) vai **escrita no `handoff.md`**, seção "Forma do protótipo", com a frase literal `Stack do dev verificada: sem shadcn` |
+
+⛔ **"Stack diferente" sem as linhas de evidência é declaração inválida**, e o portão executável reprova o pacote (ver "Portão de forma"). **Sem repo do dev ainda:** a forma default é FONTE (o boilerplate é a stack de referência da casa) e o alias fica `@/` até o repo aparecer.
+
+**FONTE → entregue o fonte do protótipo.** Copie `src/<produto>/**` para `<produto>/` e `src/proto/**` para `proto/` no pacote, junto com o `src/index.css` (tokens aplicados).
+
+**Reescrever o alias de import pro do dev (mecânico, no pacote, nunca no sandbox):**
+
+```bash
+# ex.: o dev importa a biblioteca por @smart-gov/shared/ ; o sandbox usa @/
+grep -rl 'from "@/' <produto>/ proto/ | xargs sed -i \
+  -e 's#from "@/components/ui/#from "@smart-gov/shared/components/ui/#g' \
+  -e 's#from "@/lib/utils"#from "@smart-gov/shared/lib/utils"#g' \
+  -e 's#from "@/hooks/#from "@smart-gov/shared/hooks/#g'
+grep -rn 'from "@/' <produto>/ proto/   # o que sobrar é import interno do pacote: vira relativo
+```
+
+Registre a regra de tradução em `pre-requisitos.md` item 5 e no `handoff.md`. O que **não** é biblioteca (tela importando tela, `tipos.ts`, `fixtures.ts`) vira import **relativo** dentro do pacote. Se o alias do dev for `@/`, não há nada a reescrever, e isso também se escreve.
+
+**Formatar o pacote com o lint do dev (mecânico, depois do alias):** copie a pasta da UI e a demo para dentro do repo do dev (um clone ou worktree descartável), rode o `eslint --fix` **deles** sobre ela e traga os arquivos de volta. Medido em 2026-09-18: o boilerplate indenta com 2 espaços e o `smart-gov-next` exige 4; sem este passo o dev recebe 591 erros de lint num pacote que compila e renderiza igual, e o primeiro reflexo dele é "reescrever". Confira com `diff -w` que só espaço em branco mudou, e cole no `README.md` do pacote que ele já passa no lint de destino. Aviso de `react-refresh/only-export-components` em arquivo da UI se resolve na origem (função utilitária sai do arquivo de componente), não no pacote.
+
+> ⛔ **O build compilado NÃO entra dentro do pacote, mas viaja junto, ao lado dele.** No caminho do fonte a entrega leva **dois artefatos com papéis opostos**: `handoff-ux/<label>/` é o código (copiar) e `preview/<label>-proto.html` é a **referência visual e navegável** (só olhar). O preview é um bundle single-file gerado por `npm run build:standalone` no sandbox: custa zero token, um arquivo cobre todas as telas da entrega (rota por hash, `#/proto/<slug>`) e a demo dá acesso a todos os estados. Fica **fora** de `handoff-ux/`, na raiz da branch, com um `preview/README.md` que diz, nesta ordem: abre com dois cliques; é a referência do que comparar; **não é código para reaproveitar**, porque entregar HTML no lugar do fonte foi o que quebrou a paridade. Sem essa separação e sem esse aviso, o dev trata o HTML como entrega. `px-preview` continua existindo para o PO (e-mail, URL pública); aqui o build é passo do fechamento (BLOCO 6).
 
 - **Por que:** a `px-proto` constrói o protótipo com os componentes reais e os mesmos aliases (`@/components/ui/...`). No repo do dev esses caminhos resolvem sem tradução. Entregar só o build obriga a rededuzir espaçamento, sombra, elevação e troca de estado a partir de screenshot — trabalho já feito uma vez, e a principal fonte de divergência visual.
 - **Documente no README** de onde vem cada import do proto (registry, boilerplate, interno ao pacote) e que **não há dependência nova a instalar**.
@@ -53,6 +87,20 @@ Ela **não desenha tela** (isso é `px-request`/`px-story`): fecha o ciclo, mont
 - Diga no pacote, com franqueza, que documentação **reduz** divergência mas não elimina; 1:1 estrutural só vem de componente compartilhado.
 
 > ⛔ **Nunca entregue apenas o build quando o fonte serviria.** Um bundle compilado é tão impossível de importar quanto HTML vanilla: ninguém faz `import` de `assets/index-abc123.js`. É o erro mais caro e mais silencioso deste passo, porque o pacote *parece* completo.
+
+### Sem acesso ao repo do dev: é impedimento, não é formato de entrega
+
+**O que acontece na prática quando não se diz isto:** em 2026-09-21 uma UX sem acesso ao GitLab mandou o protótipo e as histórias por chat e pediu ao dev que subisse por ela. O que viajou foi um HTML de 4,7 MB, que é o build, enquanto o fonte estava pronto no repo do PX. A entrega chegou sem versão, sem branch e sem procedência, e ninguém consegue dizer depois qual versão foi implementada. Ela não errou: a cadeia só conhecia "tem repo" e "não tem repo", e a `px-preview` dizia que HTML se manda por Teams.
+
+**A regra:** falta de acesso é **impedimento a destravar**, com dono e data, nunca um canal alternativo de entrega.
+
+1. **Registre como impedimento** no `handoff.md`, em *Perguntas em aberto*, com dono (quem concede o acesso) e a data do pedido. Acesso é ticket, não workaround.
+2. **Monte o pacote completo do mesmo jeito**, em `handoff-ux/<label>/`, com `procedencia.md` e todos os portões. O pacote não muda porque o canal está travado.
+3. **Enquanto o acesso não sai**, se a entrega não pode esperar, o pacote vai **inteiro e compactado** (`handoff-ux/<label>/` + `preview/`), com o `handoff.md` dentro, por um canal que aceite arquivo. Nunca um arquivo solto, nunca só o HTML, nunca a UI sem o `procedencia.md`.
+4. **Quem sobe registra o que subiu.** Se outra pessoa faz o push por você, o commit cita o rótulo da entrega e o `procedencia.md` viaja junto. Sem isso, a rastreabilidade morre no ato.
+5. **A pendência de acesso não fecha sozinha.** Ela sai do `handoff.md` quando o acesso existir e o push for feito por quem produziu o pacote.
+
+⛔ **O que nunca é aceitável:** mandar o protótipo por chat porque o repo está fora de alcance. O canal travado não muda o formato: o dev continua precisando do fonte, e o build continua não sendo implementável.
 
 ### Entregar o fonte NÃO é assumir o trabalho do dev
 
@@ -99,19 +147,20 @@ Segue `Skill Prompting Conventions` do `CLAUDE.md`. Estruturada pra decisões en
 
 - **Histórias ready:** já passaram pelo `px-story` (BDD *ready*). Se alguma ainda está em `px-request`, avise que o handoff nasce incompleto e ofereça fechar a `px-story` faltante antes.
 - **Referência visual (em camadas — não bloqueie cedo demais):**
-  1. **Ideal:** HTML unificado single-file (via `px-preview`), com `#view-*` por fluxo e `data-story` por elemento acionador.
-  2. **Fallback aceitável:** o projeto é um app React/Vite sem single-file → usar o **build de produção** (`dist/`) copiado para `prototipo/` como referência visual (servir via servidor estático). Marcar o single-file + `data-story` como **pendência** (não bloqueia a entrega). Se não houver build, ofereça gerar (`npm run build`) ou rodar `px-preview`.
-  3. **Último recurso:** só link do localhost (registrar no README que a referência visual é o dev server).
+  - **Caminho do FONTE:** a referência visual é o **preview standalone** gerado no fechamento (BLOCO 6, `npm run build:standalone`), em `preview/` na raiz da branch, fora do pacote. Pré-requisito aqui é só o sandbox buildar: `npm run build` verde.
+  - **Caminho da referência visual (legado sem shadcn):**
+    1. **Ideal:** HTML unificado single-file (via `px-preview`), com `#view-*` por fluxo e `data-story` por elemento acionador.
+    2. **Fallback aceitável:** o projeto é um app React/Vite sem single-file → usar o **build de produção** (`dist/`) copiado para `prototipo/` (servir via servidor estático). Marcar o single-file + `data-story` como **pendência** (não bloqueia a entrega).
+    3. **Último recurso:** só link do localhost (registrar no README que a referência visual é o dev server).
   Só bloqueie se não houver **nenhuma** referência visual possível.
 - **Delta automático:** varra as histórias `.md` *ready* e compare com entregas anteriores (`handoff-ux/*/`) para montar o delta desta leva. O PX confirma o que entra.
 
 **Perguntas obrigatórias antes de montar o pacote (`AskUserQuestion`):**
-> 1. "Esse projeto já aderiu de forma completa à biblioteca de componentes `@centralit`?"
->    **Sim** → DoD interno inclui a obrigatoriedade de usar os componentes da biblioteca.
->    **Não** → DoD interno registra que o dev adapta a referência visual conforme a stack do projeto.
-> 2. "Já existe o repositório oficial do dev para receber a entrega?"
->    **Sim** → peça o caminho local/URL; o push roda no BLOCO 6.
->    **Não / ainda não** → organize o pacote **localmente** em `handoff-ux/<label>/` na raiz do projeto atual e **pule o push** (fica pendente para quando o repo existir). Registre isso no `handoff.md`.
+> 1. **Não é pergunta.** A forma do protótipo sai da inspeção do repo do dev ("Forma do protótipo"). Apresente ao PX o veredito **com a evidência** (linhas do `package.json`, contagem e diferenças de `components/ui`, alias) e peça só a confirmação de que o repo inspecionado é o de destino. DoD interno: FONTE → uso obrigatório dos componentes da biblioteca; referência visual → só com `Stack do dev verificada: sem shadcn` no `handoff.md`.
+> 2. "Já existe o repositório oficial do dev para receber a entrega, e você consegue escrever nele?" (três respostas, não duas)
+>    **Sim, existe e eu alcanço** → peça o caminho local/URL; o push roda no BLOCO 6.
+>    **Não existe ainda** → organize o pacote **localmente** em `handoff-ux/<label>/` na raiz do projeto atual e **pule o push** (fica pendente para quando o repo existir). Registre isso no `handoff.md`.
+>    **Existe, mas eu não tenho acesso** → ver "Sem acesso ao repo" abaixo. ⛔ **Não improvise o canal.**
 > 3. "Além do repo do dev, este projeto também mantém um repositório CENTRAL do PX (um monorepo/núcleo onde vivem produto, planning e docs de várias iniciativas)?"
 >    **Sim** → ao final deste handoff, ofereça rodar `px-sync` pra espelhar o estado completo de trabalho nesse repo central. **É um destino independente do handoff**: o pacote reduzido (aqui) vai pro dev; o espelho completo (`px-sync`) vai pro núcleo — um não substitui o outro, e não bloqueia o push do BLOCO 6.
 >    **Não** → seguir só com o destino dev; não oferecer `px-sync` no fechamento.
@@ -134,6 +183,17 @@ Segue `Skill Prompting Conventions` do `CLAUDE.md`. Estruturada pra decisões en
     - ⛔ **Uma RN tem um enunciado só, num lugar só.** Se o pacote tiver um `regras-negocio.md` por fluxo com o texto da regra repetido, a mesma regra passa a existir em N versões que divergem na primeira correção — e a mesma numeração local (`RN-02` em cinco fluxos) aponta para cinco regras diferentes. Foi o que aconteceu na Vitrine: "dark mode" com **5 IDs distintos** e o lifecycle de status escrito por extenso em 3 histórias.
     - **Proximidade por fluxo é opcional e só como índice:** se o fluxo tiver um `regras-negocio.md`, ele lista **apenas os IDs** que aquele fluxo usa, com uma linha de resumo e ponteiro para o arquivo da raiz. Nunca o enunciado completo;
   - toda **spec referenciada** pela história (ex.: "ver `spec-da-aba.md`") — copiada para o fluxo e sanitizada.
+- **Uma vez por pacote (não por fluxo): as personas de usabilidade.** Copiar para `personas/` cada persona que percorreu algum fluxo desta leva, no **estado em que foi usada**, e montar o índice `personas/personas.md` a partir de `templates/personas.md`.
+  - **Como descobrir quais foram:** os relatórios em `e2e/reports/<flow-slug>__<persona-slug>.md` nomeiam o par fluxo × persona. A persona custom vive em `e2e/personas/<slug>.md`; a bundled, em `templates/persona-<slug>.md` da `ux-persona`.
+  - **A customização é parte do artefato.** Persona bundled que foi ajustada ao contexto do projeto viaja **com o ajuste aplicado no arquivo** e com o ajuste **declarado** no índice (o que mudou e o que no produto/público exigiu). Persona usada sem ajuste: escrever "usada sem ajuste". Diferença não declarada vira uma régua que só existe na cabeça de quem rodou.
+  - **O relatório NÃO entra** — diário e diagnóstico são material interno. Entra a persona, o que ela encontrou e onde isso virou CA.
+  - **Nenhum fluxo desta leva passou por `ux-persona`** → escrever isso no índice, com o motivo. **Ausência declarada é diferente de ausência silenciosa:** sem a linha, o dev não distingue "não foi validado com persona" de "esqueceram de mandar".
+- **Uma vez por pacote: os flows de validação.** Copiar para `flows/` cada `e2e/flows/<slug>.md` que cobre uma jornada das telas desta leva. Persona e flow são um par — a persona diz *com que régua*, o flow diz *que travessia*; entregar um sem o outro deixa a revalidação incompleta.
+  - **O flow é o que o Playwright do dev automatiza.** Ele é escrito em ações de interface, nunca rota, e cada passo já carrega o ponto de verificação observável. Não peça ao dev que reconstitua a jornada a partir de N arquivos de BDD tela a tela: o BDD cobre um comportamento por vez, o flow cobre a travessia — e é entre telas que o defeito de fluxo aparece.
+  - **Sanitizar os ponteiros do flow** (ver BLOCO 6): "Telas envolvidas" aponta pra `planning/<projeto>/stories/<slug>.md` e o `origem:` do frontmatter aponta pras px-story. Dentro do pacote, os dois viram `../<fluxo>/stories/<historia>.md`.
+  - **Jornada que cruza tela fora desta leva** → mantenha o flow inteiro e **marque o passo** como "tela não entregue nesta leva". Cortar o passo faz a jornada mentir; deixar sem marca faz o dev procurar tela que não existe.
+  - **Nenhum flow registrado** (telas isoladas, sem jornada multi-tela) → declarar isso, pelo mesmo motivo das personas.
+- **Uma vez por pacote: os tours de onboarding.** Copiar `planning/<iniciativa>/tours/tours.md` para `tours/tours.md` e, no caminho do fonte, `src/onboarding/` para `tours/onboarding/`. Conferir que toda âncora `data-onb` dos passos existe no `proto/`. Nenhum tour gerado nesta leva → a **declaração disso**, com motivo (mesma regra de personas e flows).
 - **Recorte dev-facing vs. interno:** aplicar o `templates/handoff-manifest.md`. Entram também **decisões de produto canônicas** (`decisoes/*.md`) e **mapa de permissões/triggers** (`rbac-*.md`) quando existirem. Ficam de fora **os arquivos** de checkpoint (`PX-PROGRESS`), prompts de continuidade, discovery/auditoria, épicos e requests **como arquivos** — mas o **conteúdo essencial** deles (RNs, specs referenciadas) é extraído para os `.md` do pacote. Se a iniciativa tiver muitos `.md` internos, gravar/atualizar `planning/<iniciativa>/HANDOFF-MANIFEST.md` e confirmar o recorte com o PX.
 
 ## BLOCO 2 — Carimbo da entrega (o "quando/qual versão")
@@ -146,15 +206,20 @@ Segue `Skill Prompting Conventions` do `CLAUDE.md`. Estruturada pra decisões en
 **Por que importa:** a régua que o PX usa pra confirmar que o pacote está completo *antes* de fechar.
 **Verificar antes de avançar pro BLOCO 4:**
 - [ ] **`procedencia.md` presente na raiz do pacote** (ver abaixo). Sem ele o pacote não sai.
-- [ ] **Forma do protótipo decidida** (mesma stack → fonte · stack diferente → visual + anatomia). Ver "Forma do protótipo".
+- [ ] **Forma do protótipo verificada no repo do dev**, com a evidência escrita no `handoff.md` (FONTE por padrão; referência visual só com prova de ausência de shadcn/Tailwind). Ver "Forma do protótipo".
+- [ ] **Caminho do FONTE: imports reescritos pro alias do dev** — `grep -rn 'from "@/' <produto>/ proto/` no pacote = zero quando o alias do dev não é `@/`; regra de tradução registrada em `pre-requisitos.md` e `handoff.md`.
 - [ ] **Mesma stack: `proto/` com o FONTE** (`src/proto/**` + `index.css` com os tokens) presente no pacote, e o README dizendo de onde vem cada import e que não há dependência nova.
-- [ ] Referência visual navegável presente (HTML unificado single-file **ou** build em `prototipo/`) — na mesma stack ela é **complemento** do fonte, não substituta.
+- [ ] **Caminho do FONTE: `preview/<label>-proto.html` + `preview/README.md` presentes na raiz da branch, fora de `handoff-ux/`**, o README dizendo que é só referência visual e navegável, e o `handoff.md` apontando para ele. Um bundle cobre todas as telas da entrega.
+- [ ] Caminho da referência visual (legado): HTML unificado single-file **ou** build em `prototipo/`.
 - [ ] Se HTML single-file: cobre todos os estados (default/loading/empty/error/disabled/read-only/hover/foco/responsivo) e breakpoints (Mobile/Tablet/Desktop/Widescreen). Se build: idem coberto pelo próprio app.
 - [ ] UI Kit do produto presente e atualizado (tokens reais de cor, tipografia, identidade).
 - [ ] **Fronteira de propriedade registrada** no pacote (o que é do dev × o que é do PX), rotulando o material como protótipo — sem SLA, sem manutenção do PX.
 - [ ] **`anatomia-visual.md` presente** quando a entrega atravessa fronteira de tecnologia (ver abaixo). Na mesma stack, marcar **N/A — o componente é a especificação**.
 - [ ] **`mapa-de-consumo.md` presente** quando o dev usa a mesma biblioteca de componentes que nós (ver abaixo).
 - [ ] Histórias com BDD completo (feliz + vazio + erro + permissão).
+- [ ] **`personas/` presente**, com o arquivo de cada persona usada e o índice `personas.md` (origem, público representado, jornada percorrida, customização declarada, achado → CA). Nenhuma persona rodou nesta leva → a **declaração disso**, com motivo, no lugar da pasta.
+- [ ] **`flows/` presente**, com cada jornada que cobre as telas desta leva, ponteiros sanitizados e passo de tela não entregue marcado. Nenhum flow registrado → a **declaração disso**, com motivo.
+- [ ] **`tours/` presente**, com `tours.md` e, no caminho do fonte, `onboarding/`; toda âncora `data-onb` referenciada existe no `proto/`. Nenhum tour → a **declaração disso**, com motivo.
 - [ ] `regras-negocio.md` **único, na raiz do pacote**, com todas as RNs em `RN-<SIGLA>-<DOMÍNIO>-<NN>`. Índice por fluxo, se houver, cita só IDs.
 - [ ] Toda spec referenciada por uma história está incluída no pacote.
 - [ ] **Conferência de completude executada** — nenhuma decisão ou história citada ficou fora (ver abaixo).
@@ -242,11 +307,14 @@ Incluir também: **fluxo de decisão** ("está 🟢 ou 🟡? então existe, não
 
 **Fazer, nesta ordem:**
 
-1. **Sanitizar TUDO que entra no pacote** (cópias de stories, RNs extraídas, specs referenciadas). Passo não-negociável — é o que separa "pacote self-contained" de "pacote com links quebrados":
+1. **Sanitizar TUDO que entra no pacote** (cópias de stories, RNs extraídas, specs referenciadas, personas copiadas). Passo não-negociável — é o que separa "pacote self-contained" de "pacote com links quebrados":
    - **Referências mortas:** nenhum caminho para `planning/`, `src/`, `epics/`, `requests/` que não exista **dentro do pacote**. Reescrever para caminho relativo ao pacote (`../regras-negocio.md`, `../../prototipo/`, `../../ui-kit.md`, `../<spec>.md`) ou remover a linha. Verificação: `grep -r` por `planning/`, `src/proto`, `epics/` no pacote deve dar **zero**.
    - **Terminologia superada:** substituir termos que mudaram pela nomenclatura canônica atual do produto (ex.: papéis antigos → papéis atuais; rótulos de status renomeados). Verificação: `grep` pelos termos antigos = zero.
    - **Copy:** sem travessão (— / –) e sem caixa alta total.
+   - **Persona custom:** o campo `origem:` do frontmatter aponta pra `publico-alvo.md#<público>`, que não viaja no pacote. Reescrever pro público por extenso (`origem: público "auditor externo", levantado no kickoff`) — ref morta em persona quebra pelo mesmo motivo que ref morta em história.
+   - **Flow:** a seção "Telas envolvidas" e o `origem:` do frontmatter apontam pra `planning/<projeto>/stories/<slug>.md`. Reescrever pra `../<fluxo>/stories/<historia>.md`. Os ponteiros de passo (`ver BDD: <cenário> em <story>`) idem. Tela que não entrou nesta leva: **não** apague o passo, marque-o.
 2. **Referência visual:**
+   - **Caminho do FONTE →** `npm run build:standalone` no sandbox; copiar `dist-standalone/index.html` para `preview/<label>-proto.html` na raiz da branch e escrever `preview/README.md` (abre com dois cliques · referência visual e navegável · não é código para copiar). Conferir que o `App.tsx` do sandbox abre o protótipo direto em `file://` e aceita rota por hash; senão o arquivo abre numa lista de links que não funcionam.
    - HTML unificado → plantar `data-story="<ID>"` em cada elemento acionador (estático: no próprio elemento; gerado por JS: no HTML que a função geradora constrói).
    - Build → copiar o `dist/` viável (index + assets, sem registry/config) para `prototipo/`; documentar no README como servir.
 3. **Montar** o `handoff.md` (template) + o `README.md` do pacote.
@@ -255,6 +323,7 @@ Incluir também: **fluxo de decisão** ("está 🟢 ou 🟡? então existe, não
 6. Apresentar o eco final ao líder e aguardar aceite explícito.
 7. **Despachar (condicional ao repo do dev):**
    - **Sem repo do dev** → o pacote já está organizado em `handoff-ux/<label>/` na raiz do projeto; **não há push**. Mostrar a árvore final e registrar no `handoff.md` que o push fica pendente.
+   - **Repo existe, sem acesso** → seguir "Sem acesso ao repo do dev" (impedimento com dono e data no `handoff.md`; pacote inteiro e compactado se não puder esperar; nunca arquivo solto). **Não** despachar por chat.
    - **Com repo do dev** → montar `handoff-ux/<label>/` **na raiz do repo do dev**, mostrar a árvore, e push via **branch órfã** (push limpo, sem herdar histórico do boilerplate):
      ```
      git checkout --orphan ux/<label>
@@ -278,12 +347,23 @@ handoff-ux/
     ├── proto/                   # código-fonte: telas .tsx + index.css com os tokens
     ├── mapa-de-telas.md         # Tela | Rota | Arquivo | Histórias (visão geral + rastreabilidade)
     ├── pre-requisitos.md        # os 7 itens conferíveis no app do dev
-    │                            # (build compilado NÃO entra — vai publicado, link no README)
+    │                            # (build compilado NÃO entra aqui: vai em preview/, irmão de handoff-ux/)
     │
     │   # Caminho da REFERÊNCIA VISUAL (stack diferente):
     ├── prototipo/               # HTML unificado single-file OU build navegável
     │
     ├── regras-negocio.md        # ÚNICO, na raiz: todas as RNs da entrega
+    │
+    ├── personas/                # quem julgou a usabilidade desta entrega
+    │   ├── personas.md          # índice: origem, público, jornada, customização, achado → CA
+    │   └── <persona-slug>.md    # a persona no estado em que foi usada
+    │
+    ├── flows/                   # a jornada que a persona percorreu e o Playwright automatiza
+    │   └── <jornada-slug>.md    # ações de interface, ponteiros já reescritos pro pacote
+    │
+    ├── tours/                   # onboarding guiado: um tour por fluxo lógico + o global (px-tour)
+    │   ├── tours.md             # spec legível: guias, passos por tela, permissões, decisões
+    │   └── onboarding/          # caminho do FONTE: cópia de src/onboarding/ (passos, guias, hook)
     │
     └── <fluxo>/
         ├── stories/
@@ -291,7 +371,13 @@ handoff-ux/
         ├── regras-negocio.md        # OPCIONAL: só a lista de IDs usados neste fluxo
         └── <spec-referenciada>.md   # quando a história referenciar
 ```
-`handoff-ux/` sempre na raiz. Uma pasta por fluxo. Use só o bloco do caminho decidido na "Forma do protótipo" — os dois nunca coexistem no mesmo pacote.
+E, **ao lado** do pacote, no caminho do fonte:
+```
+preview/
+├── README.md                # "abre com dois cliques; é referência visual; NÃO é código para copiar"
+└── <label>-proto.html       # bundle single-file do sandbox (build:standalone), todas as telas por hash
+```
+`handoff-ux/` sempre na raiz. Uma pasta por fluxo. Use só o bloco do caminho decidido na "Forma do protótipo" — os dois nunca coexistem no mesmo pacote. O `preview/` nunca entra dentro de `handoff-ux/`.
 
 ## PORTÃO EXECUTÁVEL — o pacote não sai se um destes falhar
 
@@ -307,12 +393,29 @@ npx tsc --noEmit -p tsconfig.app.json   # typecheck do fonte entregue
 npm run lint:spacing                    # grid de 8px
 npm run lint:travessao                  # travessão em copy visível
 npm run lint:caixa-alta                 # caixa alta total
-npm run lint:camadas                    # separação UI / andaime
+npm run lint:camadas                    # separação UI / demo
 npm run lint:tipografia                 # escala de tipografia e altura de controle
 npm run build                           # build a partir de cópia limpa
 ```
 
-E, dentro da pasta do pacote, a ordem dos critérios de aceite:
+Dentro da pasta do pacote, o **portão de forma**. Ele existe porque um pacote só de HTML passou em todos os outros itens deste portão e saiu para o dev como se fosse completo:
+
+```bash
+# portão de forma — rodar dentro da pasta do pacote
+( tsx=$(find . -path ./prototipo -prune -o -name "*.tsx" -print | wc -l)
+  html=$(find ./prototipo -name "*.html" 2>/dev/null | wc -l)
+  if [ "$tsx" -eq 0 ]; then
+    grep -q "Stack do dev verificada: sem shadcn" handoff.md \
+      || { echo "✖ pacote sem fonte TSX e sem prova de ausência de shadcn no handoff.md"; exit 1; }
+  fi
+  for f in $(find ./prototipo -name "*.html" 2>/dev/null); do
+    n=$(grep -c 'class="[^"]*\(flex\|px-\|py-\|rounded-\|text-sm\)' "$f")
+    [ "$n" -gt 0 ] || echo "⚠ $f não tem classe Tailwind: é HTML vanilla, vale só como preview"
+  done
+  echo "✔ portão de forma: $tsx arquivos .tsx de fonte, $html html de preview" )
+```
+
+E a ordem dos critérios de aceite:
 
 ```bash
 # ordem dos critérios de aceite — rodar dentro da pasta do pacote
@@ -337,11 +440,11 @@ num terminal e precisa devolver código de saída sem derrubar a sessão de quem
 
 ### `lint:camadas` derruba duas coisas, não uma
 
-Ele **não é mais opt-in.** Projeto com `src/proto/` e nenhuma pasta declarando `camada: ui` no README **falha**, em vez de imprimir "nenhuma camada declarada" e sair com sucesso. Se existe andaime, a UI dele mora em algum lugar; ou está separada e não foi declarada, ou continua misturada, e nos dois casos o portão não pode passar.
+Ele **não é mais opt-in.** Projeto com `src/proto/` e nenhuma pasta declarando `camada: ui` no README **falha**, em vez de imprimir "nenhuma camada declarada" e sair com sucesso. Se existe demo, a UI dele mora em algum lugar; ou está separada e não foi declarada, ou continua misturada, e nos dois casos o portão não pode passar.
 
-Ele também **mede o tamanho dos arquivos do andaime**, porque a regra de import sozinha fica verde num projeto onde a UI nunca foi extraída: se está tudo dentro do andaime, não existe import da UI para fora e nada falha. Andaime é seletor de papel, seletor de estado, tema e semeadura de mock — 100 a 150 linhas, independente do tamanho da tela que ele hospeda. O gate reprova acima de 300. Fixtures ficam de fora: são dados puros e crescerem é esperado.
+Ele também **mede o tamanho dos arquivos da demo**, porque a regra de import sozinha fica verde num projeto onde a UI nunca foi extraída: se está tudo dentro da demo, não existe import da UI para fora e nada falha. Demo é seletor de papel, seletor de estado, tema e semeadura de mock — 100 a 150 linhas, independente do tamanho da tela que ele hospeda. O gate reprova acima de 300. Fixtures ficam de fora: são dados puros e crescerem é esperado.
 
-Se o gate acusar tamanho, a correção **não é** subir o limite. É mover a interface para a camada de UI e deixar no andaime só a demonstração.
+Se o gate acusar tamanho, a correção **não é** subir o limite. É mover a interface para a camada de UI e deixar na demo só a demonstração.
 
 ### Tabela de dependências: derivada, nunca escrita
 
@@ -374,12 +477,13 @@ Toda linha da saída precisa aparecer na tabela, com a origem (registry, boilerp
 - [ ] README.md e handoff.md batem com o conteúdo real (referência visual, RNs, specs)
 
 **Pacote**
-- [ ] **Caminho do FONTE** (stack igual): **duas pastas com instrução oposta** — `<produto>/` (a UI: copiar, não editar) e `proto/` (o andaime: descartar). Nenhum arquivo repetido entre as duas. `index.css` com os tokens aplicados vai junto
+- [ ] **Portão de forma** passou: fonte TSX presente, **ou** `Stack do dev verificada: sem shadcn` no `handoff.md` com as linhas do `package.json` coladas
+- [ ] **Caminho do FONTE** (stack igual): **duas pastas com instrução oposta** — `<produto>/` (a UI: copiar, não editar) e `proto/` (a demo: descartar). Nenhum arquivo repetido entre as duas. `index.css` com os tokens aplicados vai junto
 - [ ] **Caminho do FONTE:** `<produto>/README.md` presente, declarando `camada: ui` e explicando o que entra por parâmetro (dados, papel, estado de carga, navegação)
 - [ ] **Caminho do FONTE:** a camada de UI não tem **nenhum** import de `@/proto/*` (`npm run lint:camadas` verde)
 - [ ] **Caminho do FONTE:** conteúdo de exemplo numa fixture única em `proto/fixtures.ts`, de dados puros, e o README dizendo para semear o ambiente de teste a partir dela
 - [ ] **Caminho do FONTE:** tabela de dependências **derivada** por grep, não escrita à mão
-- [ ] **Caminho do FONTE:** nenhum build compilado como arquivo no pacote. Link do protótipo publicado no `README.md` (ou pendência registrada no `handoff.md`)
+- [ ] **Caminho do FONTE:** nenhum build compilado **dentro** de `handoff-ux/<label>/`; `preview/<label>-proto.html` e `preview/README.md` presentes na raiz da branch, e o `handoff.md` aponta para eles
 - [ ] **Caminho do FONTE:** `mapa-de-telas.md` presente (Tela / Rota / Arquivo / Histórias) e `pre-requisitos.md` com os 7 itens conferíveis
 - [ ] **Caminho do FONTE:** tabela "preservar versus reescrever" no `README.md` do pacote
 - [ ] **Caminho da REFERÊNCIA VISUAL** (stack diferente): HTML single-file **ou** build em `prototipo/`, mais `anatomia-visual.md` e `mapa-de-consumo.md`.
@@ -403,14 +507,18 @@ Toda linha da saída precisa aparecer na tabela, com a origem (registry, boilerp
 - [ ] Nenhuma **config de build**: `vite.config`, `tsconfig`, `package.json`, `.env`
 - [ ] Nenhum código de componente **fora do caminho do fonte**. No caminho do fonte, `proto/**` e `index.css` entram — é o artefato principal, não exceção. Nos dois casos, nada de `src/components/ui/**`: esses vêm do registry `@centralit`, não do pacote.
 - [ ] Nenhum artefato interno: checkpoint (`PX-PROGRESS`), prompt de continuidade, discovery/auditoria, épicos, requests, scratchpad, memória
+- [ ] Nenhum **relatório de walkthrough** (`e2e/reports/*.md`) — diário e diagnóstico são internos. O que atravessa é a **persona** e a fricção já convertida em CA, no `personas/`
 
 **O que deve entrar**
+- [ ] `personas/` com **cada persona que rodou** nos fluxos desta leva, no estado em que foi usada, mais o índice `personas.md` (origem, público representado, jornada, customização declarada, fricção → CA). Nenhuma rodou → a declaração disso com motivo. **Ausência silenciosa reprova**
+- [ ] `flows/` com **cada jornada** que cobre as telas desta leva. `grep` por `planning/` dentro de `flows/` = **zero**; passo de tela não entregue **marcado**, nunca removido. Nenhum flow → a declaração disso com motivo
+- [ ] `tours/` com `tours.md` (+ `onboarding/` no caminho do fonte). Portão: toda âncora `data-onb` dos passos existe no `proto/` (`grep`); chaves de permissão pendentes listadas em `pre-requisitos.md`. Nenhum tour → a declaração disso com motivo
 - [ ] Regras de negócio por fluxo + specs referenciadas (extraídas/sanitizadas)
 - [ ] Decisões de produto canônicas (`decisoes/*.md`) e mapa de permissões (`rbac-*.md`) quando existirem
 
 ## Eco final
 
-Antes de fechar, repita em 3–4 linhas: *"Handoff **<label>**: **N** histórias em **M** fluxos, cada fluxo com regras de negócio e specs referenciadas incluídas, referência visual = **<HTML single-file | build em prototipo/>**, UI Kit incluído, **X** fronteiras de integração. Pacote self-contained (0 referência morta). Base: **<commit> de <data>, <N> commits atrás do main, registry alcançado | ⚠️ NÃO AUDITÁVEL>**. Perguntas em aberto: `<N ou nenhuma>`. **<Push via branch órfã `ux/<label>` no repo do dev | Sem repo ainda: organizado localmente, push pendente>**. **<Repo central: rodar px-sync em seguida | Sem repo central>** — confirma?"*. Só então feche.
+Antes de fechar, repita em 3–4 linhas: *"Handoff **<label>**: **N** histórias em **M** fluxos, cada fluxo com regras de negócio e specs referenciadas incluídas, referência visual = **<HTML single-file | build em prototipo/>**, UI Kit incluído, **P** personas em `personas/`, **J** jornadas em `flows/` e **T** tours em `tours/` **<ou: nenhuma rodou nesta leva, motivo declarado>**, **X** fronteiras de integração. Pacote self-contained (0 referência morta). Base: **<commit> de <data>, <N> commits atrás do main, registry alcançado | ⚠️ NÃO AUDITÁVEL>**. Perguntas em aberto: `<N ou nenhuma>`. **<Push via branch órfã `ux/<label>` no repo do dev | Sem repo ainda: organizado localmente, push pendente>**. **<Repo central: rodar px-sync em seguida | Sem repo central>** — confirma?"*. Só então feche.
 
 ## Onde salvar
 
@@ -419,15 +527,18 @@ Antes de fechar, repita em 3–4 linhas: *"Handoff **<label>**: **N** histórias
 ## Regras
 
 - **Nada sai sem o portão executável passar.** Presença de arquivo não é verificação.
+- **Forma verificada, nunca perguntada.** O repo do dev é inspecionado (`package.json`, `components/ui`, alias, CSS de tokens) e o veredito vai com a evidência no `handoff.md`. HTML vanilla nunca é referência de implementação para dev com shadcn: é preview.
 - **Nada sai sem procedência.** Coerência interna do pacote não diz nada sobre a base em que ele foi construído — foram as duas coisas confundidas que deixaram meses de entrega divergirem em silêncio. Se a procedência não é apurável, ela é **declarada como não apurável**; o que não existe é sair sem dizer.
-- **A UI vai com instrução de copiar; o andaime com instrução de descartar.** Se o dev precisar editar um arquivo da camada de UI para rodar no projeto dele, é defeito nosso e conserta-se na origem.
+- **A UI vai com instrução de copiar; a demo com instrução de descartar.** Se o dev precisar editar um arquivo da camada de UI para rodar no projeto dele, é defeito nosso e conserta-se na origem.
 
 - **Pacote self-contained.** Nenhuma referência a caminho fora do pacote — refs mortas são reescritas para relativas ou removidas na sanitização (BLOCO 6).
+- **Critério de usabilidade viaja com quem o julgou, e com a jornada em que foi julgado.** Personas (`personas/`) e flows (`flows/`) entram no pacote como par: a persona é a régua, o flow é a travessia, e o flow é também o que o Playwright do dev automatiza. O que fica de fora é o **relatório** da rodada, não a régua nem a jornada: sem eles, o CA de usabilidade chega ao dev como preferência de quem escreveu, e é a primeira coisa que se perde numa refatoração de tela.
 - **RNs e specs referenciadas viajam junto**, extraídas do interno e sanitizadas. O request fica de fora como arquivo; seu conteúdo essencial, não.
 - **Terminologia canônica.** Termos superados são substituídos pela nomenclatura atual do produto na sanitização.
-- **Referência visual em camadas.** HTML unificado single-file com `data-story` é o alvo; o build em `prototipo/` é fallback aceitável; localhost é último recurso. Não bloqueie por não ter o single-file.
+- **Código e preview viajam juntos, em pastas irmãs, com instruções opostas.** No caminho do fonte, `handoff-ux/<label>/` se copia e `preview/<label>-proto.html` só se olha. O preview é build, não texto: custa zero token e um arquivo serve N telas. Nunca dentro do pacote, nunca sem o README que diz que não é código. No caminho de referência visual (legado), vale a escala antiga: single-file com `data-story` é o alvo, build em `prototipo/` é fallback, localhost é último recurso.
 - **Doc reconciliada.** README/handoff.md descrevem o que o pacote realmente contém.
 - **Push condicional.** Sem repo do dev, organiza localmente e o push fica pendente. Com repo, push sempre via **branch órfã** — nunca a partir do histórico do boilerplate.
+- **Falta de acesso é impedimento, não canal.** Registra com dono e data, monta o pacote igual, e se precisar sair antes do acesso, sai o pacote inteiro compactado. Protótipo solto por chat não é entrega: é o formato errado no canal errado.
 - **Não desenha tela** e **não inventa boundary.** Consolida o que `px-request`/`px-story` produziram; o que faltar vira Pergunta em aberto com dono.
 - **Nunca executa o push sem aceite explícito do PX.**
 - **`handoff-ux/` sempre na raiz.** HTML é sempre unificado — nunca separado por funcionalidade.
@@ -435,7 +546,7 @@ Antes de fechar, repita em 3–4 linhas: *"Handoff **<label>**: **N** histórias
 ## Relação com o fluxo
 
 ```
-                            ┌─→ dev (referência visual)         [pacote reduzido, branch órfã]
+                            ┌─→ dev (fonte da UI no alias do dev; visual só em legado sem shadcn)   [pacote reduzido, branch órfã]
 px-request → px-story → px-handoff ─┤
                             └─→ px-sync → repo CENTRAL do PX     [espelho completo, main fast-forward]
                             ^ você está aqui

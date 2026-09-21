@@ -21,15 +21,18 @@
 - [ ] (estado error)
 
 ## 3. Critérios de usabilidade (rubrica ux-persona)
-| Dimensão | Critério | OK? |
-|---|---|---|
-| Descoberta | | [ ] |
-| Clareza | | [ ] |
-| Feedback | | [ ] |
-| Fricção | | [ ] |
-| Sem beco sem saída | | [ ] |
-| Fidelidade (UI KIT/design) | | [ ] |
-| Autenticidade de dados | | [ ] |
+
+<!-- "Origem" = a persona que travou nesse ponto num walkthrough, ou "rubrica" se o critério veio da régua, sem rodada. É o que o px-handoff usa pra montar personas/personas.md e o que diz ao dev por quem o critério foi julgado. -->
+
+| Dimensão | Critério | Origem | OK? |
+|---|---|---|---|
+| Descoberta | | | [ ] |
+| Clareza | | | [ ] |
+| Feedback | | | [ ] |
+| Fricção | | | [ ] |
+| Sem beco sem saída | | | [ ] |
+| Fidelidade (UI KIT/design) | | | [ ] |
+| Autenticidade de dados | | | [ ] |
 
 ## 4. BDD — cenários (Gherkin, pt-BR)
 ```gherkin
@@ -58,6 +61,7 @@ Funcionalidade: <nome>
 - **Público-alvo:** `planning/<projeto>/publico-alvo.md#<público>`
 - **UI KIT:** `planning/<projeto>/ui-kit.md`
 - **Flow de validação (ux-persona):** `e2e/flows/<id>.md`
+- **Personas que percorreram:** `<slug>` (`e2e/personas/<slug>.md` se custom) · relatório em `e2e/reports/<flow>__<slug>.md` · **ou** "nenhuma ainda"
 
 ## Definition of Ready (trava)
 - [ ] Narrativa ancorada num público real

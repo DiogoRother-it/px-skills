@@ -1,2 +1,10 @@
 node_modules/
 .DS_Store
+
+# Artefatos do próprio instalador rodando neste repo (ele se instala em si mesmo
+# para dogfooding). A FONTE é assets/ e skills/; o que está abaixo é cópia gerada.
+# Se algum dia o repo precisar de um CLAUDE.md próprio, use `git add -f`.
+.claude/
+CLAUDE.md
+docs/px-protocol.md
+docs/design-system/

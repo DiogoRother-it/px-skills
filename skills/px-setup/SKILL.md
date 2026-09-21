@@ -78,6 +78,23 @@ Se o `components.json` não tiver o bloco `registries`, o procedimento completo 
 
 **Pré-requisitos, os dois:** acesso de leitura ao repo privado `centralit-boilerplate` (login normal do GitHub, para o `git clone`) **e** o `CENTRALIT_TOKEN` no ambiente (para o registry). Confirme os dois; um sem o outro não sustenta a cadeia.
 
+## Passo 2c — Acesso ao repo do dev (verificar agora, não no dia da entrega)
+
+**Por que aqui:** o sandbox é o começo; o destino é o repo do dev. Descobrir no dia do handoff que o PX não escreve lá transforma um ticket de acesso em improviso, e o improviso que as pessoas encontram é mandar o protótipo por chat. Aconteceu em 2026-09-21: entrega por chat, sem versão e sem procedência, com um HTML de 4,7 MB no lugar do fonte.
+
+**Perguntar e verificar:**
+
+1. **Qual é o repo do dev deste produto?** Se ainda não existe, anote "sem repo ainda" e siga: a `px-handoff` trata esse caso.
+2. **O PX alcança esse repo?** Teste de leitura, sem clonar nada pesado:
+   ```bash
+   git ls-remote --heads <url-do-repo-do-dev>
+   ```
+   - Respondeu com as branches → acesso de leitura ok. Anote a URL no `PX-PROGRESS`.
+   - Pediu login, deu 403 ou 404 → **não há acesso**. Este é o momento de pedir, não o dia da entrega.
+3. **Escrita também?** Leitura não implica push. Confirme com quem administra o repo que o PX pode criar branch (`ux/*`). Sem isso, o handoff nasce com o despacho travado.
+
+**Se faltar acesso:** registre no `PX-PROGRESS` como pendência com **dono** (quem concede) e **data do pedido**, e avise o líder que a entrega vai depender disso. Não é bloqueio para começar a idealizar; é bloqueio para despachar. ⛔ E não é motivo para mandar protótipo por chat: ver "Sem acesso ao repo do dev" na `px-handoff`.
+
 ## Eco final
 
 Antes de executar, repita em 2–3 linhas: *"Então: projeto **X**, vou montar o sandbox em **Z** — confirma?"*. Só então rode os comandos.
@@ -89,6 +106,7 @@ Antes de executar, repita em 2–3 linhas: *"Então: projeto **X**, vou montar o
 - **Nunca `git` na mão pro UX.** A skill executa; o UX só confirma.
 - **Sandbox é o ateliê, não o produto.** Depois de entregue e mergeado, pode ser apagado.
 - **Dois acessos, não um.** O `git clone` usa o login normal do GitHub; o registry `@centralit` exige `CENTRALIT_TOKEN`. Confirmar os dois no Passo 2b — ter um só é o estado que produz entrega errada em silêncio.
+- **Três acessos, contando o destino.** O repo do dev se verifica no Passo 2c, no começo do projeto. Acesso descoberto como faltante no dia da entrega vira improviso, e o improviso é entregar por chat.
 - **Procedência preservada.** ⛔ Nunca `rm -rf .git` no sandbox. Remote renomeado com push desabilitado; é o que permite ao `px-proto` medir a idade da base.
 - **Falhar fechado.** Acesso ausente **bloqueia** o setup. Nunca cair no shadcn público como alternativa.
 

@@ -20,6 +20,52 @@
 
 ---
 
+## Hierarquia de fontes por tipo de pergunta
+
+> **Esta seção é a regra, não uma convenção.** Ela existe porque uma cadeia inteira de
+> especificação, protótipo e revisão deixou passar seis divergências do design system em
+> componentes que estavam **dentro** do catálogo. A causa medida: quem construía consultava
+> só este documento, e este documento não é a fonte mais completa nem a mais atual para
+> **anatomia**.
+
+| A pergunta é sobre | A fonte é | Por quê |
+|---|---|---|
+| **Anatomia** — quais partes o componente tem, quais props aceita, o que já vem pronto | o `.tsx` em `src/components/ui/` | É o mais completo e o mais atual. Os componentes desta biblioteca são comentados decisão por decisão, e essas decisões não estão em lugar nenhum além do arquivo |
+| **Comportamento e regra de uso** — quando usar, qual variação, o que é proibido | este documento | É onde o "quando usar / não usar" e as árvores de decisão vivem |
+| **Valor de cor** | `src/index.css` | O CSS real prevalece sobre a doc para valor visual |
+| **Exemplo de composição** | `src/showcase/` | **Auditável, nunca verdade.** Ver a regra abaixo |
+
+**O showcase é auditável, nunca verdade.** Ao copiar dele, confira contra a spec deste
+documento e contra o `.tsx`. Se divergir, **a spec ganha** e a divergência do showcase vira
+débito registrado. Isto não é desconfiança gratuita: o `showcase/Dados.tsx` chegou a ter
+duas paginações que divergiam desta spec e uma da outra, e é o arquivo que todo projeto novo
+copia.
+
+### Sem entrada neste documento, o componente É a spec
+
+**17 dos 53 componentes da biblioteca não têm entrada própria aqui** (23, se a conta for
+"entrada com o próprio nome", sem contar as famílias). Para todos eles vale a regra
+explícita, e não a suposição de que "não está documentado, então posso fazer como quiser":
+
+> Componente sem entrada neste documento → **o `.tsx` dele é a spec**. Anatomia, props,
+> defaults e decisões saem do arquivo e dos comentários dele. Divergir do arquivo é a mesma
+> coisa que divergir de uma spec escrita, e precisa ser declarado como divergência.
+
+Os que hoje não têm entrada própria:
+
+`accordion` · `alert-dialog` · `badge` · `collapsible` · `command` · `dropdown-menu` ·
+`field` · `internal-control` · `label` · `multi-select` · `navigation-menu` ·
+`password-input` · `responsive-dialog` · `separator` · `toggle` · `toggle-group` ·
+`unsaved-guard`
+
+⚠️ **Dois pares desta lista são armadilha de escolha, e já produziram defeito:**
+`accordion` × `collapsible` (os dois abrem e fecham conteúdo; o `accordion` é o item de
+lista com anatomia de linha de tabela, o `collapsible` é o primitivo cru) e
+`multi-select` × `combobox` (os dois abrem lista com busca; um é múltipla escolha, o outro
+é escolha única). Antes de escolher entre eles, abra os dois arquivos.
+
+---
+
 ## Mapeamento shadcn/ui
 
 Antes de implementar qualquer componente abaixo, checar esta tabela. "Direto" significa que o shadcn resolve pronto via CLI. "Composição" significa montar com mais de uma primitiva shadcn/Radix — documentar a composição no próprio arquivo do componente quando isso acontecer. "Sem equivalente" significa que não existe solução shadcn/Radix, nem por composição — precisa de biblioteca externa ou construção própria.
@@ -759,7 +805,22 @@ Controla a navegação entre páginas de uma listagem.
 
 **Regras:** indicar sempre a página atual; mostrar quantidade total quando possível.
 
-**Implementação:** `shadcn add pagination` ("Direto"; usa `buttonVariants`). Gotcha corrigida: a variante da página ativa vinha como `outline` (inexistente no nosso Button) → trocada por `secondary`; padding `px-2.5` do prev/next ajustado pro grid (`px-4`). Página ativa = `isActive` no `PaginationLink`. Decisões do projeto: **textos e aria-labels em português** ("Anterior"/"Próximo"/"Mais páginas"/"paginação"); **borda `gray-100`** em volta dos controles (no `PaginationContent`). Variação **com seletor de itens por página** (10/25/50/100, default 10) = composição com o `Select` + texto "Mostrando X–Y de Z" (ver App). Default de exibição: 10 por página.
+**Regras não-negociáveis (as três que a cadeia já errou):**
+
+1. **Elipse obrigatória** quando a janela de páginas não cabe. Nunca listar todas as páginas: com 40 páginas o rodapé vira uma régua de 40 botões. Usar o `PaginationEllipsis`, que existe e é exportado.
+2. **Contagem em texto**, na forma **"Mostrando 1 a 10 de 124 resultados"**. ⚠️ **Sem travessão:** a forma "Mostrando X-Y de Z", que esta spec pedia antes com **en dash**, viola a regra dura de copy do próprio design system. Escrever "a".
+3. **Seletor de itens por página é um controle**, um `Select` de verdade (10/25/50/100, default 10). Texto fixo dizendo "10 resultados por página" **não** é o seletor: é a aparência dele sem a função.
+
+**Anatomia por variant da tabela que o rodapé acompanha:**
+
+| Variant da `Table` | Rodapé | Borda interna do `PaginationContent` |
+|---|---|---|
+| `spaced` (default) | Card compacto `w-fit`, com a anatomia de uma linha da tabela | **Sai.** O card já é a moldura; mantê-la produz moldura dupla e engorda o rodapé de 58px para 68px |
+| `divided` | Faixa `border-t` de largura cheia, contagem à esquerda e controles à direita | **Fica.** Não há moldura externa |
+
+**Implementação:** `shadcn add pagination` ("Direto"; usa `buttonVariants`). Gotcha corrigida: a variante da página ativa vinha como `outline` (inexistente no nosso Button) → trocada por `secondary`; padding `px-2.5` do prev/next ajustado pro grid (`px-4`). Página ativa = `isActive` no `PaginationLink`. Decisões do projeto: **textos e aria-labels em português** ("Anterior"/"Próximo"/"Mais páginas"/"paginação"); **borda `gray-100`** em volta dos controles (no `PaginationContent`).
+
+⛔ **Não compor o rodapé de tabela à mão.** O `pagination.tsx` exporta **`TablePagination`**, que já entrega contagem, seletor de itens por página, elipse e a anatomia certa por variant. As props têm exatamente os nomes que o `useTablePagination` devolve, então o ponto de uso é `<TablePagination {...pg} onPageChange={pg.setPage} onPageSizeChange={pg.setPageSize} variant="divided" itemLabel="tickets" />`. As três regras acima eram cumpridas de forma diferente em cada cópia enquanto a composição era manual; agora não sobra o que divergir.
 
 ---
 
@@ -776,6 +837,46 @@ Indica o progresso em fluxos com múltiplas etapas lineares.
 **Estados:** Não iniciado / Em andamento / Concluído / Erro / Desabilitado
 
 **Regras:** o usuário deve poder ver todas as etapas e entender sua posição. Não ocultar etapas futuras.
+
+---
+
+### Onboarding Guiado
+
+**Descrição**
+Motor de onboarding white label em quatro superfícies que formam um fluxo único: gatilho (bússola ao lado do título da seção), modal de boas vindas, tour ancorado em elementos reais da tela e pesquisa de satisfação ao concluir. Substitui o Tour Guiado (`tour`, descontinuado em 0.4.0).
+
+**Quando usar:** onboarding de novo usuário numa tela de operação (lista, formulário, painel), apresentar uma jornada que atravessa telas, ensinar uma ação (abrir menu, painel, aba) mostrando onde clicar.
+**Não usar:** dica pontual num único elemento (usar Tooltip), fluxo de poucos passos dentro de um formulário (usar Stepper), tela de consulta pura (não pede guia).
+
+**Regra da porta única:** nem o disparo automático nem o gatilho manual levam direto ao passo a passo. Os dois abrem o modal, e só "Iniciar Tour Guiado" começa a sequência. O guia é marcado como visto no instante em que o modal aparece: quem fecha sem fazer nada não é abordado de novo automaticamente; o chamariz do gatilho continua convidando até o primeiro clique consciente.
+
+**Variações (superfícies):**
+- `Onboarding.Ajuda`: Button ícone (Compass) + Tooltip. Pulsa com anel enquanto o usuário não engajou.
+- `Onboarding.Intro` + `Onboarding.Intro.Topicos`: Dialog com prosa, lista de tópicos e três saídas (iniciar, suporte, agora não).
+- `Onboarding` (executor): recorte no overlay, radar (passo explicativo) ou anel (passo de ação), cartão em **balão** (janela com 700px ou mais de altura, ao lado do alvo, clampado à janela com 12px de folga) ou em **faixa** (abaixo de 700px, presa à borda com mais folga; alvo estreito e alto vira trilho e a faixa recua). Também renderiza a pesquisa.
+- Pesquisa de satisfação: Dialog com escala de 5 pontos (`aria-pressed`, ícones Lucide com rótulo textual), comentário opcional, agradecimento por 1600ms.
+
+**Estados:** inativo (gatilho com ou sem chamariz) / intro / passo explicativo (Voltar a partir do 2º; Finalizar no último) / passo de ação (sem Próximo, selo "Clique no destaque", anel, interação presa ao alvo mais o cartão) / com dica / aguardando alvo (`aguardarAlvo`: recorte segue o alvo, cartão espera 3 quadros estáveis, teto 1500ms) / alvo não encontrado (cartão centralizado com aviso, Próximo e Pular disponíveis) / faixa / csat (vazio, nota selecionada, enviado, dispensado) / reduced-motion (tudo estático).
+
+**Vocabulário do passo** (`PassoOnboarding`): `target` (seletor, convenção `[data-onb="nome"]`), `title`, `content`, `placement` (`top|bottom|left|right|auto`), `spotlightClicks`, e em `data`: `acao`, `aguardarAlvo`, `avancarQuandoAparecer`, `rolar`, `dica`. Qualquer outra chave é livre para `aoEntrarPasso` dirigir a tela (fechar painel, trocar aba).
+
+**Regras de autoria de guia:**
+- Nunca ancore em elemento mais alto que a janela. Ancore no cabeçalho da seção ou no elemento interno que a copy explica.
+- Ancore no invólucro visível, não no controle nativo. Componentes compostos (Input com ícone ou afixo, Select, Combobox) repassam `data-*` ao elemento interno, e o recorte abraçaria só ele, sem ícone e borda. Envolva o componente num `<div data-onb="...">` do tamanho do controle.
+- Rolar é decisão do guia inteiro: se um passo tem `rolar`, todos os ancorados na página têm. Flutuante e gaveta ficam de fora.
+- Passo de ação perto da borda de baixo precisa de `placement` explícito.
+- Alvo condicional não vira passo: o que ele ensinaria entra no passo do campo que decide se ele aparece.
+- Monte os passos condicionalmente; array vazio é a forma correta de dizer "nada a ensinar" (desliga auto disparo e chamariz).
+- Tela de escrita não pede cliques que deixem alteração pendente. Passo final que dispara ação descreve, não pede o clique.
+- O guia pode atravessar uma gaveta; nesse caso segure o fechamento dela enquanto `controle.ativo`. Ao concluir, devolva a tela ao estado em que o guia a encontrou.
+- Jornada entre telas: `marcarContinuacaoOnboarding` na origem, `consumirContinuacaoOnboarding` no destino com `emCurso: true`. O total da jornada é declarado desde o passo 1.
+- As três pontas (`useOnboarding`, `Onboarding.Intro`, `Onboarding`) precisam estar na árvore. Depois de um merge, varra os usos de `useOnboarding(` e confirme.
+
+**Personalização pelo UI Kit:** cor, forma, tamanho, tipografia e movimento saem de variáveis `--onb-*` (`--onb-cor`, `--onb-superficie`, `--onb-raio`, `--onb-largura`, `--onb-largura-compacta`, `--onb-fonte`, `--onb-duracao-transicao`, `--onb-duracao-moldura`, `--onb-duracao-pulso`, entre outras) com default derivado dos tokens do projeto. Redeclarar no `index.css` do produto prevalece. Textos por `textos` no hook. Empilhamento: overlay e recorte em `z-index: 100`, radar, anel e cartão em 101; gavetas e modais do aplicativo (z-50) ficam abaixo.
+
+**Implementação:** sem componente no shadcn; composição própria em `src/components/ui/onboarding/` sobre Button, Card, Dialog, Textarea e Tooltip, sem `react-joyride`. `use-onboarding.ts` (máquina de estados), `geometria.ts` (funções puras, testadas), `use-alvo.ts` (medição por quadro, espera de alvo, observação de surgimento), `use-interacao-presa.ts`, `rolagem.ts` (movimento mínimo no container certo, desconto do sticky), `persistencia.ts` (adapter localStorage, dois métodos obrigatórios), `continuacao.ts` (sessionStorage), `onboarding.css` (variáveis, moldura cônica com `@property`, radar, anel, chamariz, reduced-motion). Superfície de QA no cartão: `data-onboarding-alvo`, `data-onboarding-acao`, `data-onboarding-passo` e o contador em `[data-slot=onboarding-contador]`. Precisa de `TooltipProvider` na árvore.
+
+> **Tour Guiado (`tour`) foi descontinuado na 0.4.0 do boilerplate** e substituído pelo Onboarding Guiado acima. Migração: `steps {path, anchor, title, description}` → `passos {target, title, content}` com `target` = `[data-onb="x"]`; `storageKey` → `id` (+ `versao`); `TourTrigger` → `Onboarding.Ajuda`; `TourOverlay` → `Onboarding.Intro` + `Onboarding`; passo em outra página → `marcarContinuacaoOnboarding` na origem e `jornada: { ...consumirContinuacaoOnboarding(id), emCurso: true }` no destino. Não use `tour` em tela nova.
 
 ---
 

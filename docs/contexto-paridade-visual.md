@@ -38,7 +38,7 @@ Isto é o que mais se erra nesta iniciativa, e foi o motivo de este documento ex
 
 A divergência visual entre protótipo aprovado e tela implementada **não vinha de desatenção do dev.** Vinha do formato da entrega.
 
-A esteira mandava escrever a tela num arquivo só, com o andaime de demonstração (seletor de papel, seletor de estado, tema, mock) costurado dentro da interface. Para extrair a UI, o dev era obrigado a **editar**. Quem edita reescreve. Cada reescrita muda um espaçamento, uma variante, uma ordem.
+A esteira mandava escrever a tela num arquivo só, com a demo de demonstração (seletor de papel, seletor de estado, tema, mock) costurado dentro da interface. Para extrair a UI, o dev era obrigado a **editar**. Quem edita reescreve. Cada reescrita muda um espaçamento, uma variante, uma ordem.
 
 Medido numa peça real, um card de produto: **18 decisões visuais que o design system não dita.** Uma delas um `text-[11px]`, fora da escala. Um dev seguindo o DS corretamente escreveria `text-xs` (12px), estaria certo, e a tela sairia diferente. Multiplicado pelas peças de um pacote, são centenas de decisões reproduzidas de olho.
 
@@ -48,7 +48,7 @@ O segundo problema, do mesmo tamanho: **o gate de saída do handoff conferia pre
 
 **centralit-boilerplate, PR #4, mergeado.** Publica `@centralit/tour`; corrige o bug do `navbar` (a prop `tooltip` no hambúrguer quebra sem `TooltipProvider`, e todo projeto novo herdava); sobe `check-camadas.mjs` e `check-tipografia.mjs`; escreve a regra das duas pastas no `CLAUDE.md`.
 
-**px-skills 1.10.0, PR #3, mergeado.** `px-proto` passa a construir em duas pastas (Passo 5 reescrito, com template de UI, contrato, fixture e andaime). `px-handoff` ganha a seção PORTÃO EXECUTÁVEL.
+**px-skills 1.10.0, PR #3, mergeado.** `px-proto` passa a construir em duas pastas (Passo 5 reescrito, com template de UI, contrato, fixture e demo). `px-handoff` ganha a seção PORTÃO EXECUTÁVEL.
 
 **px-skills 1.11.0, PR #4, mergeado.** Ordem das histórias e rastreabilidade história para código: o `mapa-de-telas.md` passa a carregar ordem e ID estável, inventário de peças obrigatório, e `px-story` ganha as regras de numeração.
 
@@ -79,12 +79,12 @@ Motivo: projeto que não usa Playwright receberia arquivo que não roda, e arqui
 Eram duas conhecidas, e uma terceira apareceu ao mexer. Todas do mesmo tipo, que é o mais perigoso: **portão que fica verde sem ter verificado nada.**
 
 **`lint:camadas` era opt-in.** Ele só rodava se o projeto declarasse `camada: ui` no README da pasta de UI. Sem isso, imprimia "nenhuma camada declarada" e **saía com sucesso** — o mesmo defeito do `tsc` sem `-p` que esta iniciativa existe para combater.
-*Corrigido:* falha quando existe `src/proto/` com arquivos `.tsx` e nenhuma camada declarada. Se existe andaime, tem que existir camada.
-*Provado contra erro plantado:* `✖ check-camadas: existem 1 arquivo(s) de tela em src/proto/ e nenhuma camada de UI declarada`, exit 1. Projeto legítimo sem andaime continua exit 0.
+*Corrigido:* falha quando existe `src/proto/` com arquivos `.tsx` e nenhuma camada declarada. Se existe demo, tem que existir camada.
+*Provado contra erro plantado:* `✖ check-camadas: existem 1 arquivo(s) de tela em src/proto/ e nenhuma camada de UI declarada`, exit 1. Projeto legítimo sem demo continua exit 0.
 
 **O gate não detectava projeto ainda misturado.** Se a UI nunca foi extraída, não existe import da UI para fora, e a regra de import fica verde num projeto totalmente misturado.
-*Corrigido:* mede o tamanho dos arquivos do andaime. Limite 300 linhas, que é o dobro do topo da faixa documentada (100 a 150) — folga para variação sem deixar passar o caso real de 800 linhas. **Fixtures ficam fora da regra:** são dados puros e crescerem é esperado; acusar fixture seria falso positivo, e gate com falso positivo o time aprende a ignorar.
-*Provado contra erro plantado:* andaime de 802 linhas → `✖ 1 arquivo(s) de andaime grande(s) demais (limite: 300 linhas)`, exit 1, com fixture de 900 linhas no mesmo diretório **não** acusada.
+*Corrigido:* mede o tamanho dos arquivos da demo. Limite 300 linhas, que é o dobro do topo da faixa documentada (100 a 150) — folga para variação sem deixar passar o caso real de 800 linhas. **Fixtures ficam fora da regra:** são dados puros e crescerem é esperado; acusar fixture seria falso positivo, e gate com falso positivo o time aprende a ignorar.
+*Provado contra erro plantado:* demo de 802 linhas → `✖ 1 arquivo(s) de demo grande(s) demais (limite: 300 linhas)`, exit 1, com fixture de 900 linhas no mesmo diretório **não** acusada.
 
 **O comando de ordem dos CA estava publicado quebrado** (descoberto em 25/08). A `px-handoff` 1.11.0 anunciou o comando no portão executável; ele foi gravado por heredoc não citado, o shell expandiu o `'^$'` do `grep -v`, e o bloco saiu cortado no meio da terceira linha. Cerca de código aberta, 95 linhas do arquivo duplicadas. Colar no terminal dava erro de sintaxe.
 *Corrigido na px-skills 1.11.1:* bloco restaurado, duplicata removida (495 → 393 linhas), e o comando agora **devolve código de saída** — a versão original só imprimia `FORA DE ORDEM:` e terminava em 0, ou seja, mesmo inteiro era um gate que não podia falhar.
@@ -120,7 +120,7 @@ A separação em duas pastas é a pré-condição disso. Implica decidir quem ma
 
 **Nosso, sem dono:** o drift entre projeto e design system. Projetos ficam arquivos atrás sem nada avisar. Exige skill própria ou ligar o `DesignSync`.
 
-**Projetos não migrados:** dois apps React no boilerplate continuam com UI e andaime misturados, e um deles não usa a pasta `proto/`, então o gate nem ativa lá. Precisa de decisão de convenção antes da migração. Outros dois projetos entregam HTML standalone e não têm caminho de paridade nenhum.
+**Projetos não migrados:** dois apps React no boilerplate continuam com UI e demo misturada, e um deles não usa a pasta `proto/`, então o gate nem ativa lá. Precisa de decisão de convenção antes da migração. Outros dois projetos entregam HTML standalone e não têm caminho de paridade nenhum.
 
 ## 10. Armadilhas técnicas já pagas (não reintroduza)
 

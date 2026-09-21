@@ -38,7 +38,7 @@ Cada um em `templates/persona-<slug>.md`, com contexto de uso, familiaridade, pa
 |---|---|
 | `novice` | Leigo no assunto e em sistemas; lê tudo, não infere ícone sem rótulo, desiste só depois de tentar de novo com calma. |
 | `rushed` | Pressa real, pula texto, quer o caminho mais curto, desiste rápido se não achar de cara. |
-| `skeptical` | Desconfia de cada ação, relê antes de confirmar, quer certeza antes de qualquer coisa que pareça irreversível. |
+| `skeptical` | Desconfia de cada ação, relê antes de confirmar, quer certeza antes de qualquer coisa que pareça irreversível. Questiona também **por que cada dado pessoal está sendo pedido** e quem vai enxergar o que ele preencheu. |
 | `mobile` | Uma mão, tela pequena, sinal instável; se irrita com alvo de toque pequeno e com texto cortado. |
 | `accessibility` | Presta atenção em contraste, foco visível, ordem de leitura e tamanho de alvo — sinaliza o que um leitor de tela/teclado teria dificuldade. |
 | `power-user` | Já conhece o produto, quer atalho e densidade, se incomoda com passo redundante ou confirmação repetida. |
@@ -86,6 +86,8 @@ e2e/reports/<flow-slug>__<persona-slug>.md
 - **Achado pequeno, localizado numa tela** → `px-change`.
 - **Achado que exige repensar a tela** → `px-request` (nova spec da tela).
 - **Vários achados espalhados, produto inteiro** → alimenta o backlog do `px-epic` ou do `px-audit` (Bloco 5/6), se estiver dentro de uma auditoria.
+
+**E a persona em si vai pro dev.** No fechamento, o `px-handoff` copia pra `personas/` do pacote **cada persona que rodou** nos fluxos entregues, no estado em que foi usada, com a customização de contexto declarada. O relatório fica interno; a persona atravessa. Motivo: os critérios de usabilidade dos CA nasceram dessas rodadas, e critério sem a régua que o gerou é a primeira coisa que se perde quando alguém "simplifica" a tela na implementação. Se você ajustou uma persona bundled ao contexto do projeto, **salve o ajuste em `e2e/personas/<slug>.md`** em vez de mantê-lo só no prompt da Fase 1 — o que não está em arquivo não chega no handoff.
 
 ## Quando NÃO usar
 
