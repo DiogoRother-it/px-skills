@@ -1,6 +1,6 @@
 ---
 name: px-request
-description: Entrevista de UI à prova de balas. Transforma um pedido cru ("quero uma tabela") numa especificação tão completa que qualquer pessoa — mesmo sem ser UX — consegue tocar o handoff sem deixar buraco. Interroga UMA coisa de cada vez, explica por que cada resposta importa, dá exemplo e default recomendado, ancora na biblioteca do design system, e devolve em eco o que entendeu. Use sempre que o líder pedir uma tela, componente, fluxo ou estado — ex: "quero montar uma tabela", "preciso de um formulário", "monta a tela de listagem".
+description: Entrevista de UI à prova de balas. Transforma um pedido cru ("quero uma tabela") numa especificação tão completa que qualquer pessoa — mesmo sem ser UX — consegue tocar o handoff sem deixar buraco. Interroga UMA coisa de cada vez, explica por que cada resposta importa, dá exemplo e default recomendado, ancora na biblioteca do design system, e devolve em eco o que entendeu. Use sempre que o líder pedir uma tela, componente, fluxo ou estado — ex: "quero montar uma tabela", "preciso de um formulário", "monta a tela de listagem". É também a porta única de mudança de UI: a triagem do início manda ajuste localizado em tela que já existe para a `px-change`, sem rodar a entrevista completa.
 compatibility: claude-code
 metadata:
   audience: px-ux
@@ -41,6 +41,30 @@ Conduza em pt-BR. O projeto já deve ter passado pelo `px-kickoff` (públicos-al
 ## Prompting
 
 Segue `Skill Prompting Conventions` do `CLAUDE.md`. Estruturada para decisões enumeráveis; livre para objetivo/copy/nomes.
+
+---
+
+## Passo 0 — Triagem (antes do Bloco 1)
+
+**Decidir:** se o pedido é para esta entrevista ou para a `px-change`.
+**Por que importa:** esta é a porta única de mudança de UI. Ajuste pequeno que passa pelos 12 blocos gasta uma entrevista inteira (e o dobro do contexto) em algo que cabe em 5; tela nova que passa pela `px-change` chega ao dev sem público, dados, regras nem responsividade.
+
+**Fazer:** antes de perguntar qualquer coisa do Bloco 1, classifique o pedido pelo `$ARGUMENTS` e pelo código. Se o próprio pedido já deixa claro, não pergunte: ecoe a classificação e siga. Se não deixa, use `AskUserQuestion`:
+
+| Pergunta | Opções |
+|---|---|
+| "Isto muda uma tela que já existe, ou cria uma tela?" | Ajuste em tela que já existe · Tela ou componente novo · Várias telas ou um fluxo · Refazer uma tela inteira |
+
+| Resposta | Caminho |
+|---|---|
+| **Ajuste em tela que já existe** (campo novo, label, ícone, paginação, botão de copiar, um estado que faltava, copy, modal pequeno dentro da tela) | **Pare aqui e invoque a `px-change`** com o pedido em `$ARGUMENTS`. Não conduza os blocos abaixo |
+| **Tela ou componente novo** | Siga para o Bloco 1 |
+| **Várias telas ou um fluxo** | `px-epic` primeiro (ver "Escopo" acima) |
+| **Refazer uma tela inteira** | `px-audit` para diagnosticar o AS-IS, depois volte para cá |
+
+**Critério quando houver dúvida:** se a tela, a rota e o propósito continuam os mesmos, é ajuste. Se nasce uma rota, um fluxo ou um propósito novo, é tela nova.
+
+**Chegando da `px-change`** (o ajuste cresceu): não recomece. Os blocos dela viram o início desta entrevista, já respondidos: Propósito e escopo → **B1**, Estados impactados → **B7** (parcial: complete os estados que ela não tocou), Ancoragem no DS → **B6**, Copy → **B8**. Ecoe o que foi herdado e siga a partir do **B2**, marcando nos blocos herdados só o que faltar.
 
 ---
 

@@ -3,6 +3,18 @@
 Todas as versões instaláveis via `npx github:DiogoRother-it/px-skills` / `npx @centralit/px-skills`.
 O instalador imprime só a versão mais recente no terminal — o histórico completo vive aqui.
 
+## 1.21.0 — 2026-10-06
+
+**Ajuste pequeno entrava pela entrevista inteira.** A `px-request` apontava a `px-change` para ajuste localizado, mas não fazia a triagem: quem abria a `px-request` para trocar um label passava pelos 12 blocos. E quando um ajuste da `px-change` crescia, a `px-request` recomeçava do zero.
+
+- **`px-request` — Passo 0, triagem.** Antes do Bloco 1, o pedido é classificado em ajuste em tela que já existe (vai para a `px-change`, sem conduzir os blocos), tela ou componente novo (segue a entrevista), várias telas ou fluxo (`px-epic`) ou tela refeita inteira (`px-audit`). Critério de dúvida: se a tela, a rota e o propósito continuam os mesmos, é ajuste. A description passa a dizer que ela é a porta única de mudança de UI.
+- **`px-request` herda da `px-change`.** Quando o ajuste cresce, os blocos da `px-change` viram B1 (propósito e escopo), B7 (estados, parcial), B6 (ancoragem no DS) e B8 (copy), e a entrevista segue do B2.
+- **`px-change`** passa a levar o que já foi respondido ao encaminhar para a `px-request`.
+
+**O protótipo era aprovado sem ninguém usar a tela.** O Passo 7 da `px-proto` só conferia console, switcher e tokens. O `agile-proto` do time de dev já cobria a interação; trazido para cá.
+
+- **`px-proto` — Passo 7a, validação de interação**, estado por estado e com o pane do navegador visível: cada ação clicada, inputs, teclado (Tab, foco, Enter, Espaço, Escape), clique fora, overlays sem recorte, viewport estreito e largo com um dono de scroll, conteúdo longo, alturas padrão dos controles, console e copy contra comportamento. O Passo 9 só aprova com o 7a marcado.
+
 ## 1.20.0 — 2026-09-21
 
 **A entrega chegava ao dev como HTML vanilla, e a cadeia autorizava isso.** Em call com o time de dev do SmartCity (Robson Bezerra, Dener Almeida), o arquiteto mostrou o que recebia: `secretarias_cidadao.html` com 3.407 linhas, zero classe Tailwind, zero componente; CIT Contracts, 34.126 linhas. O `handoff.md` da semana-37 declarava "stack diferente → referência visual". Verificado na `main` do `smart-gov-next` no mesmo dia: React 19, Tailwind v4, `radix-ui`, 57 componentes shadcn em `packages/shared`, `button.tsx` idêntico ao nosso fora o alias. **A stack era a mesma.** A LLM do dev reinterpretava o HTML inteiro e cada dev saía com um resultado.

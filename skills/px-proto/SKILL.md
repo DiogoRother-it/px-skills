@@ -467,7 +467,26 @@ Informe: *"Proto disponível em `localhost:PORT/proto/<slug>` — abrindo no nav
 
 Abra o localhost. Confirme: renderizou sem erro no console? Switcher funciona? Tokens aplicados?
 
-*"Proto da tela [X] aberto — [N] estados no switcher. Revise e me diga o que ajustar."*
+### 7a — Validação de interação (obrigatória, estado por estado)
+
+**Por que importa:** screenshot e "renderizou" não provam que a tela funciona. Botão inerte, overlay que não fecha, menu cortado e foco perdido só aparecem quando alguém usa a tela. Se o PX não exercitar, quem descobre é o dev, o PO ou o usuário.
+
+Com o pane do navegador **visível** (oculto, as animações não terminam), exercite cada estado do switcher e marque:
+
+- [ ] Cada ação primária e secundária foi clicada e produz um resultado visível (nenhum botão inerte)
+- [ ] Inputs e selects editados, com o estado refletido na tela
+- [ ] Teclado: ordem do Tab, foco visível, Enter e Espaço acionam, Escape fecha overlays
+- [ ] Clique fora fecha menus, popovers e drawers que devem fechar
+- [ ] Dropdown e popover não são cortados pela borda da tela nem pelo container
+- [ ] Viewport estreito (≈375px) e largo: sem scroll horizontal, e cada região tem um único dono de scroll
+- [ ] Conteúdo longo (nome extenso, lista grande) quebra ou rola dentro do próprio container, sem vazar
+- [ ] Alturas padrão de input, select e button preservadas
+- [ ] Console sem erro nem módulo que falhou ao carregar
+- [ ] A copy bate com o comportamento: o que o botão diz é o que ele faz, e a mensagem de estado descreve o que aconteceu
+
+Falhou um item → corrija antes de apresentar. Item que não se aplica à tela → marque N/A com o motivo.
+
+*"Proto da tela [X] aberto — [N] estados no switcher, interação validada em todos. Revise e me diga o que ajustar."*
 
 ---
 
@@ -517,6 +536,7 @@ Cada ajuste é aplicado direto, sem perguntar. O PX vê e manda mais ou aprova.
 Quando aprovado:
 
 0. ⛔ **A tela existe como `.tsx` em `src/<produto>/`, com imports de `@/components/ui/`?** Tela que existe só como `.html` (vanilla ou CDN), ou só dentro de `src/proto/`, **não é aprovável**: volte ao Passo 5. É este item que impede a entrega de sair como HTML pro dev.
+0a. A validação de interação do Passo 7a está marcada em todos os estados do switcher (ou N/A com motivo)
 1. Adicione no topo: `// Aprovado em: YYYY-MM-DD`
 2. Confirme que a anatomia do Passo 8b está completa para todos os componentes do inventário, **com a coluna "Origem" apurada** (não `NÃO APURADA`)
 2a. Confirme que o inventário do Passo 1b tem as três colunas do meio preenchidas em **todas** as linhas, e que o Passo 4b tem veredito (uma divergência declarada por linha, ou "nenhuma divergência do design system" por extenso)

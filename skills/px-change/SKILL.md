@@ -161,7 +161,7 @@ Em ambos os casos, atualizar o checkpoint `planning/<iniciativa>/PX-PROGRESS.md`
 
 Após implementar:
 - Rodar `npm run lint` (inclui `lint:travessao` e `lint:caixa-alta`) para confirmar que nenhuma copy nova vaza as regras.
-- Se o ajuste virou algo maior: "Isso cresceu — quer abrir um `px-request` formal para a tela?"
+- Se o ajuste virou algo maior: "Isso cresceu — quer abrir um `px-request` formal para a tela?" Ao encaminhar, **leve o que já foi respondido** (o arquivo do ajuste em `changes/` ou a nota no request): a `px-request` herda os blocos 1 a 4 daqui como B1, B7, B6 e B8 e não pergunta de novo (ver o Passo 0 dela).
 
 ## Relação com o fluxo
 

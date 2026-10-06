@@ -161,6 +161,15 @@ log(`${c.d}  estar no repo — ela vem no bundle do design system, não neste pa
 // Ao publicar uma versão nova: acrescente a chave aqui, 1 a 3 linhas de ~74 colunas.
 // Isto é o resumo de leitura rápida; a íntegra vive no CHANGELOG.md.
 const HIGHLIGHTS = {
+  "1.21.0": [
+    "px-request vira a porta unica de mudanca de UI: o Passo 0 classifica o",
+    "  pedido e manda ajuste em tela que ja existe para a px-change, sem a",
+    "  entrevista de 12 blocos. Se o ajuste cresce, a px-request herda as",
+    "  respostas da px-change e recomeca no B2, sem perguntar de novo.",
+    "px-proto ganha o Passo 7a: validacao de interacao estado por estado",
+    "  (cliques, teclado, Escape, clique fora, viewport, overflow, console,",
+    "  copy x comportamento). A aprovacao passa a depender dele.",
+  ],
   "1.18.0": [
     "Nova skill px-tour: onboarding guiado por fluxo logico, sobre o",
     "  componente Onboarding Guiado do DS. Um flow, um tour; o global junta",
