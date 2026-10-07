@@ -3,6 +3,19 @@
 Todas as versões instaláveis via `npx github:DiogoRother-it/px-skills` / `npx @centralit/px-skills`.
 O instalador imprime só a versão mais recente no terminal — o histórico completo vive aqui.
 
+## 1.22.0 — 2026-10-07
+
+**Cada entrega era uma ilha.** A `px-handoff` mandava cada entrega numa branch órfã nova, com a versão no nome da pasta (`handoff-ux/semana-39/`). Sem histórico em comum nem caminho estável, o diff entre duas entregas mostrava o pacote inteiro como novo: na semana-39 do ITSM, 239 arquivos para 18 mudanças reais. O dev relia tudo para descobrir o que aplicar. O modelo abaixo foi pedido pelo dev do ITSM e está em uso lá desde 2026-09-29.
+
+- **Tronco `ux/ui`**, separado do produto, com só `handoff-ux/`, `preview/` e `CHANGELOG.md`. Nasce uma única vez, na primeira entrega.
+- **Uma branch por entrega, `ux/entrega-<label>`**, tirada do merge mais recente do tronco, nunca de outra branch de entrega. Volta por MR, com o `git diff --stat origin/ux/ui...HEAD` na descrição. Depois do merge, tag anotada com o rótulo.
+- **Pasta estável `handoff-ux/`**, sem a versão no nome, atualizada no lugar. Ganha `COMECE-AQUI.md` (fixo) e `entregas/<label>.md` (a nota de cada entrega). O preview passa a ter nome fixo: `preview/proto.html`.
+- **Commits por assunto**, com as remoções num commit próprio, com o motivo.
+- **`CHANGELOG.md` acumulativo** na raiz: Novo, Alterado (antes e depois), Removido, Quebra de contrato, Componentes do DS e Como atualizar.
+- **Histórias e specs versionadas no lugar:** `Versão: vN · <label> · Status` no topo e "Histórico de versões" no fim.
+- **Antes do push**, a entrega é aplicada num clone limpo da branch do produto, e o `tsc -b` não pode ganhar erro. O GATE ganha quatro itens do tronco.
+- O BLOCO 2 passa a nomear a branch, a nota, a seção do CHANGELOG e a tag, nunca a pasta. Templates, a tabela da `px-sync` e o `px-protocol.md` deixam de falar em branch órfã.
+
 ## 1.21.0 — 2026-10-06
 
 **Ajuste pequeno entrava pela entrevista inteira.** A `px-request` apontava a `px-change` para ajuste localizado, mas não fazia a triagem: quem abria a `px-request` para trocar um label passava pelos 12 blocos. E quando um ajuste da `px-change` crescia, a `px-request` recomeçava do zero.

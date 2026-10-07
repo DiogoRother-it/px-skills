@@ -46,7 +46,7 @@ ruído interno pro dev e infla a entrega. Este manifesto fixa o recorte, de form
 | Relatório de walkthrough | `e2e/reports/*.md` (diário da persona + diagnóstico) | Material de diagnóstico. O que o dev consome é a **persona** (dev-facing, acima) e o critério que nasceu dela, já dentro da história. O diário bruto é como chegamos ao critério |
 | Planejamento superado (como arquivo) | `epics/*.md`, `requests/*.md` | O arquivo fica de fora, mas seu **conteúdo essencial é extraído**: RNs → `regras-negocio.md`, specs referenciadas → `<spec>.md` no fluxo (sanitizados) |
 | Memória do assistente + scratchpad | `~/.claude/...`, arquivos temporários | Nunca sai |
-| Build compilado **dentro** de `handoff-ux/<label>/` | `dist/`, `standalone.html` misturados ao código | Dentro do pacote ele é lido como entrega, e foi assim que HTML virou referência de implementação. O bundle vai em `preview/<label>-proto.html`, **irmão** de `handoff-ux/`, com `preview/README.md` dizendo que é só referência visual e navegável (dev-facing, fora do pacote) |
+| Build compilado **dentro** de `handoff-ux/` | `dist/`, `standalone.html` misturados ao código | Dentro do pacote ele é lido como entrega, e foi assim que HTML virou referência de implementação. O bundle vai em `preview/<label>-proto.html`, **irmão** de `handoff-ux/`, com `preview/README.md` dizendo que é só referência visual e navegável (dev-facing, fora do pacote) |
 | Config de build | `vite.config`, `tsconfig`, `package.json`, `.env` | Ambiente é do repo do dev |
 | Biblioteca de componentes | `src/components/ui/**` | Vem do registry `@centralit` (privado, exige `CENTRALIT_TOKEN`), versionada — cópia no pacote duplica biblioteca. O `procedencia.md` declara se o proto usou o registry ou não |
 

@@ -161,6 +161,13 @@ log(`${c.d}  estar no repo — ela vem no bundle do design system, não neste pa
 // Ao publicar uma versão nova: acrescente a chave aqui, 1 a 3 linhas de ~74 colunas.
 // Isto é o resumo de leitura rápida; a íntegra vive no CHANGELOG.md.
 const HIGHLIGHTS = {
+  "1.22.0": [
+    "px-handoff deixa a branch orfa: a entrega vai pelo tronco ux/ui. O tronco",
+    "  nasce uma vez; cada entrega e uma branch ux/entrega-<label> tirada do",
+    "  ultimo merge, com MR de volta e tag anotada. Pasta handoff-ux/ estavel,",
+    "  CHANGELOG.md acumulativo, commits por assunto e historias versionadas.",
+    "  O diff entre entregas passa a mostrar so o que mudou.",
+  ],
   "1.21.0": [
     "px-request vira a porta unica de mudanca de UI: o Passo 0 classifica o",
     "  pedido e manda ajuste em tela que ja existe para a px-change, sem a",

@@ -97,7 +97,7 @@ A IA nunca desenha a partir de um prompt vago. Interroga o propósito e ancora n
 
 **`px-sync` (opcional, quando há repo central do PX).** Sobe o espelho completo de trabalho (produto + `planning/` + `docs/`) pro repo central, sempre `main` fast-forward e gated por aceite explícito. Independente do `px-handoff`: um entrega pro dev (pacote reduzido), o outro sincroniza o time de PX (espelho completo).
 
-O terreno técnico (repo/branch/scaffold) do produto é sempre da `px-setup`. `px-handoff` e `px-sync` também rodam git, mas só no próprio destino gated e sempre com aceite explícito antes do push (branch órfã pro dev; `main` fast-forward pro repo central) — nunca no terreno técnico que a `px-setup` já preparou.
+O terreno técnico (repo/branch/scaffold) do produto é sempre da `px-setup`. `px-handoff` e `px-sync` também rodam git, mas só no próprio destino gated e sempre com aceite explícito antes do push (branch `ux/entrega-<label>` com MR para o tronco `ux/ui` pro dev; `main` fast-forward pro repo central) — nunca no terreno técnico que a `px-setup` já preparou.
 
 ## Checkpoint de progresso (PX-PROGRESS) — obrigatório
 

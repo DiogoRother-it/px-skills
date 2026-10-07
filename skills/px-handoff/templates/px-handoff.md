@@ -16,7 +16,7 @@
 
 | Arquivo | O que cobre |
 |---|---|
-| `../../preview/<label>-proto.html` | **Caminho do fonte:** referência visual e navegável, fora do pacote. Só para olhar e comparar; o código é `<produto>/` |
+| `../preview/proto.html` | **Caminho do fonte:** referência visual e navegável, fora do pacote. Só para olhar e comparar; o código é `<produto>/` |
 | `prototipo/` | **Caminho da referência visual (legado):** HTML unificado single-file **ou** build do protótipo (ver `README.md`) |
 | `ui-kit.md` | Tokens de cor, tipografia, status e identidade do produto |
 
@@ -81,7 +81,7 @@ Os **critérios de usabilidade** de cada história saíram destas rodadas. Ao mu
 
 ## 6. Definition of Done (resumo)
 - Biblioteca de componentes: `<@centralit obrigatória | dev adapta à stack>`.
-- Referência visual: `<preview/<label>-proto.html fora do pacote, com README (caminho do fonte) | HTML single-file com data-story | build em prototipo/ (single-file pendente)>`.
+- Referência visual: `<preview/proto.html fora do pacote, com README (caminho do fonte) | HTML single-file com data-story | build em prototipo/ (single-file pendente)>`.
 - Pacote self-contained: 0 referência a caminho externo; RNs e specs referenciadas incluídas.
 - Personas e flows: `<P personas em personas/ e J jornadas em flows/ | nenhuma rodou nesta leva, motivo declarado>`.
 - Tours: `<N tours de fluxo + global em tours/ | nenhum nesta leva, motivo declarado>`.
@@ -90,4 +90,4 @@ Os **critérios de usabilidade** de cada história saíram destas rodadas. Ao mu
 - `<pendência>` — dono: `<nome>` · aguardando: `<o que falta>`
 - (ou) Nenhuma.
 
-<!-- Salvar em: handoff-ux/<label>/handoff.md -->
+<!-- Salvar em: handoff-ux/handoff.md (tronco ux/ui); a nota desta entrega vai em handoff-ux/entregas/<label>.md -->

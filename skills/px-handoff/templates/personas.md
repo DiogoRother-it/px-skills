@@ -1,6 +1,6 @@
 # Personas de usabilidade — quem julgou esta entrega
 
-> **Template reutilizável da `px-handoff`.** Copie para `handoff-ux/<label>/personas/personas.md`
+> **Template reutilizável da `px-handoff`.** Copie para `handoff-ux/personas/personas.md`
 > e preencha. Os arquivos de persona (`<slug>.md`) ficam **nesta mesma pasta**, no estado exato
 > em que foram usados — inclusive com os ajustes de contexto do projeto já aplicados. As jornadas
 > que elas percorreram ficam em `../flows/`.
