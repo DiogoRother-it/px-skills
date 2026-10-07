@@ -161,6 +161,12 @@ log(`${c.d}  estar no repo — ela vem no bundle do design system, não neste pa
 // Ao publicar uma versão nova: acrescente a chave aqui, 1 a 3 linhas de ~74 colunas.
 // Isto é o resumo de leitura rápida; a íntegra vive no CHANGELOG.md.
 const HIGHLIGHTS = {
+  "1.22.1": [
+    "A UI deixa de ser 'copiar sem editar': o dev copia e edita so a",
+    "  integracao (eventos, tipos, dados, imports, carregamento e erro do back)",
+    "  e corrige o que ja existe, avisando o PX. Criar ou mudar o que o usuario",
+    "  ve passa pelo PX. Entregas seguintes por diff entre tags com --3way.",
+  ],
   "1.22.0": [
     "px-handoff deixa a branch orfa: a entrega vai pelo tronco ux/ui. O tronco",
     "  nasce uma vez; cada entrega e uma branch ux/entrega-<label> tirada do",

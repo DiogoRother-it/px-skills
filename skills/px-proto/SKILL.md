@@ -1,6 +1,6 @@
 ---
 name: px-proto
-description: Cria a tela do protótipo dentro do boilerplate (Vite + localhost) usando os componentes reais do shadcn, os tokens reais do UI KIT e mock data do px-request. Constrói em DUAS pastas obrigatoriamente: a UI, que é destinada à produção e o dev copia sem editar, e a demo do protótipo (seletores de papel e estado, dados de exemplo), que é descartável. O PX trabalha no localhost com HMR — vê, ajusta, aprova. Obrigatório após o px-request e antes do px-story. Use quando o líder disser "gera o proto", "quero ver como fica", "prototipar a tela", "visualizar a spec", ou ao fechar um px-request.
+description: Cria a tela do protótipo dentro do boilerplate (Vite + localhost) usando os componentes reais do shadcn, os tokens reais do UI KIT e mock data do px-request. Constrói em DUAS pastas obrigatoriamente: a UI, que é destinada à produção e o dev copia e edita só a integração, e a demo do protótipo (seletores de papel e estado, dados de exemplo), que é descartável. O PX trabalha no localhost com HMR — vê, ajusta, aprova. Obrigatório após o px-request e antes do px-story. Use quando o líder disser "gera o proto", "quero ver como fica", "prototipar a tela", "visualizar a spec", ou ao fechar um px-request.
 compatibility: claude-code
 metadata:
   audience: px-ux
@@ -11,15 +11,15 @@ metadata:
 
 Esta skill cria o protótipo da tela **dentro do boilerplate**, usando os componentes reais do shadcn/ui, os tokens reais do `src/index.css` e o servidor de desenvolvimento Vite. O PX vê a tela no localhost com HMR — ajusta em tempo real, aprova — e só então a tela vira história (`px-story`).
 
-**A tela nasce em duas pastas, e a distinção importa mais que qualquer outra regra desta skill:** `src/<produto>/` guarda a **UI, que é destinada à produção** e é entregue ao dev com a instrução de copiar sem editar; `src/proto/` guarda o **demo**, que é descartável. Tratar o protótipo inteiro como descartável é o que produz código que o dev não consegue reaproveitar, e é a causa raiz da divergência visual entre protótipo e implementação.
+**A tela nasce em duas pastas, e a distinção importa mais que qualquer outra regra desta skill:** `src/<produto>/` guarda a **UI, que é destinada à produção** e é entregue ao dev com a instrução de copiar e editar só a integração; `src/proto/` guarda o **demo**, que é descartável. Tratar o protótipo inteiro como descartável é o que produz código que o dev não consegue reaproveitar, e é a causa raiz da divergência visual entre protótipo e implementação.
 
 **Por que no boilerplate:** componentes reais, tokens reais, HMR. Aqui é o mesmo stack do produto, só com mock data e diretório separado.
 
 > ⛔ **HTML standalone (vanilla ou via CDN) não é aproximação aceitável: é a causa raiz medida da divergência.** Em 2026-09-18 o time de dev do SmartCity mostrou o que recebia: HTML de 3.407 linhas sem uma classe Tailwind e sem uma fronteira de componente, enquanto o repo deles tinha a nossa biblioteca inteira, byte a byte. A LLM do dev precisou reinterpretar cada região, e cada dev obteve um resultado diferente. Uma tela que existe só como `.html` **não é protótipo desta skill e não é aprovável** (Passo 9). Se o líder pedir "gera um HTML", a resposta é: o proto nasce em TSX aqui; o HTML pra PO sai depois pelo `px-preview`.
 
-> **Este fonte vai ser COPIADO por outro time, não lido.** Quando o dev implementa na mesma stack, a `px-handoff` entrega `src/<produto>/` com a instrução de copiar sem editar. Escreva pensando nisso: nome de variável que se explica, `// INTEGRATION BOUNDARY:` nas fronteiras, e nenhum truque que você não queira ver rodando em produção. É o que permite fidelidade 1:1 sem ninguém redesenhar a partir de screenshot, e sem ninguém redigitar centenas de decisões visuais.
+> **Este fonte vai ser COPIADO por outro time, não lido.** Quando o dev implementa na mesma stack, a `px-handoff` entrega `src/<produto>/` com a instrução de copiar e editar só a integração (a regra está na `px-handoff`). Escreva pensando nisso: nome de variável que se explica, `// INTEGRATION BOUNDARY:` nas fronteiras, e nenhum truque que você não queira ver rodando em produção. É o que permite fidelidade 1:1 sem ninguém redesenhar a partir de screenshot, e sem ninguém redigitar centenas de decisões visuais.
 >
-> **Se o dev precisar editar um arquivo da camada de UI para rodar no projeto dele, é defeito nosso** e conserta-se na origem. A demo é outra história: `src/proto/` não é biblioteca, não é pacote, não vai para produção, e o PX não mantém. A fronteira de propriedade está registrada na `px-handoff`.
+> **Se o dev precisar mudar o que o usuário vê (layout, componentes, comportamento, campos, textos, tokens) para rodar no projeto dele, é defeito nosso** e conserta-se na origem. Ajustar a integração (eventos, tipos, dados, imports, carregamento e erro do back) é trabalho dele. A demo é outra história: `src/proto/` não é biblioteca, não é pacote, não vai para produção, e o PX não mantém. A fronteira de propriedade está registrada na `px-handoff`.
 
 **Por que obrigatório:** spec textual não substitui revisão visual. Erros de hierarquia, densidade, estados e copy só aparecem quando você vê a tela. Corrigir aqui é grátis; corrigir depois do dev é caro.
 
@@ -301,7 +301,7 @@ defeito da cadeia, não ajuste de gosto — e volta como correção, não como p
 
 | Arquivo | O que contém | Destino |
 |---|---|---|
-| `src/<produto>/tela-<slug>.tsx` | **A UI.** Recebe dados, papel de usuário, estado de carga e navegação por parâmetro | Vai para produção. O dev copia e **não edita** |
+| `src/<produto>/tela-<slug>.tsx` | **A UI.** Recebe dados, papel de usuário, estado de carga e navegação por parâmetro | Vai para produção. O dev copia e edita **só a integração** |
 | `src/proto/page-<slug>.tsx` | **A demo.** Seletor de papel, seletor de estado, tema, dados de exemplo, navegação de protótipo | Descartável |
 
 **Por que:** enquanto UI e demo moram no mesmo arquivo, o dev é obrigado a **editar** para extrair a interface, e quem edita reescreve. Toda reescrita muda um espaçamento, uma variante, uma ordem. É a causa raiz da divergência visual entre protótipo e implementação, e revisão humana não pega isso de forma confiável.
@@ -571,7 +571,7 @@ Quando aprovado:
 - **Borda, cor de destaque, visual de alerta em cards** → confirmar se aplica a todos ou só aos que têm condição.
 - **Header de tela** → confirmar se tem breadcrumb/router ou só H1.
 - **Switcher de estado obrigatório** — todos os estados do B7.
-- **A UI é código destinado à produção; a demo é descartável.** Não trate o protótipo inteiro como descartável: a pasta de UI é entregue com a instrução "copie, não edite", e é isso que elimina a divergência visual. Só `src/proto/` é jogado fora.
+- **A UI é código destinado à produção; a demo é descartável.** Não trate o protótipo inteiro como descartável: a pasta de UI é entregue com a instrução "copie e edite só a integração", e é isso que elimina a divergência visual. Só `src/proto/` é jogado fora.
 - **Contrato de dado pela forma do contrato, nunca `typeof MOCK[0]`.** Ausente não é vazio; variante é união discriminada.
 - **Uma fixture só**, em `src/proto/fixtures.ts`, de dados puros. Tela não declara mock próprio.
 - **`npm run lint:camadas` verde** antes de considerar o proto pronto.

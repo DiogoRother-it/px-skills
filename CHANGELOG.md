@@ -3,6 +3,15 @@
 Todas as versões instaláveis via `npx github:DiogoRother-it/px-skills` / `npx @centralit/px-skills`.
 O instalador imprime só a versão mais recente no terminal — o histórico completo vive aqui.
 
+## 1.22.1 — 2026-10-07
+
+**"Copiar sem editar" travava a integração.** A UI ia ao dev com a instrução de copiar sem editar. No ITSM, o dev aplicou a semana-40 e o Novo ticket não abria, porque a rota não passava o evento para a tela: ligar a tela é trabalho dele, e a regra o impedia.
+
+- **`px-handoff` e `px-proto`:** a UI vai com a instrução de **copiar e editar só a integração**. O dev pode mudar a integração (eventos, tipos, mapeamento de dados, imports, carregamento e erro vindos do back) e corrigir estado ou comportamento que **já existe** e não funciona como a spec, avisando o PX. Criar o que não existe ou mudar o que o usuário vê (layout, componentes, comportamento, campos, textos, tokens) passa pelo PX.
+- A regra fica escrita no `COMECE-AQUI.md` do pacote.
+- Como o dev edita, a entrega seguinte se aplica pelo diff entre as tags com `git apply --3way`, nunca sobrescrevendo a pasta. O "Como atualizar" do CHANGELOG passa a dizer isso.
+- Cabeçalho de arquivo da UI que ainda diz "copie sem editar" está velho: reescrever ao tocar.
+
 ## 1.22.0 — 2026-10-07
 
 **Cada entrega era uma ilha.** A `px-handoff` mandava cada entrega numa branch órfã nova, com a versão no nome da pasta (`handoff-ux/semana-39/`). Sem histórico em comum nem caminho estável, o diff entre duas entregas mostrava o pacote inteiro como novo: na semana-39 do ITSM, 239 arquivos para 18 mudanças reais. O dev relia tudo para descobrir o que aplicar. O modelo abaixo foi pedido pelo dev do ITSM e está em uso lá desde 2026-09-29.

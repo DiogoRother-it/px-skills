@@ -1,6 +1,6 @@
 ---
 name: px-handoff
-description: Skill de FECHAMENTO da cadeia PX. Monta o pacote de handoff pro dev a partir das histórias já ready. Quando o dev implementa na MESMA stack do protótipo, entrega o FONTE em duas pastas com instrução oposta: a UI (copiar, não editar) e a demo do protótipo (descartar), mais os tokens — é o que garante fidelidade visual, porque elimina a reescrita; quando a stack é diferente, entrega referência visual navegável + anatomia. Sempre acompanha o UI Kit do produto, as histórias de negócio (BDD), as regras de negócio por fluxo e as specs referenciadas, tudo self-contained e organizado por fluxo. Não envia config de build nem artefatos internos. Use ao fechar um lote de telas prontas pra levar pro dev — "fechar o handoff", "preparar a entrega pro dev", "empacotar pro desenvolvimento", "qual sprint essa entrega entra", "finalizar o fluxo".
+description: Skill de FECHAMENTO da cadeia PX. Monta o pacote de handoff pro dev a partir das histórias já ready. Quando o dev implementa na MESMA stack do protótipo, entrega o FONTE em duas pastas com instrução oposta: a UI (copiar; o dev edita só a integração) e a demo do protótipo (descartar), mais os tokens — é o que garante fidelidade visual, porque elimina a reescrita; quando a stack é diferente, entrega referência visual navegável + anatomia. Sempre acompanha o UI Kit do produto, as histórias de negócio (BDD), as regras de negócio por fluxo e as specs referenciadas, tudo self-contained e organizado por fluxo. Não envia config de build nem artefatos internos. Use ao fechar um lote de telas prontas pra levar pro dev — "fechar o handoff", "preparar a entrega pro dev", "empacotar pro desenvolvimento", "qual sprint essa entrega entra", "finalizar o fluxo".
 compatibility: claude-code
 metadata:
   audience: px-ux
@@ -353,7 +353,7 @@ Incluir também: **fluxo de decisão** ("está 🟢 ou 🟡? então existe, não
 ```
 CHANGELOG.md                     # acumulativo, a entrega mais recente no topo (formato abaixo)
 handoff-ux/                      # nunca leva a versão no nome
-    ├── COMECE-AQUI.md           # fixo: como aplicar uma entrega no app do dev
+    ├── COMECE-AQUI.md           # fixo: como aplicar uma entrega e o que o dev pode editar na UI
     ├── entregas/
     │   └── <label>.md           # a nota de cada entrega: resumo + passo a passo do "Como atualizar"
     ├── handoff.md
@@ -361,7 +361,7 @@ handoff-ux/                      # nunca leva a versão no nome
     ├── ui-kit.md
     │
     │   # Caminho do FONTE (stack igual):
-    ├── <produto>/               # a UI: cópia byte a byte do src/<produto>/ (copiar, não editar)
+    ├── <produto>/               # a UI: cópia byte a byte do src/<produto>/ (copiar; o dev edita só a integração)
     ├── locales/                 # os textos de cada idioma, quando o produto tem i18n
     ├── index.css                # os tokens aplicados
     ├── proto/                   # a demo: seletores e fixtures (descartar)
@@ -398,7 +398,7 @@ preview/
 └── proto.html               # nome fixo; bundle single-file do sandbox (build:standalone), todas as telas por hash
 ```
 
-**`CHANGELOG.md`: uma seção por entrega, no topo.** Novo · Alterado (antes e depois) · Removido · Quebra de contrato (props exportadas que mudaram) · Componentes do DS · Como atualizar (comandos com o diff entre a tag anterior e esta). A nota em `entregas/<label>.md` repete o resumo e traz o passo a passo.
+**`CHANGELOG.md`: uma seção por entrega, no topo.** Novo · Alterado (antes e depois) · Removido · Quebra de contrato (props exportadas que mudaram) · Componentes do DS · Como atualizar (comandos com o diff entre a tag anterior e esta, aplicado com `git apply --3way`, porque o dev pode ter editado a integração). A nota em `entregas/<label>.md` repete o resumo e traz o passo a passo.
 
 **Histórias e specs versionadas no lugar.** No topo: `**Versão:** vN · <label> · **Status:** <status>`; no fim, "Histórico de versões". Trecho que a entrega tornou falso é **reescrito no lugar**, marcado com `(vN)`, e o texto antigo vai só para o histórico. Cada linha afirma só o que o código faz hoje.
 `handoff-ux/` sempre na raiz. Uma pasta por fluxo. Use só o bloco do caminho decidido na "Forma do protótipo" — os dois nunca coexistem no mesmo pacote. O `preview/` nunca entra dentro de `handoff-ux/`.
@@ -502,7 +502,7 @@ Toda linha da saída precisa aparecer na tabela, com a origem (registry, boilerp
 
 **Pacote**
 - [ ] **Portão de forma** passou: fonte TSX presente, **ou** `Stack do dev verificada: sem shadcn` no `handoff.md` com as linhas do `package.json` coladas
-- [ ] **Caminho do FONTE** (stack igual): **duas pastas com instrução oposta** — `<produto>/` (a UI: copiar, não editar) e `proto/` (a demo: descartar). Nenhum arquivo repetido entre as duas. `index.css` com os tokens aplicados vai junto
+- [ ] **Caminho do FONTE** (stack igual): **duas pastas com instrução oposta** — `<produto>/` (a UI: copiar; o dev edita só a integração) e `proto/` (a demo: descartar). Nenhum arquivo repetido entre as duas. `index.css` com os tokens aplicados vai junto
 - [ ] **Caminho do FONTE:** `<produto>/README.md` presente, declarando `camada: ui` e explicando o que entra por parâmetro (dados, papel, estado de carga, navegação)
 - [ ] **Caminho do FONTE:** a camada de UI não tem **nenhum** import de `@/proto/*` (`npm run lint:camadas` verde)
 - [ ] **Caminho do FONTE:** conteúdo de exemplo numa fixture única em `proto/fixtures.ts`, de dados puros, e o README dizendo para semear o ambiente de teste a partir dela
@@ -557,7 +557,11 @@ Antes de fechar, repita em 3–4 linhas: *"Handoff **<label>**: **N** histórias
 - **Nada sai sem o portão executável passar.** Presença de arquivo não é verificação.
 - **Forma verificada, nunca perguntada.** O repo do dev é inspecionado (`package.json`, `components/ui`, alias, CSS de tokens) e o veredito vai com a evidência no `handoff.md`. HTML vanilla nunca é referência de implementação para dev com shadcn: é preview.
 - **Nada sai sem procedência.** Coerência interna do pacote não diz nada sobre a base em que ele foi construído — foram as duas coisas confundidas que deixaram meses de entrega divergirem em silêncio. Se a procedência não é apurável, ela é **declarada como não apurável**; o que não existe é sair sem dizer.
-- **A UI vai com instrução de copiar; a demo com instrução de descartar.** Se o dev precisar editar um arquivo da camada de UI para rodar no projeto dele, é defeito nosso e conserta-se na origem.
+- **A UI vai com instrução de copiar e editar só a integração; a demo com instrução de descartar.** A regra fica escrita no `COMECE-AQUI.md`:
+  - **O dev pode mudar na UI:** a integração (eventos, tipos, mapeamento de dados, imports, carregamento e erro vindos do back) e a correção de estado ou comportamento que **já existe** e não funciona como a spec, **avisando o PX**.
+  - **Passa pelo PX:** criar o que não existe ou mudar o que o usuário vê (layout, componentes, comportamento, campos, textos, tokens).
+  - Como o dev edita, a entrega seguinte se aplica pelo diff entre as tags com `git apply --3way`, nunca sobrescrevendo a pasta. Arquivo da UI que ainda diz "copie sem editar" no cabeçalho está velho: reescreva ao tocar.
+  - Se o dev precisar mudar o que o usuário vê para rodar no projeto dele, é defeito nosso e conserta-se na origem.
 
 - **Pacote self-contained.** Nenhuma referência a caminho fora do pacote — refs mortas são reescritas para relativas ou removidas na sanitização (BLOCO 6).
 - **Critério de usabilidade viaja com quem o julgou, e com a jornada em que foi julgado.** Personas (`personas/`) e flows (`flows/`) entram no pacote como par: a persona é a régua, o flow é a travessia, e o flow é também o que o Playwright do dev automatiza. O que fica de fora é o **relatório** da rodada, não a régua nem a jornada: sem eles, o CA de usabilidade chega ao dev como preferência de quem escreveu, e é a primeira coisa que se perde numa refatoração de tela.
