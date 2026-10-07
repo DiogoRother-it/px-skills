@@ -161,6 +161,12 @@ log(`${c.d}  estar no repo — ela vem no bundle do design system, não neste pa
 // Ao publicar uma versão nova: acrescente a chave aqui, 1 a 3 linhas de ~74 colunas.
 // Isto é o resumo de leitura rápida; a íntegra vive no CHANGELOG.md.
 const HIGHLIGHTS = {
+  "1.23.0": [
+    "px-handoff oferece dois modelos: Tradicional (branch orfa) e Novo (tronco",
+    "  ux/ui). Antes de recomendar, analisa o repo do dev: branches ux/*, padrao",
+    "  da pasta e sinais de custo. Migrar custoso: Tradicional. Senao: Novo, com",
+    "  o Diogo (lider de UX) acompanhando a criacao do tronco e a 1a entrega.",
+  ],
   "1.22.1": [
     "A UI deixa de ser 'copiar sem editar': o dev copia e edita so a",
     "  integracao (eventos, tipos, dados, imports, carregamento e erro do back)",

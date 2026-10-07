@@ -17,7 +17,7 @@ Times de PX costumam trabalhar num **monorepo central** (ex `px-projects`) onde 
 |---|---|---|
 | Destino | Repo do **dev** | Repo **central** do PX |
 | Conteúdo | Reduzido: fonte da UI + UI Kit + histórias, em `handoff-ux/` | **Completo**: produto + `planning/` + `docs/` + `.claude/` + config |
-| Git | Branch `ux/entrega-<label>` tirada do tronco `ux/ui`, MR e tag | **`main`**, fast-forward, histórico preservado |
+| Git | Novo: branch `ux/entrega-<label>` tirada do tronco `ux/ui`, MR e tag · Tradicional: branch órfã `ux/<label>` | **`main`**, fast-forward, histórico preservado |
 | Propósito | Implementar | Seguir idealizando |
 
 **Público:** o líder UX/PX. Seja direto: confirme o escopo, proteja o que não pode ser tocado, e só então faça o push (sempre gated).

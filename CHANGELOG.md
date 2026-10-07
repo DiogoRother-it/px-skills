@@ -3,6 +3,16 @@
 Todas as versões instaláveis via `npx github:DiogoRother-it/px-skills` / `npx @centralit/px-skills`.
 O instalador imprime só a versão mais recente no terminal — o histórico completo vive aqui.
 
+## 1.23.0 — 2026-10-07
+
+**A 1.22.0 trocou a branch órfã pelo tronco de uma vez, mas os produtos estão em adequação.** Há repos com entregas órfãs em andamento, em que migrar agora custaria mais do que ajuda.
+
+- **`px-handoff` — dois modelos:** **Handoff Tradicional** (branch órfã `ux/<label>`, pasta `handoff-ux/<label>/`, `preview/<label>-proto.html`) e **Handoff Novo** (tronco `ux/ui`, como na 1.22.0).
+- **Análise antes de recomendar** (pergunta 4 e a seção "Modelo de entrega"): branches `ux/*` do repo do dev (órfãs ou do tronco), padrão da pasta e dependência do caminho antigo em scripts, CI ou docs do dev. Tronco existente ou primeira entrega: Novo. Entregas órfãs sem sinal de custo: Novo, migrando a partir da última órfã. Com qualquer sinal de custo (entrega em consumo, dev sem MR ou PX sem permissão, script dependendo do caminho, prazo): Tradicional, com a migração registrada como pendência.
+- **Handoff Novo com acompanhamento obrigatório do líder de UX (Diogo Queiroz)** na criação ou migração do tronco e na primeira entrega por ele, registrado no `handoff.md` antes do push.
+- **Migração:** o tronco nasce da última órfã (a pasta perde a versão no nome no primeiro commit), em vez de nascer vazio.
+- O GATE, o eco, o "onde salvar" e as regras passam a valer por modelo. Depois que o tronco existe num repo, toda entrega vai por ele.
+
 ## 1.22.1 — 2026-10-07
 
 **"Copiar sem editar" travava a integração.** A UI ia ao dev com a instrução de copiar sem editar. No ITSM, o dev aplicou a semana-40 e o Novo ticket não abria, porque a rota não passava o evento para a tela: ligar a tela é trabalho dele, e a regra o impedia.

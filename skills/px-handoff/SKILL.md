@@ -1,6 +1,6 @@
 ---
 name: px-handoff
-description: Skill de FECHAMENTO da cadeia PX. Monta o pacote de handoff pro dev a partir das histórias já ready. Quando o dev implementa na MESMA stack do protótipo, entrega o FONTE em duas pastas com instrução oposta: a UI (copiar; o dev edita só a integração) e a demo do protótipo (descartar), mais os tokens — é o que garante fidelidade visual, porque elimina a reescrita; quando a stack é diferente, entrega referência visual navegável + anatomia. Sempre acompanha o UI Kit do produto, as histórias de negócio (BDD), as regras de negócio por fluxo e as specs referenciadas, tudo self-contained e organizado por fluxo. Não envia config de build nem artefatos internos. Use ao fechar um lote de telas prontas pra levar pro dev — "fechar o handoff", "preparar a entrega pro dev", "empacotar pro desenvolvimento", "qual sprint essa entrega entra", "finalizar o fluxo".
+description: Skill de FECHAMENTO da cadeia PX. Monta o pacote de handoff pro dev a partir das histórias já ready. Quando o dev implementa na MESMA stack do protótipo, entrega o FONTE em duas pastas com instrução oposta: a UI (copiar; o dev edita só a integração) e a demo do protótipo (descartar), mais os tokens — é o que garante fidelidade visual, porque elimina a reescrita; quando a stack é diferente, entrega referência visual navegável + anatomia. Sempre acompanha o UI Kit do produto, as histórias de negócio (BDD), as regras de negócio por fluxo e as specs referenciadas, tudo self-contained e organizado por fluxo. Não envia config de build nem artefatos internos. Oferece dois modelos de entrega, Tradicional (branch órfã) e Novo (tronco ux/ui), e recomenda um depois de analisar o repo do dev. Use ao fechar um lote de telas prontas pra levar pro dev — "fechar o handoff", "preparar a entrega pro dev", "empacotar pro desenvolvimento", "qual sprint essa entrega entra", "finalizar o fluxo".
 compatibility: claude-code
 metadata:
   audience: px-ux
@@ -164,6 +164,43 @@ Segue `Skill Prompting Conventions` do `CLAUDE.md`. Estruturada pra decisões en
 > 3. "Além do repo do dev, este projeto também mantém um repositório CENTRAL do PX (um monorepo/núcleo onde vivem produto, planning e docs de várias iniciativas)?"
 >    **Sim** → ao final deste handoff, ofereça rodar `px-sync` pra espelhar o estado completo de trabalho nesse repo central. **É um destino independente do handoff**: o pacote reduzido (aqui) vai pro dev; o espelho completo (`px-sync`) vai pro núcleo — um não substitui o outro, e não bloqueia o push do BLOCO 6.
 >    **Não** → seguir só com o destino dev; não oferecer `px-sync` no fechamento.
+> 4. **Modelo de entrega: Tradicional ou Novo.** Não pergunte no escuro: analise o repo do dev primeiro (ver "Modelo de entrega" abaixo), apresente a evidência e a recomendação, e só então peça a escolha com `AskUserQuestion`, a recomendada primeiro.
+
+### Modelo de entrega: Tradicional ou Novo (decidir antes do BLOCO 1)
+
+Estamos em adequação: os dois modelos valem, e a escolha é por repo.
+
+| | **Handoff Tradicional** (branch órfã) | **Handoff Novo** (tronco `ux/ui`) |
+|---|---|---|
+| Branch | Uma branch órfã nova por entrega, `ux/<label>` | Uma branch `ux/entrega-<label>` tirada do tronco `ux/ui`, MR de volta, tag depois do merge |
+| Pasta | `handoff-ux/<label>/` (a versão no nome) | `handoff-ux/` estável, atualizada no lugar |
+| Preview | `preview/<label>-proto.html` | `preview/proto.html` (nome fixo) |
+| O que mudou | O dev compara as duas pastas | `CHANGELOG.md` acumulativo + `entregas/<label>.md` + diff entre tags |
+| Custo para o dev | Relê o pacote inteiro a cada entrega | Lê só o diff |
+
+**Analise o repo do dev antes de recomendar** (só leitura, sem checkout no repo dele):
+```
+git ls-remote --heads origin 'ux/*'
+git ls-remote --tags origin
+```
+Para cada `ux/*`: `git rev-list --max-parents=0 origin/ux/<x>` (se não tem base comum com a branch do produto, é órfã) e `git ls-tree --name-only origin/ux/<x> handoff-ux/` (pasta com a versão no nome ou estável). No repo do dev, `git grep -n "handoff-ux/"` mostra se algum script, CI ou doc dele depende do caminho antigo.
+
+| O que a análise mostra | Recomendação |
+|---|---|
+| O tronco `ux/ui` já existe | **Novo.** Custo zero: siga o tronco |
+| Nenhuma branch `ux/*` (primeira entrega neste repo) | **Novo.** Custo baixo: o tronco nasce nesta entrega |
+| Entregas órfãs anteriores, e nenhum sinal de custo abaixo | **Novo**, migrando: o tronco nasce da última órfã (ver BLOCO 6) |
+| Entregas órfãs anteriores **e** qualquer sinal de custo | **Tradicional**, e registre a migração como pendência com dono |
+
+**Sinais de custo** (basta um):
+- uma entrega órfã ainda está sendo consumida pelo dev agora, ou a entrega anterior não foi aplicada;
+- o dev não conhece ou não aceitou receber por MR, ou o PX não tem permissão para criar branch `ux/*` e abrir MR no repo dele;
+- script, CI ou documentação do dev depende do caminho `handoff-ux/<label>/` (o `git grep` acima);
+- a entrega precisa sair agora e a migração (montar o tronco, converter a pasta, escrever o CHANGELOG inicial) não cabe no prazo.
+
+Apresente ao PX: as branches `ux/*` encontradas (órfãs ou do tronco), o padrão da pasta, os sinais de custo encontrados e a recomendação. Registre a escolha e a evidência no `handoff.md`.
+
+> ⛔ **Handoff Novo: chamar o líder de UX (Diogo Queiroz) é obrigatório** enquanto o repo não tem uma entrega aceita pelo tronco, ou seja, na criação ou na migração do tronco e na primeira entrega por ele. Antes do primeiro push, **pare** e peça ao PX que chame o Diogo para acompanhar. O push só segue depois que o PX confirmar, e a confirmação vai no `handoff.md` (`Acompanhamento: Diogo Queiroz, <data>`). A partir da segunda entrega aceita pelo tronco no mesmo repo, não é mais obrigatório.
 
 ---
 
@@ -197,7 +234,9 @@ Segue `Skill Prompting Conventions` do `CLAUDE.md`. Estruturada pra decisões en
 - **Recorte dev-facing vs. interno:** aplicar o `templates/handoff-manifest.md`. Entram também **decisões de produto canônicas** (`decisoes/*.md`) e **mapa de permissões/triggers** (`rbac-*.md`) quando existirem. Ficam de fora **os arquivos** de checkpoint (`PX-PROGRESS`), prompts de continuidade, discovery/auditoria, épicos e requests **como arquivos** — mas o **conteúdo essencial** deles (RNs, specs referenciadas) é extraído para os `.md` do pacote. Se a iniciativa tiver muitos `.md` internos, gravar/atualizar `planning/<iniciativa>/HANDOFF-MANIFEST.md` e confirmar o recorte com o PX.
 
 ## BLOCO 2 — Carimbo da entrega (o "quando/qual versão")
-**Decidir:** o rótulo desta entrega. Ele nomeia a branch `ux/entrega-<label>`, a nota `handoff-ux/entregas/<label>.md`, a seção do `CHANGELOG.md` e a tag anotada depois do merge. **Nunca o nome da pasta:** `handoff-ux/` é estável, e é isso que deixa o diff entre entregas mostrar só o que mudou.
+**Decidir:** o rótulo desta entrega.
+- **Handoff Novo:** nomeia a branch `ux/entrega-<label>`, a nota `handoff-ux/entregas/<label>.md`, a seção do `CHANGELOG.md` e a tag anotada depois do merge. **Nunca o nome da pasta:** `handoff-ux/` é estável, e é isso que deixa o diff entre entregas mostrar só o que mudou.
+- **Handoff Tradicional:** nomeia a branch órfã `ux/<label>`, a pasta `handoff-ux/<label>/` e o `preview/<label>-proto.html`.
 **Fazer (`AskUserQuestion` para o rótulo):**
 - Aceita **`semana-<NN>`** (ex.: `semana-41`), com sufixo quando a semana tem mais de uma entrega (`semana-41.consulta-servidor`), **ou** **`v<N>`** quando o time versiona por entrega.
 - Use o rótulo que o PX indicar; se ele já disse no contexto inicial, não repergunte.
@@ -324,10 +363,23 @@ Incluir também: **fluxo de decisão** ("está 🟢 ou 🟡? então existe, não
 7. **Despachar (condicional ao repo do dev):**
    - **Sem repo do dev** → o pacote já está organizado em `handoff-ux/` na raiz do projeto; **não há push**. Mostrar a árvore final e registrar no `handoff.md` que o push fica pendente.
    - **Repo existe, sem acesso** → seguir "Sem acesso ao repo do dev" (impedimento com dono e data no `handoff.md`; pacote inteiro e compactado se não puder esperar; nunca arquivo solto). **Não** despachar por chat.
-   - **Com repo do dev** → entrega pelo **tronco `ux/ui`**. O tronco é separado do produto (só `handoff-ux/`, `preview/` e `CHANGELOG.md`); o dev aplica cada entrega no `src/` dele. ⛔ **Nunca uma branch órfã por entrega, nunca a versão no nome da pasta:** cada entrega isolada não tem diff com a anterior, e o dev relê o pacote inteiro (medido: 239 arquivos no diff para 18 mudanças reais).
-     - **Tronco ainda não existe (primeira entrega):** crie `ux/ui` **uma única vez**, sem o histórico do produto, com `handoff-ux/`, `preview/` e `CHANGELOG.md`. Ele vira a base de todas as entregas seguintes.
+   - **Com repo do dev, Handoff Tradicional (branch órfã)** → montar `handoff-ux/<label>/` e `preview/<label>-proto.html` **na raiz do repo do dev**, mostrar a árvore, e push numa branch órfã nova (sem herdar histórico do boilerplate):
+     ```
+     git checkout --orphan ux/<label>
+     git rm -rf .
+     git add handoff-ux/<label>/ preview/
+     git commit -m "ux(<label>): handoff <resumo>"
+     git push origin ux/<label>
+     ```
+     No `README.md` do pacote, diga ao dev como ver o que mudou desde a entrega anterior: `git diff --stat origin/ux/<anterior>:handoff-ux/<anterior>/ origin/ux/<label>:handoff-ux/<label>/`. Confirmar o push com o hash. **Push só com o aceite explícito do PX.**
+   - **Com repo do dev, Handoff Novo (tronco `ux/ui`)** → o tronco é separado do produto (só `handoff-ux/`, `preview/` e `CHANGELOG.md`); o dev aplica cada entrega no `src/` dele. Nada de branch órfã por entrega nem de versão no nome da pasta: é o que deixa o diff mostrar só o que mudou (medido no ITSM: 239 arquivos no diff das órfãs para 18 mudanças reais). **Na criação ou migração do tronco e na primeira entrega por ele, o Diogo acompanha** (ver "Modelo de entrega").
+     - **Tronco ainda não existe, sem entregas anteriores:** crie `ux/ui` **uma única vez**, sem o histórico do produto, com `handoff-ux/`, `preview/` e `CHANGELOG.md`.
        ```
        git switch --orphan ux/ui
+       ```
+     - **Tronco ainda não existe, com entregas órfãs anteriores (migração):** o tronco nasce da **última órfã**, para não perder o que o dev já recebeu. No primeiro commit, a pasta perde a versão no nome (`git mv handoff-ux/<última>/* handoff-ux/`) e o preview ganha o nome fixo; marque essa base com a tag `<última>`. As órfãs antigas ficam intocadas.
+       ```
+       git switch -c ux/ui origin/ux/<última>
        ```
      - **Toda entrega:** uma branch `ux/entrega-<label>`, tirada do **merge mais recente** do tronco, nunca de outra branch de entrega. Se a entrega anterior ainda não entrou, monte local e refaça a branch depois do merge.
        ```
@@ -397,6 +449,8 @@ preview/
 ├── README.md                # "abre com dois cliques; é referência visual; NÃO é código para copiar"
 └── proto.html               # nome fixo; bundle single-file do sandbox (build:standalone), todas as telas por hash
 ```
+
+**No Handoff Tradicional**, o mesmo conteúdo vai dentro de `handoff-ux/<label>/` e o preview se chama `preview/<label>-proto.html`; não há `CHANGELOG.md`, `entregas/` nem tag. O resto desta seção vale só para o Handoff Novo.
 
 **`CHANGELOG.md`: uma seção por entrega, no topo.** Novo · Alterado (antes e depois) · Removido · Quebra de contrato (props exportadas que mudaram) · Componentes do DS · Como atualizar (comandos com o diff entre a tag anterior e esta, aplicado com `git apply --3way`, porque o dev pode ter editado a integração). A nota em `entregas/<label>.md` repete o resumo e traz o passo a passo.
 
@@ -516,10 +570,12 @@ Toda linha da saída precisa aparecer na tabela, com a origem (registry, boilerp
 - [ ] `paridade/` presente: matriz de estados enumerada, spec de comparação visual, adaptador com o ponto de sessão a preencher, `excecoes.md` com a ordem de precedência e `gates.md` com a saída real dos comandos
 - [ ] `excecoes.md` declara a precedência: **o contrato do DS vence o protótipo**, e diff nesse ponto não é falha de paridade. Sem essa linha, o aceite "harness verde" obriga o dev a reimportar defeito nosso para o teste passar
 - [ ] `handoff.md` sem campos `<placeholder>` vazios
-- [ ] **Tronco:** a branch `ux/entrega-<label>` saiu de `origin/ux/ui` no merge mais recente; nenhuma pasta com a versão no nome; o `git diff --stat origin/ux/ui...HEAD` está colado na descrição da MR e mostra só o que mudou
-- [ ] **Tronco:** seção desta entrega no topo do `CHANGELOG.md` e `entregas/<label>.md` presente; remoções em commit próprio, com motivo
-- [ ] **Tronco:** histórias e specs tocadas com `Versão: vN · <label>` no topo e a linha nova no "Histórico de versões"
-- [ ] **Tronco:** a entrega aplicada num clone limpo da branch do produto não acrescentou erro ao `tsc -b`
+- [ ] **Modelo de entrega** registrado no `handoff.md` com a evidência da análise do repo (branches `ux/*`, padrão da pasta, sinais de custo) e a recomendação
+- [ ] **Só no Handoff Novo, na criação ou migração do tronco e na primeira entrega por ele:** `Acompanhamento: Diogo Queiroz, <data>` no `handoff.md`
+- [ ] **Só no Handoff Novo:** a branch `ux/entrega-<label>` saiu de `origin/ux/ui` no merge mais recente; nenhuma pasta com a versão no nome; o `git diff --stat origin/ux/ui...HEAD` está colado na descrição da MR e mostra só o que mudou
+- [ ] **Só no Handoff Novo:** seção desta entrega no topo do `CHANGELOG.md` e `entregas/<label>.md` presente; remoções em commit próprio, com motivo
+- [ ] **Só no Handoff Novo:** histórias e specs tocadas com `Versão: vN · <label>` no topo e a linha nova no "Histórico de versões"
+- [ ] **Só no Handoff Novo:** a entrega aplicada num clone limpo da branch do produto não acrescentou erro ao `tsc -b`
 
 **Histórias**
 - [ ] BDD completo (feliz + vazio + erro + permissão) em cada história
@@ -546,11 +602,11 @@ Toda linha da saída precisa aparecer na tabela, com a origem (registry, boilerp
 
 ## Eco final
 
-Antes de fechar, repita em 3–4 linhas: *"Handoff **<label>**: **N** histórias em **M** fluxos, cada fluxo com regras de negócio e specs referenciadas incluídas, referência visual = **<HTML single-file | build em prototipo/>**, UI Kit incluído, **P** personas em `personas/`, **J** jornadas em `flows/` e **T** tours em `tours/` **<ou: nenhuma rodou nesta leva, motivo declarado>**, **X** fronteiras de integração. Pacote self-contained (0 referência morta). Base: **<commit> de <data>, <N> commits atrás do main, registry alcançado | ⚠️ NÃO AUDITÁVEL>**. Perguntas em aberto: `<N ou nenhuma>`. **<Branch `ux/entrega-<label>` com MR para o tronco `ux/ui`, tag depois do merge | Sem repo ainda: organizado localmente, push pendente>**. **<Repo central: rodar px-sync em seguida | Sem repo central>** — confirma?"*. Só então feche.
+Antes de fechar, repita em 3–4 linhas: *"Handoff **<label>**: **N** histórias em **M** fluxos, cada fluxo com regras de negócio e specs referenciadas incluídas, referência visual = **<HTML single-file | build em prototipo/>**, UI Kit incluído, **P** personas em `personas/`, **J** jornadas em `flows/` e **T** tours em `tours/` **<ou: nenhuma rodou nesta leva, motivo declarado>**, **X** fronteiras de integração. Pacote self-contained (0 referência morta). Base: **<commit> de <data>, <N> commits atrás do main, registry alcançado | ⚠️ NÃO AUDITÁVEL>**. Perguntas em aberto: `<N ou nenhuma>`. **<Handoff Novo: branch `ux/entrega-<label>` com MR para o tronco `ux/ui`, tag depois do merge, acompanhado por <Diogo | não obrigatório> | Handoff Tradicional: branch órfã `ux/<label>`, motivo: <sinal de custo> | Sem repo ainda: organizado localmente, push pendente>**. **<Repo central: rodar px-sync em seguida | Sem repo central>** — confirma?"*. Só então feche.
 
 ## Onde salvar
 
-`handoff-ux/handoff.md` (o retrato da entrega atual) e `handoff-ux/entregas/<label>.md` (a nota desta entrega), no tronco `ux/ui`.
+**Handoff Novo:** `handoff-ux/handoff.md` (o retrato da entrega atual) e `handoff-ux/entregas/<label>.md` (a nota desta entrega), no tronco `ux/ui`. **Handoff Tradicional:** `handoff-ux/<label>/handoff.md`.
 
 ## Regras
 
@@ -560,7 +616,7 @@ Antes de fechar, repita em 3–4 linhas: *"Handoff **<label>**: **N** histórias
 - **A UI vai com instrução de copiar e editar só a integração; a demo com instrução de descartar.** A regra fica escrita no `COMECE-AQUI.md`:
   - **O dev pode mudar na UI:** a integração (eventos, tipos, mapeamento de dados, imports, carregamento e erro vindos do back) e a correção de estado ou comportamento que **já existe** e não funciona como a spec, **avisando o PX**.
   - **Passa pelo PX:** criar o que não existe ou mudar o que o usuário vê (layout, componentes, comportamento, campos, textos, tokens).
-  - Como o dev edita, a entrega seguinte se aplica pelo diff entre as tags com `git apply --3way`, nunca sobrescrevendo a pasta. Arquivo da UI que ainda diz "copie sem editar" no cabeçalho está velho: reescreva ao tocar.
+  - Como o dev edita, a entrega seguinte se aplica pelo diff, nunca sobrescrevendo a pasta: no Handoff Novo, o diff entre as tags com `git apply --3way`; no Tradicional, o diff entre a pasta da entrega anterior e a desta. Arquivo da UI que ainda diz "copie sem editar" no cabeçalho está velho: reescreva ao tocar.
   - Se o dev precisar mudar o que o usuário vê para rodar no projeto dele, é defeito nosso e conserta-se na origem.
 
 - **Pacote self-contained.** Nenhuma referência a caminho fora do pacote — refs mortas são reescritas para relativas ou removidas na sanitização (BLOCO 6).
@@ -569,7 +625,7 @@ Antes de fechar, repita em 3–4 linhas: *"Handoff **<label>**: **N** histórias
 - **Terminologia canônica.** Termos superados são substituídos pela nomenclatura atual do produto na sanitização.
 - **Código e preview viajam juntos, em pastas irmãs, com instruções opostas.** No caminho do fonte, `handoff-ux/` se copia e `preview/proto.html` só se olha. O preview é build, não texto: custa zero token e um arquivo serve N telas. Nunca dentro do pacote, nunca sem o README que diz que não é código. No caminho de referência visual (legado), vale a escala antiga: single-file com `data-story` é o alvo, build em `prototipo/` é fallback, localhost é último recurso.
 - **Doc reconciliada.** README/handoff.md descrevem o que o pacote realmente contém.
-- **Push condicional, sempre pelo tronco.** Sem repo do dev, organiza localmente e o push fica pendente. Com repo, uma branch `ux/entrega-<label>` tirada do `ux/ui`, MR de volta para ele e tag anotada depois do merge. Nunca branch órfã por entrega, nunca a versão no nome da pasta.
+- **Push condicional, no modelo escolhido.** Sem repo do dev, organiza localmente e o push fica pendente. Com repo, o modelo sai da análise do repo (ver "Modelo de entrega"): **Handoff Novo** (branch `ux/entrega-<label>` tirada do `ux/ui`, MR e tag, com o Diogo acompanhando a criação ou migração do tronco e a primeira entrega) ou **Handoff Tradicional** (branch órfã `ux/<label>`), este só quando migrar for custoso agora. Nunca misture os dois no mesmo repo: depois que o tronco existe, toda entrega vai por ele.
 - **Falta de acesso é impedimento, não canal.** Registra com dono e data, monta o pacote igual, e se precisar sair antes do acesso, sai o pacote inteiro compactado. Protótipo solto por chat não é entrega: é o formato errado no canal errado.
 - **Não desenha tela** e **não inventa boundary.** Consolida o que `px-request`/`px-story` produziram; o que faltar vira Pergunta em aberto com dono.
 - **Nunca executa o push sem aceite explícito do PX.**
@@ -578,7 +634,7 @@ Antes de fechar, repita em 3–4 linhas: *"Handoff **<label>**: **N** histórias
 ## Relação com o fluxo
 
 ```
-                            ┌─→ dev (fonte da UI no alias do dev; visual só em legado sem shadcn)   [branch ux/entrega-<label> → MR no tronco ux/ui → tag]
+                            ┌─→ dev (fonte da UI no alias do dev; visual só em legado sem shadcn)   [Novo: ux/entrega-<label> → MR no tronco ux/ui → tag | Tradicional: branch órfã ux/<label>]
 px-request → px-story → px-handoff ─┤
                             └─→ px-sync → repo CENTRAL do PX     [espelho completo, main fast-forward]
                             ^ você está aqui
