@@ -70,18 +70,93 @@ if (faltando.length) {
 ok(`${nSkills} skills instaladas em ${relative(TARGET, skillsDest) || ".claude/skills"}`)
 writeFileSync(stampPath, VERSION + "\n")
 
-// 2. Docs de design system → <target>/docs/design-system/ (não sobrescreve sem avisar)
-const dsSrc = join(PKG, "assets", "design-system")
-const dsDest = join(TARGET, "docs", "design-system")
-mkdirSync(dsDest, { recursive: true })
-let nDocs = 0, nSkipped = 0
-for (const f of readdirSync(dsSrc)) {
-  const dest = join(dsDest, f)
-  if (existsSync(dest)) { nSkipped++; continue }
-  copyFileSync(join(dsSrc, f), dest)
-  nDocs++
+// 2. Docs de design system → <target>/docs/design-system/, os do DS QUE ESTE PROJETO USA.
+//
+// Há dois DS em uso (2026-11-09): o @cit (GitLab, centralit/shadcn) nos sistemas novos e o
+// boilerplate-cit (o primeiro, GitHub, centralit-boilerplate) nos antigos, que ainda não viraram a
+// chave. Cada um tem o próprio documento, e a fonte é o repositório dele: o pacote traz os dois em
+// assets/design-system/<ds>/, atualizados por scripts/sync-ds.mjs a cada versão.
+//
+// O DS sai do registry do components.json do projeto (raiz ou até dois níveis abaixo):
+// "@cit" ou cithyper → @cit; "@centralit" ou centralit-boilerplate → boilerplate-cit. --ds=cit|boilerplate
+// manda sobre a detecção. Sem registry conhecido, vale o boilerplate-cit (protótipo HTML e projetos
+// antigos). Com os dois DS no mesmo repo (um monorepo de projetos), nada é instalado: rode com --ds
+// dentro da pasta do projeto.
+//
+// SOBRESCREVE, ao contrário de antes: a cópia que nunca era atualizada é o que fez cada projeto ter
+// uma versão diferente do mesmo documento. A pasta passa a ser gerada, como .claude/skills/, e o
+// ORIGEM.md diz de onde veio. Cópia antiga feita à mão (sem ORIGEM.md) e diferente vai para
+// .anterior-<data>/ antes de ser trocada, e o instalador avisa.
+const DS = {
+  cit: { rotulo: "@cit", sinais: ["@cit", "cithyper"] },
+  boilerplate: { rotulo: "boilerplate-cit", sinais: ["@centralit", "centralit-boilerplate"] },
 }
-ok(`${nDocs} docs de design system em docs/design-system/${nSkipped ? ` (${nSkipped} já existiam, mantidos)` : ""}`)
+const acharComponentsJson = (dir, nivel = 0) => {
+  const achados = []
+  let entradas = []
+  try { entradas = readdirSync(dir, { withFileTypes: true }) } catch { return achados }
+  for (const e of entradas) {
+    if (e.isFile() && e.name === "components.json") achados.push(join(dir, e.name))
+    else if (e.isDirectory() && nivel < 2 && !["node_modules", "dist"].includes(e.name) && !e.name.startsWith("."))
+      achados.push(...acharComponentsJson(join(dir, e.name), nivel + 1))
+  }
+  return achados
+}
+const dsDoComponentsJson = (arquivo) => {
+  let regs = {}
+  try { regs = JSON.parse(readFileSync(arquivo, "utf8")).registries || {} } catch { return null }
+  const texto = Object.entries(regs).map(([k, v]) => `${k} ${typeof v === "string" ? v : v?.url || ""}`).join(" ")
+  return Object.keys(DS).find((ds) => DS[ds].sinais.some((s) => texto.includes(s))) || null
+}
+const argDS = process.argv.find((a) => a.startsWith("--ds="))?.slice(5)
+if (argDS && !DS[argDS]) fail(`--ds=${argDS} não existe. Use --ds=cit ou --ds=boilerplate`)
+let dsEscolhido = argDS, motivoDS = "pedido com --ds"
+if (!dsEscolhido) {
+  const porArquivo = acharComponentsJson(TARGET).map((a) => [relative(TARGET, a), dsDoComponentsJson(a)]).filter(([, ds]) => ds)
+  const distintos = [...new Set(porArquivo.map(([, ds]) => ds))]
+  if (distintos.length === 1) { dsEscolhido = distintos[0]; motivoDS = `pelo ${porArquivo[0][0]}` }
+  else if (distintos.length === 0) { dsEscolhido = "boilerplate"; motivoDS = "sem components.json com registry conhecido" }
+  else {
+    warn("Este repositório usa os dois design systems; os docs de design system NÃO foram instalados:")
+    for (const [a, ds] of porArquivo) warn(`  ${a} → ${DS[ds].rotulo}`)
+    warn("  rode o instalador dentro da pasta do projeto, ou com --ds=cit | --ds=boilerplate")
+  }
+}
+if (dsEscolhido) {
+  const dsSrc = join(PKG, "assets", "design-system", dsEscolhido)
+  const dsDest = join(TARGET, "docs", "design-system")
+  const origem = JSON.parse(readFileSync(join(dsSrc, "ORIGEM.json"), "utf8"))
+  mkdirSync(dsDest, { recursive: true })
+  const origemMd = join(dsDest, "ORIGEM.md")
+  const gerada = existsSync(origemMd)
+  const anterior = gerada ? (readFileSync(origemMd, "utf8").match(/^\*\*Design system:\*\* (.+)$/m)?.[1] ?? null) : null
+  const docs = readdirSync(dsSrc).filter((f) => f.endsWith(".md"))
+  const backup = join(dsDest, `.anterior-${new Date().toISOString().slice(0, 10)}`)
+  let nGuardados = 0
+  for (const f of docs) {
+    const dest = join(dsDest, f)
+    if (!gerada && existsSync(dest) && readFileSync(dest, "utf8") !== readFileSync(join(dsSrc, f), "utf8")) {
+      mkdirSync(backup, { recursive: true })
+      copyFileSync(dest, join(backup, f))
+      nGuardados++
+    }
+    copyFileSync(join(dsSrc, f), dest)
+  }
+  const ref = origem.commit
+    ? `${origem.repo.replace(/\.git$/, "")}, commit \`${origem.commit.slice(0, 7)}\` (${origem.data?.slice(0, 10)})`
+    : `${origem.repo.replace(/\.git$/, "")}, versão ${origem.versao}`
+  writeFileSync(origemMd,
+    `# Origem destes documentos\n\n` +
+    `**Design system:** ${origem.rotulo}\n\n` +
+    `Gerados pelo instalador das skills PX (v${VERSION}) a partir de ${ref}, pasta \`${origem.caminho}/\`.\n\n` +
+    `**Não edite aqui.** A fonte é o repositório do design system: mude lá, e a próxima versão das skills\n` +
+    `traz a mudança. Uma edição aqui some na próxima instalação.\n` +
+    (origem.provisorio ? `\n⚠️ ${origem.provisorio}\n` : ""))
+  ok(`docs de design system ${origem.rotulo} em docs/design-system/ (${motivoDS})`)
+  if (anterior && anterior !== origem.rotulo) info(`  o projeto trocou de ${anterior} para ${origem.rotulo}`)
+  if (nGuardados) warn(`  ${nGuardados} doc(s) antigo(s) e diferente(s) guardado(s) em ${relative(TARGET, backup)}/ antes da troca`)
+  if (origem.provisorio) warn("  cópia provisória: a fonte ainda não publicou esta versão (ver docs/design-system/ORIGEM.md)")
+}
 
 // 2b. Hook de sessão → <target>/.claude/hooks/ + SessionStart no settings.json
 // Avisa o UX quando as skills estão atrás, o sandbox não tem procedência ou falta
@@ -161,6 +236,12 @@ log(`${c.d}  estar no repo — ela vem no bundle do design system, não neste pa
 // Ao publicar uma versão nova: acrescente a chave aqui, 1 a 3 linhas de ~74 colunas.
 // Isto é o resumo de leitura rápida; a íntegra vive no CHANGELOG.md.
 const HIGHLIGHTS = {
+  "1.24.0": [
+    "Docs de design system do DS que o projeto usa: @cit ou boilerplate-cit,",
+    "  pelo registry do components.json (ou --ds=cit|boilerplate). A pasta",
+    "  docs/design-system/ passa a ser gerada e atualizada a cada instalacao,",
+    "  com ORIGEM.md; copia antiga a mao vai para .anterior-<data>/.",
+  ],
   "1.23.0": [
     "px-handoff oferece dois modelos: Tradicional (branch orfa) e Novo (tronco",
     "  ux/ui). Antes de recomendar, analisa o repo do dev: branches ux/*, padrao",

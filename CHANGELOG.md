@@ -3,6 +3,16 @@
 Todas as versões instaláveis via `npx github:DiogoRother-it/px-skills` / `npx @centralit/px-skills`.
 O instalador imprime só a versão mais recente no terminal — o histórico completo vive aqui.
 
+## 1.24.0 — 2026-11-09
+
+**O mesmo documento de design system tinha uma versão em cada projeto.** O instalador copiava os docs de `docs/design-system/` só quando o arquivo não existia, e nunca atualizava. Medido no `px-projects` em 2026-11-09: o `ds-components_v4.md` e o `ds-foundations_v4.md` do pacote, do `@cit`, do boilerplate e de cada projeto eram todos diferentes entre si. Além disso, os docs eram de um DS só, e hoje há dois em uso.
+
+- **Dois design systems, cada um com a sua fonte:** `@cit` (GitLab, `centralit/shadcn`) e `boilerplate-cit` (GitHub, `centralit-boilerplate`). O pacote traz os dois em `assets/design-system/<ds>/`, com um `ORIGEM.json` (repositório, commit, versão).
+- **O instalador escolhe pelo projeto:** pelo registry do `components.json` (raiz ou até dois níveis abaixo); `--ds=cit|boilerplate` manda sobre a detecção. Sem registry conhecido, vale o `boilerplate-cit`. Num repo com os dois (um monorepo de projetos), não instala e pede o `--ds` dentro da pasta do projeto.
+- **`docs/design-system/` passa a ser gerada:** é sobrescrita a cada instalação e ganha um `ORIGEM.md` que diz de onde veio e que não se edita ali. Cópia antiga feita à mão e diferente vai para `.anterior-<data>/` antes da troca. Trocar de DS é trocar o registry e reinstalar.
+- **`scripts/sync-ds.mjs`** traz os docs das fontes antes de cada versão, e `--verificar` diz se algum está atrás. Ele recusa o boilerplate abaixo da 0.4.0, para não apagar o Onboarding Guiado que a `px-tour` usa.
+- ⚠️ **O `boilerplate/` vai provisório:** a 0.4.0 do boilerplate não está publicada no GitHub. Até ela entrar, ele é a cópia da 1.23.0, e o `ds-foundations` está atrás da fonte.
+
 ## 1.23.0 — 2026-10-07
 
 **A 1.22.0 trocou a branch órfã pelo tronco de uma vez, mas os produtos estão em adequação.** Há repos com entregas órfãs em andamento, em que migrar agora custaria mais do que ajuda.
