@@ -97,10 +97,12 @@ primeiro, nos antigos que ainda não viraram a chave. O instalador escolhe pelo 
 versão diferente do mesmo documento. Cópia antiga feita à mão vai para `docs/design-system/.anterior-<data>/`
 antes da troca. Quando um projeto migrar para o `@cit`, basta trocar o registry e reinstalar.
 
-Cada `assets/design-system/<ds>/ORIGEM.json` diz o repositório, o commit e a versão da fonte. O
-`boilerplate/` está **provisório**: é a cópia da 1.23.0, com o Onboarding Guiado da 0.4.0, que ainda
-não foi publicada no GitHub (o `main` está na 0.3.1). O `sync-ds.mjs` recusa trazer o boilerplate
-abaixo da 0.4.0.
+Cada `assets/design-system/<ds>/ORIGEM.json` diz o repositório, o commit e a versão da fonte.
+
+⚠️ **O Onboarding Guiado se perdeu.** A 0.4.0 do boilerplate, que o trazia, nunca foi publicada, e o
+código sumiu com a máquina em que foi feita. Os docs do boilerplate seguem a fonte (0.3.1, com o
+`tour`), a spec do componente está no boilerplate em `docs/propostas/onboarding-guiado.md`, e a
+`px-tour` está suspensa até ele ser reconstruído.
 
 **Fluxo de edição:**
 - **Regra de componente** → edite **no repositório do DS** (`docs/design-system/` do `@cit` ou do boilerplate) → aqui, rode `node scripts/sync-ds.mjs` antes de publicar a versão. **Nunca** edite `assets/design-system/<ds>/*.md` à mão: some no próximo sync. `node scripts/sync-ds.mjs --verificar` diz se algum está atrás da fonte.

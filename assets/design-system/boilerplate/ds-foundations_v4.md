@@ -190,17 +190,17 @@ Biblioteca **Lucide** como padrão único para todos os produtos. Três tamanhos
 
 ### Escala semântica
 
-| Token | Uso |
-|---|---|
-| `--sh-flat` | Elementos discretos, sem elevação visível |
-| `--sh-card` | Cards padrão, leve separação do fundo |
-| `--sh-priority` | Cards em destaque, elevação moderada |
-| `--sh-modal` | Modais e drawers, máxima elevação |
+| Token CSS | Classe Tailwind | Valor | Uso |
+|---|---|---|---|
+| `--sh-flat` | `shadow-flat` | `0 1px 2px rgba(0,0,0,.05)` | Elementos discretos, sem elevação visível |
+| `--sh-card` | `shadow-card` | `0 2px 6px rgba(0,0,0,.08)` | Cards padrão, leve separação do fundo |
+| `--sh-priority` | `shadow-priority` | `0 4px 12px rgba(0,0,0,.10)` | Cards em destaque, elevação moderada |
+| `--sh-modal` | `shadow-modal` | `0 8px 32px rgba(0,0,0,.14)` | Modais e drawers, máxima elevação |
 
 ### Regras de uso
 - Sombra comunica hierarquia e elevação — usar de forma consistente
+- Nunca usar as classes utilitárias do Tailwind (`shadow-sm/md/lg/xl`) — usar apenas os tokens semânticos acima
 - Não usar gradientes decorativos — gradientes apenas para encoding de dado físico/contínuo
-- Valores reais vivem no `uikit-[projeto].html`
 
 ---
 
@@ -316,3 +316,40 @@ border / input / ring
 ### Regras
 - Nunca usar valor de cor hardcoded — sempre `var(--token)` ou classe mapeada
 - Em conflito entre documentos: UIKit prevalece para tokens visuais; DS prevalece para specs de comportamento
+
+---
+
+## 12. Paleta categórica (charts)
+
+### O que é
+Cinco tokens de série para gráficos e mapas de categoria (papel de usuário, tipo de evento, etc.). Não são tokens de marca — são escala funcional para distinguir séries de dado.
+
+### Tokens
+
+| Token | Classe Tailwind | Valor padrão | Papel |
+|---|---|---|---|
+| `--chart-1` | `text-chart-1` / `bg-chart-1` | `#145d61` (primary do projeto) | Série principal |
+| `--chart-2` | `text-chart-2` / `bg-chart-2` | `#16a34a` | Série 2 |
+| `--chart-3` | `text-chart-3` / `bg-chart-3` | `#f59e0b` | Série 3 |
+| `--chart-4` | `text-chart-4` / `bg-chart-4` | `#ef4444` | Série 4 |
+| `--chart-5` | `text-chart-5` / `bg-chart-5` | `#8b5cf6` | Série 5 |
+
+### Regras de uso
+- O `--chart-1` deve ser alinhado à cor primária do projeto ao aplicar o boilerplate
+- Consumir sempre via `var(--chart-N)` em CSS/JS — nunca como atributo SVG direto (variável CSS não resolve em atributo SVG; usar `getComputedStyle` em runtime se necessário)
+- Para mapas de categoria fora de gráficos (ex: badge de papel de usuário), preferir os tokens semânticos (`primary`, `success`, `warning`, `destructive`) antes de criar mapeamento ad-hoc
+- Se o projeto precisar de mais de 5 séries, definir a extensão no `uikit-[projeto].html`, não aqui
+
+---
+
+## ⚠️ Exceção documentada — contraste de `muted-foreground`
+
+**Decisão pendente de UX.**
+
+`--muted-foreground: #6b7280` sobre `--background: #ffffff` resulta em **4,48:1** — marginalmente abaixo do piso WCAG AA (4,5:1) para texto normal.
+
+Enquanto não houver decisão, `muted-foreground` **não deve ser usado em texto informativo crítico** (valores, rótulos de campo, mensagens de erro). Usar `--foreground` (7,58:1) nesses contextos. `muted-foreground` permanece válido para metadados, placeholders e texto decorativo onde a não conformidade é aceitável visualmente.
+
+**Opções a decidir:**
+- (a) Escurecer para `#6b7280` → `#595f6b` (~4,6:1) — mudança sutil, fecha o gap
+- (b) Manter e documentar exceção explícita, restringindo uso a texto decorativo

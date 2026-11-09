@@ -56,7 +56,7 @@ e2e/flows/<slug-da-jornada>.md
 
 Com o flow salvo, ofereça: "Quer rodar o `ux-persona` nesse flow agora, com qual persona?" Se ainda não há persona definida pro público, aponte para os 6 personas bundled do `ux-persona` (ou "criar próprio").
 
-Se todas as telas do flow já têm `px-story` com proto aprovado, ofereça também: "Quer gerar o onboarding guiado dessa jornada com o `px-tour`?" Um flow, um tour: é a unidade que o `px-tour` consome.
+⛔ **Não ofereça o `px-tour` enquanto ele estiver suspenso** (1.24.0: o componente Onboarding Guiado se perdeu). Quando ele voltar: se todas as telas do flow já têm `px-story` com proto aprovado, ofereça "Quer gerar o onboarding guiado dessa jornada com o `px-tour`?". Um flow, um tour: é a unidade que o `px-tour` consome.
 
 ## Relação com o fluxo
 

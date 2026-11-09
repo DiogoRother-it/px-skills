@@ -1,6 +1,6 @@
 ---
 name: px-tour
-description: Gera o onboarding guiado de um fluxo lógico ao fechar a cadeia PX, sobre o componente Onboarding Guiado do design system — um tour acionável por fluxo (ex. "Novo contrato", "Visualizar contrato") e um tour global que encadeia todos, montados em runtime pelas permissões do usuário (RBAC granular). Não é entrevista: compila os passos de artefatos já prontos (flow do ux-flows, px-story, px-request, mapa de telas, relatórios do ux-persona) e só pede confirmação. Use quando o líder disser "gera o tour", "cria o onboarding desse fluxo", "quero o guia dessa jornada", "monta o tour global", ou quando ux-flows/px-story/px-handoff oferecerem o onboarding. Posição: depois da última px-story do fluxo e do ux-flows, antes da px-handoff.
+description: ⚠️ SUSPENSA desde a 1.24.0 (2026-11-09) — o componente Onboarding Guiado, sobre o qual ela foi escrita, se perdeu e não existe em nenhum dos dois design systems; ao ser chamada, avisa e para. Gera o onboarding guiado de um fluxo lógico ao fechar a cadeia PX, sobre o componente Onboarding Guiado do design system — um tour acionável por fluxo (ex. "Novo contrato", "Visualizar contrato") e um tour global que encadeia todos, montados em runtime pelas permissões do usuário (RBAC granular). Não é entrevista: compila os passos de artefatos já prontos (flow do ux-flows, px-story, px-request, mapa de telas, relatórios do ux-persona) e só pede confirmação. Use quando o líder disser "gera o tour", "cria o onboarding desse fluxo", "quero o guia dessa jornada", "monta o tour global", ou quando ux-flows/px-story/px-handoff oferecerem o onboarding. Posição: depois da última px-story do fluxo e do ux-flows, antes da px-handoff.
 compatibility: claude-code
 metadata:
   audience: px-ux
@@ -8,6 +8,19 @@ metadata:
 ---
 
 # px-tour — onboarding guiado por fluxo lógico
+
+> ## ⛔ SUSPENSA (px-skills 1.24.0, 2026-11-09)
+>
+> Esta skill foi escrita sobre o componente **Onboarding Guiado** da 0.4.0 do boilerplate. A 0.4.0
+> nunca foi publicada e o código se perdeu: o componente **não existe** no boilerplate-cit nem no
+> `@cit`. Os dois só têm o `tour` (Tour Guiado), com outra API. A spec do que se perdeu está no
+> boilerplate, em `docs/propostas/onboarding-guiado.md`.
+>
+> **Ao ser chamada, não gere passos, âncoras nem código.** Diga ao líder, em duas linhas, que a skill
+> está suspensa e por quê, e ofereça os caminhos: (a) reconstruir o Onboarding Guiado a partir da
+> spec, no `@cit` ou no boilerplate, antes de usar esta skill; (b) se o produto precisa de um guia
+> agora, montar com o `tour` do DS que o projeto usa, fora desta skill, pela `px-request`. O resto
+> deste arquivo fica como registro e volta a valer quando o componente existir.
 
 Um **tour** aqui é o guia do componente **Onboarding Guiado** (`ds-components_v4.md` → Onboarding Guiado; anatomia em `src/components/ui/onboarding/`, que é a spec do que já vem pronto): bússola ao lado do título da seção, modal de boas vindas, passos ancorados em elementos reais da tela e pesquisa de satisfação ao concluir. Esta skill **não desenha o componente**: escreve os passos, as âncoras e a fiação que o produto precisa para o guia rodar.
 

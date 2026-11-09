@@ -241,6 +241,9 @@ const HIGHLIGHTS = {
     "  pelo registry do components.json (ou --ds=cit|boilerplate). A pasta",
     "  docs/design-system/ passa a ser gerada e atualizada a cada instalacao,",
     "  com ORIGEM.md; copia antiga a mao vai para .anterior-<data>/.",
+    "px-tour SUSPENSA: o componente Onboarding Guiado se perdeu (a 0.4.0 do",
+    "  boilerplate nunca foi publicada). A spec esta no boilerplate, em",
+    "  docs/propostas/onboarding-guiado.md.",
   ],
   "1.23.0": [
     "px-handoff oferece dois modelos: Tradicional (branch orfa) e Novo (tronco",

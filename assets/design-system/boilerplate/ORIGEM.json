@@ -4,8 +4,7 @@
   "repo": "https://github.com/DiogoRother-it/centralit-boilerplate.git",
   "ref": "main",
   "caminho": "docs/design-system",
-  "commit": null,
-  "data": null,
-  "versao": "0.4.0",
-  "provisorio": "A cópia que o pacote já distribuía na 1.23.0, com o Onboarding Guiado da 0.4.0, que ainda não está publicada na fonte (o main está na 0.3.1). O ds-foundations está atrás da fonte. Rode node scripts/sync-ds.mjs --so=boilerplate quando a 0.4.0 estiver no GitHub."
+  "commit": "9b408e67005a2e0be31bab83b9a209f49dd9dcb3",
+  "data": "2026-08-25T15:56:37-03:00",
+  "versao": "0.3.1"
 }

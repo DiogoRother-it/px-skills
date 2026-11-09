@@ -33,9 +33,8 @@ export const FONTES = {
     repo: "https://github.com/DiogoRother-it/centralit-boilerplate.git",
     ref: "main",
     caminho: "docs/design-system",
-    // A 0.4.0 trouxe o Onboarding Guiado, que a px-tour usa. Fonte abaixo disso apagaria a seção
-    // que o pacote já distribui. Só passa com --forcar.
-    versaoMinima: "0.4.0",
+    // Um DS pode declarar versaoMinima: fonte abaixo dela não é trazida (sem --forcar). O boilerplate
+    // já teve a 0.4.0 aqui, até se saber que ela se perdeu sem publicar (2026-11-09).
   },
 }
 
