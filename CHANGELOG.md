@@ -3,6 +3,13 @@
 Todas as versões instaláveis via `npx github:DiogoRother-it/px-skills` / `npx @centralit/px-skills`.
 O instalador imprime só a versão mais recente no terminal — o histórico completo vive aqui.
 
+## 1.25.0 — 2026-11-11
+
+**Projeto novo nascia no design system antigo sem ninguém escolher.** A `px-setup` sempre clonava o `centralit-boilerplate`, cujo registry é `@centralit`; o instalador via isso e instalava os docs do `boilerplate-cit`, mesmo em sistema novo, que deveria estar no `@cit`.
+
+- **`px-setup` pergunta o DS** (Passo 1b), com `@cit` como padrão para sistema novo. A escolha define o clone (`gitlab.cithyper.click/centralit/shadcn` ou `centralit-boilerplate`), o registry e o token (`CIT_REGISTRY_TOKEN` com `PRIVATE-TOKEN`, ou `CENTRALIT_TOKEN`), o `--ds` do instalador e de onde o teste de alcance deve responder. Depois de instalar, confere o `ORIGEM.md`; DS diferente do escolhido para o setup.
+- **`px-start` confere o DS de um sandbox que já existe** (`ORIGEM.md` e registry), avisa quando um sistema novo está no `boilerplate-cit` e para se os dois discordam. O DS entra no eco e no `PX-PROGRESS` (`ds: cit | boilerplate`).
+
 ## 1.24.0 — 2026-11-09
 
 **O mesmo documento de design system tinha uma versão em cada projeto.** O instalador copiava os docs de `docs/design-system/` só quando o arquivo não existia, e nunca atualizava. Medido no `px-projects` em 2026-11-09: o `ds-components_v4.md` e o `ds-foundations_v4.md` do pacote, do `@cit`, do boilerplate e de cada projeto eram todos diferentes entre si. Além disso, os docs eram de um DS só, e hoje há dois em uso.

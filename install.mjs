@@ -236,6 +236,11 @@ log(`${c.d}  estar no repo — ela vem no bundle do design system, não neste pa
 // Ao publicar uma versão nova: acrescente a chave aqui, 1 a 3 linhas de ~74 colunas.
 // Isto é o resumo de leitura rápida; a íntegra vive no CHANGELOG.md.
 const HIGHLIGHTS = {
+  "1.25.0": [
+    "px-setup pergunta o design system antes de clonar: @cit (padrao para",
+    "  sistema novo, GitLab centralit/shadcn, CIT_REGISTRY_TOKEN) ou",
+    "  boilerplate-cit. px-start confere o DS de sandbox que ja existe.",
+  ],
   "1.24.0": [
     "Docs de design system do DS que o projeto usa: @cit ou boilerplate-cit,",
     "  pelo registry do components.json (ou --ds=cit|boilerplate). A pasta",

@@ -38,24 +38,60 @@ O PX sempre começa no boilerplate — independentemente de o repo do dev existi
 
 > **Branch por funcionalidade/fluxo, não por projeto.** Um projeto tem várias funcionalidades → várias branches `ux/*`. O slug `<funcionalidade>` é o **mesmo** que a cadeia usa em `planning/<iniciativa>/` e no `PX-PROGRESS` — um slug só governa planning, checkpoint e branch. Se a funcionalidade ainda não tem nome (discovery não rodou), ela nasce assim que o `px-intake` decide o slug; não invente nome provisório.
 
+## Passo 1b — Qual design system? (perguntar sempre, antes de clonar)
+
+**Decidir:** sobre qual design system este projeto vai ser construído.
+**Por que importa:** há **dois DS em uso** (desde 2026-11-09). O instalador das skills escolhe a documentação pelo registry do `components.json`. Se o sandbox nasce do boilerplate antigo, o projeto fica no `boilerplate-cit` **sem nenhum aviso**, e toda a cadeia (`px-request`, `px-proto`, `px-change`) passa a ancorar no DS errado.
+
+Pergunte (`AskUserQuestion`):
+- **`@cit` (Recomendado para sistema novo)**: o DS atual, fonte em `gitlab.cithyper.click/centralit/shadcn`.
+- **`boilerplate-cit`**: o DS antigo, só para produto que ainda não migrou ou para estender um sistema que já está nele.
+
+Default: `@cit`, a menos que o líder diga que o produto já vive no `boilerplate-cit`. Grave a escolha no eco final e no `PX-PROGRESS` (`ds: cit | boilerplate`). As etapas seguintes dependem dela:
+
+| | `@cit` | `boilerplate-cit` |
+|---|---|---|
+| Registry no `components.json` | `@cit` | `@centralit` |
+| Instalar componente | `npx shadcn add @cit/<nome>` | `npx shadcn add @centralit/<nome>` |
+| Instalar skills | `npx github:DiogoRother-it/px-skills --ds=cit` | `npx github:DiogoRother-it/px-skills --ds=boilerplate` |
+| Teste de alcance (Passo 2b) | resposta vem de `gitlab.cithyper.click` | resposta vem de `api.github.com` |
+
+| Repositório-base (clone) | `https://gitlab.cithyper.click/centralit/shadcn.git` | `https://github.com/DiogoRother-it/centralit-boilerplate.git` |
+| Token no ambiente | `CIT_REGISTRY_TOKEN` (header `PRIVATE-TOKEN`) | `CENTRALIT_TOKEN` (header `Authorization: Bearer`) |
+
+Bloco `registries` esperado no `components.json` de um projeto `@cit`:
+
+```json
+"@cit": {
+  "url": "https://gitlab.cithyper.click/api/v4/projects/centralit%2Fshadcn/repository/files/public%2Fr%2F{name}.json/raw?ref=main",
+  "headers": { "PRIVATE-TOKEN": "${CIT_REGISTRY_TOKEN}" }
+}
+```
+
 ## Passo 2 — Montar o sandbox
 
-**O que é:** uma cópia local do boilerplate — já traz a biblioteca de componentes e os tokens. É o ateliê do PX: padronizado, isolado e independente do repo do dev.
+**O que é:** uma cópia local da base do DS escolhido no Passo 1b. Ela já traz a biblioteca de componentes e os tokens. É o ateliê do PX: padronizado, isolado e independente do repo do dev.
 
 **Executar (a skill roda; não peça pro UX digitar):**
 1. Pedir um nome pra pasta (livre; ex: a ideia do projeto).
-2. Clonar o boilerplate: `git clone https://github.com/DiogoRother-it/centralit-boilerplate.git <pasta>`
+2. Clonar a base do DS escolhido:
+   - `boilerplate-cit`: `git clone https://github.com/DiogoRother-it/centralit-boilerplate.git <pasta>`
+   - `@cit`: `git clone https://gitlab.cithyper.click/centralit/shadcn.git <pasta>` (login do GitLab). Depois de clonar, confira que o `components.json` tem o registry `@cit` (bloco do Passo 1b).
 3. Entrar na pasta e **preservar a procedência, desabilitando o push** (⛔ **nunca** `rm -rf .git` — ver abaixo):
    - `git remote rename origin boilerplate-upstream`
    - `git remote set-url --push boilerplate-upstream no-push`
 4. Instalar: `npm install`
 5. **Configurar o token do registry** (Passo 2b) — sem ele o sandbox não puxa componente novo.
-6. Adicionar as skills: `npx github:DiogoRother-it/px-skills`
+6. Adicionar as skills, passando o DS do Passo 1b: `npx github:DiogoRother-it/px-skills --ds=cit` (ou `--ds=boilerplate`). Em seguida, confira que `docs/design-system/ORIGEM.md` diz o DS escolhido. Se disser outro, ⛔ pare.
 7. Avisar pra **recarregar a sessão** (as skills aparecem no menu `/` só depois) e **começar por `/px-start`**.
 
 > ⛔ **Por que não `rm -rf .git`.** Cortar o git deixa o sandbox **inauditável**: sem commit de origem, sem `git fetch`, sem idade. Um sandbox que envelhece meses passa a divergir do boilerplate **sem sinal nenhum** — e a cadeia inteira produz entrega plausível sobre base errada. O remote renomeado com push desabilitado resolve as duas coisas: protege o boilerplate do time (era a intenção original) **e** mantém a procedência medível pelo `px-proto`.
 
-## Passo 2b — Token do registry `@centralit` (uma vez por máquina)
+## Passo 2b — Token do registry (uma vez por máquina)
+
+> **No `@cit`:** o token é o `CIT_REGISTRY_TOKEN`, um Personal Access Token do GitLab `gitlab.cithyper.click` com escopo `read_api` e acesso ao projeto `centralit/shadcn`. Verificação: `echo $CIT_REGISTRY_TOKEN`, bloco `@cit` no `components.json` e teste de alcance com a resposta vindo de `gitlab.cithyper.click`. Para persistir: `export CIT_REGISTRY_TOKEN=<token>` no perfil do shell. As mesmas regras de "falhar fechado" valem.
+>
+> O restante desta seção descreve o registry `@centralit` (`boilerplate-cit`).
 
 **Por que importa:** a biblioteca de componentes **não** vem só do clone. Ela é distribuída como registry shadcn privado (`@centralit`, 52 itens), declarado no `components.json` do boilerplate e autenticado por `Authorization: Bearer ${CENTRALIT_TOKEN}`. Clone e registry são **dois acessos distintos**: dá pra ter o clone e não ter o registry. Nesse estado, `npx shadcn add` cai no shadcn **público** — que responde com sucesso e entrega o default `new-york`, não o componente da Central IT. Silencioso, plausível e errado.
 
@@ -97,7 +133,7 @@ Se o `components.json` não tiver o bloco `registries`, o procedimento completo 
 
 ## Eco final
 
-Antes de executar, repita em 2–3 linhas: *"Então: projeto **X**, vou montar o sandbox em **Z** — confirma?"*. Só então rode os comandos.
+Antes de executar, repita em 2–3 linhas: *"Então: projeto **X**, design system **`@cit` | `boilerplate-cit`**, vou montar o sandbox em **Z** — confirma?"*. Só então rode os comandos.
 
 ## Regras
 
@@ -105,7 +141,8 @@ Antes de executar, repita em 2–3 linhas: *"Então: projeto **X**, vou montar o
 - **Não faz a entrega.** Branch, push e MR são responsabilidade do `px-handoff`.
 - **Nunca `git` na mão pro UX.** A skill executa; o UX só confirma.
 - **Sandbox é o ateliê, não o produto.** Depois de entregue e mergeado, pode ser apagado.
-- **Dois acessos, não um.** O `git clone` usa o login normal do GitHub; o registry `@centralit` exige `CENTRALIT_TOKEN`. Confirmar os dois no Passo 2b — ter um só é o estado que produz entrega errada em silêncio.
+- **DS escolhido, não herdado.** O Passo 1b pergunta sempre. Clonar o boilerplate por padrão coloca o projeto no DS antigo sem ninguém decidir.
+- **Dois acessos, não um.** O `git clone` usa o login normal (GitLab no `@cit`, GitHub no `boilerplate-cit`); o registry exige o token (`CIT_REGISTRY_TOKEN` ou `CENTRALIT_TOKEN`). Confirmar os dois no Passo 2b — ter um só é o estado que produz entrega errada em silêncio.
 - **Três acessos, contando o destino.** O repo do dev se verifica no Passo 2c, no começo do projeto. Acesso descoberto como faltante no dia da entrega vira improviso, e o improviso é entregar por chat.
 - **Procedência preservada.** ⛔ Nunca `rm -rf .git` no sandbox. Remote renomeado com push desabilitado; é o que permite ao `px-proto` medir a idade da base.
 - **Falhar fechado.** Acesso ausente **bloqueia** o setup. Nunca cair no shadcn público como alternativa.
