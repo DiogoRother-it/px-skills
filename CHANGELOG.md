@@ -3,6 +3,15 @@
 Todas as versões instaláveis via `npx github:DiogoRother-it/px-skills` / `npx @centralit/px-skills`.
 O instalador imprime só a versão mais recente no terminal — o histórico completo vive aqui.
 
+## 1.26.0 — 2026-11-11
+
+**A `px-draw` só sabia fazer um rascunho HTML estático e neutro.** Para comparar caminhos e levar para reunião, o time montava o quadro à mão.
+
+- **Dois formatos à escolha do UX (Passo 0):** **HTML único**, para testar uma ideia a fundo (vista do problema, vista da proposta funcionando e painel de testes com "Comparar com hoje"), e **canvas de propostas** no Artifacts (tipo Design), com uma linha por pergunta de design, telas numeradas em fluxo ou variações, "Hoje" em cima da proposta, post-its e páginas. Todas as telas do canvas têm PLAY, e a skill avisa o UX que o quadro é interativo. Sem a ferramenta de Artifacts, cai para o HTML único.
+- **Visual pelo estado do projeto:** design system do projeto (`@cit` ou `boilerplate-cit`) quando já está definido; neutro só no discovery inicial.
+- **Fechamento por linha:** o UX diz qual variação venceu em cada linha, e o link vai para o `PX-PROGRESS`. Proibido dado inventado com cara de real.
+- `px-start` passa a oferecer "Exploração visual (HTML único ou canvas)" no lugar de "Rascunho HTML descartável".
+
 ## 1.25.0 — 2026-11-11
 
 **Projeto novo nascia no design system antigo sem ninguém escolher.** A `px-setup` sempre clonava o `centralit-boilerplate`, cujo registry é `@centralit`; o instalador via isso e instalava os docs do `boilerplate-cit`, mesmo em sistema novo, que deveria estar no `@cit`.

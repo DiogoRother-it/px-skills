@@ -236,6 +236,11 @@ log(`${c.d}  estar no repo — ela vem no bundle do design system, não neste pa
 // Ao publicar uma versão nova: acrescente a chave aqui, 1 a 3 linhas de ~74 colunas.
 // Isto é o resumo de leitura rápida; a íntegra vive no CHANGELOG.md.
 const HIGHLIGHTS = {
+  "1.26.0": [
+    "px-draw com dois formatos: HTML unico (problema, proposta e painel de",
+    "  testes) ou canvas de propostas no Artifacts, com linhas lado a lado,",
+    "  telas com PLAY e post-its. Usa o DS do projeto quando ja definido.",
+  ],
   "1.25.0": [
     "px-setup pergunta o design system antes de clonar: @cit (padrao para",
     "  sistema novo, GitLab centralit/shadcn, CIT_REGISTRY_TOKEN) ou",
