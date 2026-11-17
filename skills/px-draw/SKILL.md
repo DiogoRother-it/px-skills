@@ -1,6 +1,6 @@
 ---
 name: px-draw
-description: Exploração visual antes da spec, em dois formatos à escolha do UX. HTML único para testar uma ideia a fundo (vista do problema, vista da proposta e painel de testes), ou canvas de propostas no Artifacts (tipo Design), com linhas de comparação lado a lado, telas numeradas que funcionam de verdade (PLAY), post-its e comentários, como um quadro do Figma. Visual neutro no discovery inicial; design system do projeto (`@cit` ou `boilerplate-cit`) quando ele já está definido. Ao fechar, descarta e vai para px-start, ou vira referência para px-request. Use quando quiser explorar ou comparar ideias visualmente antes de especificar: "rascunhar uma ideia", "explorar visualmente", "ver como ficaria", "montar variações", "comparar propostas", "montar um canvas", "levar opções pra reunião", "discovery ainda muito vago".
+description: Exploração visual antes da spec, em dois formatos à escolha do UX. HTML único para testar uma ideia a fundo (vista do problema, vista da proposta e painel de testes), ou canvas de propostas no Artifacts (tipo Design), com linhas de comparação lado a lado, telas numeradas que funcionam de verdade (PLAY), post-its e comentários, como um quadro do Figma. Visual neutro no discovery inicial; design system `@cit` quando o projeto já tem sandbox. Ao fechar, descarta e vai para px-start, ou vira referência para px-request. Use quando quiser explorar ou comparar ideias visualmente antes de especificar: "rascunhar uma ideia", "explorar visualmente", "ver como ficaria", "montar variações", "comparar propostas", "montar um canvas", "levar opções pra reunião", "discovery ainda muito vago".
 compatibility: claude-code
 metadata:
   audience: px-ux
@@ -53,10 +53,10 @@ Pergunte (ou infira de `$ARGUMENTS`), uma coisa de cada vez:
 ### Visual: neutro ou design system?
 
 Decida pelo estado do projeto, sem perguntar se a resposta for óbvia:
-- **Projeto com design system definido** (sandbox com `docs/design-system/ORIGEM.md`, ou `ds` no `PX-PROGRESS`) → use o DS do projeto (`@cit` ou `boilerplate-cit`): tokens de cor, tipografia, raio e anatomia dos componentes descritos em `docs/design-system/`. A proposta fica comparável com o produto real.
+- **Projeto com design system definido** (sandbox com `docs/design-system/ORIGEM.md`, ou `ds` no `PX-PROGRESS`) → use o `@cit`: tokens de cor, tipografia, raio e anatomia dos componentes descritos em `docs/design-system/`. A proposta fica comparável com o produto real.
 - **Discovery inicial, sem DS nem identidade** → visual neutro: cinzas (`#f5f5f5`, `#e0e0e0`, `#666`, `#1a1a1a`) e um acento placeholder (`#3b82f6`). Identidade vem no `px-kickoff`.
 
-Eco antes de produzir: *"Vou montar [HTML único | canvas] de [X], [N telas / linhas], visual [neutro | `@cit` | `boilerplate-cit`], [com | sem] comparação com hoje. Confirma?"*
+Eco antes de produzir: *"Vou montar [HTML único | canvas] de [X], [N telas / linhas], visual [neutro | `@cit`], [com | sem] comparação com hoje. Confirma?"*
 
 ## Passo 2A: HTML único
 

@@ -84,7 +84,7 @@ Segue `Skill Prompting Conventions` do `CLAUDE.md`. Estruturada pra decisões en
 **Por que importa:** prazo, stack e marca mudam o que é possível. Melhor saber agora que no handoff.
 **Perguntar:**
 - "Tem prazo, orçamento ou data que já é fato?" — *ex: precisa demonstrar até segunda.*
-- "Tem restrição técnica ou de marca já dada?" — *ex: precisa rodar sobre o boilerplate; cores da marca X.*
+- "Tem restrição técnica ou de marca já dada?" — *ex: precisa rodar sobre o design system `@cit`; cores da marca X.*
 - "Existe documento, link, tela legada ou stakeholder que eu deveria conhecer?" — registra inputs/referências.
 
 ## BLOCO 5 — Escopo inicial (inclui / não inclui)
@@ -104,7 +104,7 @@ Segue `Skill Prompting Conventions` do `CLAUDE.md`. Estruturada pra decisões en
    - Dependência de ordem entre partes (uma trava a outra).
    - Escopo maior do que cabe numa conversa só.
 2. **Identidade existe?** Se é **projeto novo** (sem público-alvo/UI KIT definidos) → o próximo passo é **`px-kickoff`**, sempre, antes de qualquer tela.
-3. **Alvo de build** (`AskUserQuestion`) — *Protótipo HTML (via `px-proto`, valida fluxo sem tocar no produto)* × *App React do produto (a partir do boilerplate) (Recomendado se já vai virar produto)*. Muda o que "pronto" significa.
+3. **Alvo de build** (`AskUserQuestion`) — *Protótipo HTML (via `px-proto`, valida fluxo sem tocar no produto)* × *App React do produto (a partir do sandbox `@cit`) (Recomendado se já vai virar produto)*. Muda o que "pronto" significa.
 4. **Roteia** (`AskUserQuestion`, recomendada marcada):
    - Projeto novo → **`px-kickoff`** (setup de identidade), depois o abaixo.
    - Iniciativa (várias telas) → **`px-epic`** pra decompor em backlog de telas → cada tela no **`px-request`**.

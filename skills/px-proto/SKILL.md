@@ -1,19 +1,19 @@
 ---
 name: px-proto
-description: Cria a tela do protótipo dentro do boilerplate (Vite + localhost) usando os componentes reais do shadcn, os tokens reais do UI KIT e mock data do px-request. Constrói em DUAS pastas obrigatoriamente: a UI, que é destinada à produção e o dev copia e edita só a integração, e a demo do protótipo (seletores de papel e estado, dados de exemplo), que é descartável. O PX trabalha no localhost com HMR — vê, ajusta, aprova. Obrigatório após o px-request e antes do px-story. Use quando o líder disser "gera o proto", "quero ver como fica", "prototipar a tela", "visualizar a spec", ou ao fechar um px-request.
+description: Cria a tela do protótipo dentro do sandbox `@cit` (Vite + localhost) usando os componentes reais do shadcn, os tokens reais do UI KIT e mock data do px-request. Constrói em DUAS pastas obrigatoriamente: a UI, que é destinada à produção e o dev copia e edita só a integração, e a demo do protótipo (seletores de papel e estado, dados de exemplo), que é descartável. O PX trabalha no localhost com HMR — vê, ajusta, aprova. Obrigatório após o px-request e antes do px-story. Use quando o líder disser "gera o proto", "quero ver como fica", "prototipar a tela", "visualizar a spec", ou ao fechar um px-request.
 compatibility: claude-code
 metadata:
   audience: px-ux
   workflow: proto
 ---
 
-# px-proto — protótipo visual no boilerplate (Vite + localhost)
+# px-proto — protótipo visual no sandbox `@cit` (Vite + localhost)
 
-Esta skill cria o protótipo da tela **dentro do boilerplate**, usando os componentes reais do shadcn/ui, os tokens reais do `src/index.css` e o servidor de desenvolvimento Vite. O PX vê a tela no localhost com HMR — ajusta em tempo real, aprova — e só então a tela vira história (`px-story`).
+Esta skill cria o protótipo da tela **dentro do sandbox `@cit`**, usando os componentes reais do shadcn/ui, os tokens reais do `src/index.css` e o servidor de desenvolvimento Vite. O PX vê a tela no localhost com HMR — ajusta em tempo real, aprova — e só então a tela vira história (`px-story`).
 
 **A tela nasce em duas pastas, e a distinção importa mais que qualquer outra regra desta skill:** `src/<produto>/` guarda a **UI, que é destinada à produção** e é entregue ao dev com a instrução de copiar e editar só a integração; `src/proto/` guarda o **demo**, que é descartável. Tratar o protótipo inteiro como descartável é o que produz código que o dev não consegue reaproveitar, e é a causa raiz da divergência visual entre protótipo e implementação.
 
-**Por que no boilerplate:** componentes reais, tokens reais, HMR. Aqui é o mesmo stack do produto, só com mock data e diretório separado.
+**Por que no sandbox:** componentes reais, tokens reais, HMR. Aqui é o mesmo stack do produto, só com mock data e diretório separado.
 
 > ⛔ **HTML standalone (vanilla ou via CDN) não é aproximação aceitável: é a causa raiz medida da divergência.** Em 2026-09-18 o time de dev do SmartCity mostrou o que recebia: HTML de 3.407 linhas sem uma classe Tailwind e sem uma fronteira de componente, enquanto o repo deles tinha a nossa biblioteca inteira, byte a byte. A LLM do dev precisou reinterpretar cada região, e cada dev obteve um resultado diferente. Uma tela que existe só como `.html` **não é protótipo desta skill e não é aprovável** (Passo 9). Se o líder pedir "gera um HTML", a resposta é: o proto nasce em TSX aqui; o HTML pra PO sai depois pelo `px-preview`.
 
@@ -114,13 +114,13 @@ Este mapeamento é **público** — mostre ao PX antes de codar.
 
 **Regras (as de sempre, mantidas):**
 - Se existe em `src/components/ui/` → usar obrigatoriamente, nunca reimplementar.
-- Se não existe → `npx shadcn@latest add @centralit/<componente>` antes de codar. **O prefixo `@centralit/` é obrigatório.**
-- ⛔ **`npx shadcn add <componente>` sem o prefixo é proibido.** A forma sem prefixo resolve no shadcn **público** e **funciona** — entrega o default `new-york` em vez do componente da Central IT. Não dá erro, não dá aviso: o proto inteiro nasce sobre a base errada e a `anatomia-visual.md` do Passo 8b registra os valores vanilla como se fossem "default do boilerplate — não customizar", instruindo o dev a preservar o que ele deve substituir. Foi exatamente esse o mecanismo do incidente do sandbox sem token.
+- Se não existe → `npx shadcn@latest add @cit/<componente>` antes de codar. **O prefixo `@cit/` é obrigatório.**
+- ⛔ **`npx shadcn add <componente>` sem o prefixo é proibido.** A forma sem prefixo resolve no shadcn **público** e **funciona** — entrega o default `new-york` em vez do componente da Central IT. Não dá erro, não dá aviso: o proto inteiro nasce sobre a base errada e a `anatomia-visual.md` do Passo 8b registra os valores vanilla como se fossem "default do DS — não customizar", instruindo o dev a preservar o que ele deve substituir. Foi exatamente esse o mecanismo do incidente do sandbox sem token.
 - **Se o `add` do registry falhar** (401/404) → ⛔ **pare**. É acesso, não é componente faltando. Volte ao `px-setup` Passo 2b. Nunca instale a versão pública como contorno, nunca implemente o componente à mão.
 - **Componente que não existe no registry** (53 itens em `public/r/`) → é decisão de design system, não de proto. Registre como Pergunta em aberto com dono; não invente primitiva.
 - `<table>` HTML nativo, `<span>` com classes manuais, `<button>` sem primitiva shadcn → **proibidos** quando existe equivalente no catálogo.
 
-Componentes que **sempre** existem no boilerplate e **nunca** devem ser reimplementados:
+Componentes que **sempre** existem no `@cit` e **nunca** devem ser reimplementados:
 
 | Elemento | Usar |
 |---|---|
@@ -178,20 +178,22 @@ próxima sessão, e é ela que o `px-story` e o `px-handoff` vão citar.
 
 **A — Procedência da base (novo)**
 
-1. **É uma cópia do boilerplate?** `git remote -v` deve mostrar `boilerplate-upstream` apontando pra `centralit-boilerplate`.
-   - ✗ Sem remote nenhum → sandbox montado antes da 1.14.0 (quando o `px-setup` fazia `rm -rf .git`) **ou** projeto que nunca veio do boilerplate. Nos dois casos a procedência é indeterminável: **avise explicitamente** que a base não é auditável e ofereça remontar o sandbox pelo `px-setup`.
+1. **É uma cópia do `@cit`?** `git remote -v` deve mostrar `ds-upstream` apontando pra `gitlab.cithyper.click/centralit/shadcn` (sandboxes montados antes da 1.27.0 usam o nome `boilerplate-upstream`, mesmo apontando pro `centralit/shadcn`; aceite e use esse nome nos comandos abaixo).
+   - ✗ Remote apontando pra `centralit-boilerplate` → sandbox no DS antigo, descontinuado. ⛔ Pare e devolva pra `px-setup` montar um novo no `@cit`.
+   - ✗ Sem remote nenhum → sandbox montado antes da 1.14.0 (quando o `px-setup` fazia `rm -rf .git`) **ou** projeto que nunca veio do `centralit/shadcn`. Nos dois casos a procedência é indeterminável: **avise explicitamente** que a base não é auditável e ofereça remontar o sandbox pelo `px-setup`.
    - ✗ Remote de outro repo → não é o ateliê do PX. Pare.
-2. **Qual a idade da base?** `git fetch boilerplate-upstream` e depois `git log --oneline HEAD..boilerplate-upstream/main | wc -l` + `git log -1 --format=%cd HEAD`.
+2. **Qual a idade da base?** `git fetch ds-upstream` e depois `git log --oneline HEAD..ds-upstream/main | wc -l` + `git log -1 --format=%cd HEAD`.
    - **> 30 dias ou > 20 commits atrás** → ⚠️ avise o líder com o número exato antes de codar. Base velha não bloqueia, mas **precisa ser dita**: é o que distingue "decidimos trabalhar assim" de "ninguém sabia".
-3. **Registry alcançável?** `CENTRALIT_TOKEN` no ambiente **e** bloco `registries.@centralit` no `components.json`.
+3. **Registry alcançável?** `CIT_REGISTRY_TOKEN` no ambiente **e** bloco `registries.@cit` no `components.json`.
    - ✗ → ⛔ **bloqueia.** Sem o token, todo `add` do Passo 1 cai no shadcn público em silêncio. Encaminhe pro `px-setup` Passo 2b.
+   - `403 ... account has been blocked` → token revogado ou expirado. ⛔ Bloqueia igual; encaminhe pro `px-setup` Passo 2b (pedir o valor atual do `ds-registry-readonly` para o Diogo Rother).
 
 **B — Ambiente**
 
 4. Servidor rodando? Se não, `npm run dev` em background.
-5. `src/index.css` tem os tokens do UI KIT? Se não, avise que o `px-kickoff` precisa materializar primeiro. (Os tokens também chegam por `npx shadcn@latest add @centralit/theme` — ver `docs/registry.md` no boilerplate.)
-6. `docs/design-system/ds-components_v4.md` existe? O Passo 4 consulta esse catálogo. Se faltar, rode `npx github:DiogoRother-it/px-skills` — o instalador o entrega, do DS que o projeto usa (`@cit` ou `boilerplate-cit`, pelo registry do `components.json`; num repo com os dois, rode dentro da pasta do projeto ou com `--ds=cit|boilerplate`). Confira no `docs/design-system/ORIGEM.md` que o DS é o do projeto. **Nunca improvise a anatomia de memória**: catálogo ausente produz componente plausível e anatomia errada. ⚠️ **O catálogo é a fonte de comportamento, não de anatomia** — anatomia sai do `.tsx`, e 17 dos 53 componentes não têm entrada no catálogo (Passo 4). Ter o documento não dispensa abrir o arquivo.
-7. Todos os componentes do inventário (Passo 1) estão em `src/components/ui/`? Se não, instale os que faltam **pelo registry** (`@centralit/<nome>`), respeitando as regras do Passo 1.
+5. `src/index.css` tem os tokens do UI KIT? Se não, avise que o `px-kickoff` precisa materializar primeiro. (Os tokens também chegam pelo registry `@cit`.)
+6. `docs/design-system/ds-components_v4.md` existe? O Passo 4 consulta esse catálogo. Se faltar, rode `npx github:DiogoRother-it/px-skills` — o instalador o entrega. Confira que o `docs/design-system/ORIGEM.md` diz `@cit`. **Nunca improvise a anatomia de memória**: catálogo ausente produz componente plausível e anatomia errada. ⚠️ **O catálogo é a fonte de comportamento, não de anatomia** — anatomia sai do `.tsx`, e 17 dos 53 componentes não têm entrada no catálogo (Passo 4). Ter o documento não dispensa abrir o arquivo.
+7. Todos os componentes do inventário (Passo 1) estão em `src/components/ui/`? Se não, instale os que faltam **pelo registry** (`@cit/<nome>`), respeitando as regras do Passo 1.
 
 **Registrar o resultado.** Anote no `PX-PROGRESS` a linha de procedência apurada aqui: commit da base, data, distância do `main` e versão das skills. É o dado que o `px-handoff` estampa no pacote — e sem ele nenhuma entrega é rastreável depois.
 
@@ -215,7 +217,7 @@ têm entrada própria lá** (23, contando só entrada com o próprio nome), e en
 ⚠️ **O `src/showcase/` é auditável, nunca verdade.** Ele é um exemplo escrito por alguém, não
 uma spec. **Ao copiar dele, confira contra a spec e contra o `.tsx` antes de colar.**
 Divergiu? **A spec ganha**, e a divergência do showcase vira débito externo registrado no
-`PX-PROGRESS` (é do boilerplate, não deste projeto). Isto não é formalidade: o
+`PX-PROGRESS` (é do repositório do DS, não deste projeto). Isto não é formalidade: o
 `showcase/Dados.tsx` chegou a ter duas paginações que divergiam da spec e uma da outra, e é o
 arquivo que todo projeto novo copia. Copiar dele sem conferir propaga o defeito com cara de
 padrão da casa.
@@ -516,7 +518,7 @@ Cada ajuste é aplicado direto, sem perguntar. O PX vê e manda mais ou aprova.
 | **Região/componente** | header, moldura da tabela, linha, drawer, dropdown, card de KPI, chart… |
 | **Valores exatos** | altura, padding, gap, raio, sombra, fonte/peso, largura. Números, não adjetivos. |
 | **Origem** | **Boilerplate** (default da lib já correto — *não customizar*) × **Override do projeto** (identidade própria — *aplicar*) |
-| **Base apurada** | Commit do `boilerplate-upstream` e data, conforme o Passo 3A. Preencher com o valor real, nunca "atual" |
+| **Base apurada** | Commit do `ds-upstream` e data, conforme o Passo 3A. Preencher com o valor real, nunca "atual" |
 | **Componente da lib** | qual componente/hook cobre a região (`Table variant="spaced"`, `sheet.tsx`, `useTableSort`…) |
 | **Intenção**, quando não for óbvia | *ex: "body do drawer em `--surface-soft` e footer em `--surface` separa conteúdo de ações — não uniformizar"* |
 
@@ -525,7 +527,7 @@ Cada ajuste é aplicado direto, sem perguntar. O PX vê e manda mais ou aprova.
 - **Gambiarra de protótipo que NÃO deve ser replicada** — workaround de contexto de empilhamento, delay artificial de skeleton, valor fora da escala de 8px. Diga explicitamente o que normalizar.
 - **Equivalência de biblioteca** quando a do proto difere da do dev (ícones, por exemplo): equivalência **semântica**, nunca cópia de glifo.
 
-> ⛔ **A coluna "Origem" é indeterminável sem o registry.** Classificar um valor como "Boilerplate — não customizar" exige comparar com o componente real de `@centralit`. Se o Passo 3A não passou, você não tem esse referencial: preenchida por dedução, a coluna não fica vazia — fica **afirmativamente errada**, e manda o dev preservar exatamente o que ele precisa substituir. Sem o Passo 3A verde, marque cada linha como `Origem: NÃO APURADA` e registre a pendência com dono. É pior errar aqui do que deixar em branco.
+> ⛔ **A coluna "Origem" é indeterminável sem o registry.** Classificar um valor como "DS — não customizar" exige comparar com o componente real de `@cit`. Se o Passo 3A não passou, você não tem esse referencial: preenchida por dedução, a coluna não fica vazia — fica **afirmativamente errada**, e manda o dev preservar exatamente o que ele precisa substituir. Sem o Passo 3A verde, marque cada linha como `Origem: NÃO APURADA` e registre a pendência com dono. É pior errar aqui do que deixar em branco.
 >
 > **Trava:** componente no inventário do Passo 1 sem entrada na anatomia **bloqueia a aprovação**. A `px-handoff` cobra a completude deste arquivo no DoD dela — se ficar para lá, já é tarde.
 >

@@ -35,9 +35,9 @@ Conduza em pt-BR.
 
 **Por que importa:** o kickoff **escreve tokens no `src/index.css`** do sandbox e gera o UI KIT que toda a cadeia vai consumir.
 **Fazer, antes de qualquer pergunta:**
-- Confirmar que estamos no **sandbox do boilerplate** do projeto (criado pelo `px-setup`). O PX sempre trabalha no boilerplate — o `src/index.css` aqui é o ambiente correto para a identidade.
+- Confirmar que estamos no **sandbox `@cit`** do projeto (criado pelo `px-setup`). O PX sempre trabalha no sandbox — o `src/index.css` aqui é o ambiente correto para a identidade.
 - Se o sandbox ainda não existe, encaminhar pra `px-setup` antes de continuar.
-- Se o alvo é só um protótipo descartável, seguir pelo `px-proto` (stack própria, não toca no `index.css` do boilerplate).
+- Se o alvo é só um protótipo descartável, seguir pelo `px-proto` (stack própria, não toca no `index.css` do sandbox).
 - Na entrega, o dev migra os tokens de identidade pro formato da stack do projeto real — isso é nivelamento de stack, não responsabilidade do PX.
 
 ## Modo "proponho e valido" (contra o interrogatório)

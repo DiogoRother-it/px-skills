@@ -43,7 +43,7 @@ Ela **não desenha tela** (isso é `px-request`/`px-story`): fecha o ciclo, mont
 | Tailwind **e** shadcn (Radix ou Base UI) **e** pasta `components/ui` com a biblioteca | **FONTE, obrigatório** | UI em TSX com os imports reescritos pro alias do dev. Primitiva diferente da nossa (Base UI × Radix) **não muda a forma**: entra em `pre-requisitos.md` com a lista de props que mudam (`asChild` → `render`) |
 | Sem Tailwind ou sem shadcn (legado, outra stack) | Referência visual + anatomia | Único caso. A evidência (as linhas do `package.json` que provam a ausência) vai **escrita no `handoff.md`**, seção "Forma do protótipo", com a frase literal `Stack do dev verificada: sem shadcn` |
 
-⛔ **"Stack diferente" sem as linhas de evidência é declaração inválida**, e o portão executável reprova o pacote (ver "Portão de forma"). **Sem repo do dev ainda:** a forma default é FONTE (o boilerplate é a stack de referência da casa) e o alias fica `@/` até o repo aparecer.
+⛔ **"Stack diferente" sem as linhas de evidência é declaração inválida**, e o portão executável reprova o pacote (ver "Portão de forma"). **Sem repo do dev ainda:** a forma default é FONTE (o `@cit` é a stack de referência da casa) e o alias fica `@/` até o repo aparecer.
 
 **FONTE → entregue o fonte do protótipo.** Copie `src/<produto>/**` para `<produto>/` e `src/proto/**` para `proto/` no pacote, junto com o `src/index.css` (tokens aplicados).
 
@@ -60,12 +60,12 @@ grep -rn 'from "@/' <produto>/ proto/   # o que sobrar é import interno do paco
 
 Registre a regra de tradução em `pre-requisitos.md` item 5 e no `handoff.md`. O que **não** é biblioteca (tela importando tela, `tipos.ts`, `fixtures.ts`) vira import **relativo** dentro do pacote. Se o alias do dev for `@/`, não há nada a reescrever, e isso também se escreve.
 
-**Formatar o pacote com o lint do dev (mecânico, depois do alias):** copie a pasta da UI e a demo para dentro do repo do dev (um clone ou worktree descartável), rode o `eslint --fix` **deles** sobre ela e traga os arquivos de volta. Medido em 2026-09-18: o boilerplate indenta com 2 espaços e o `smart-gov-next` exige 4; sem este passo o dev recebe 591 erros de lint num pacote que compila e renderiza igual, e o primeiro reflexo dele é "reescrever". Confira com `diff -w` que só espaço em branco mudou, e cole no `README.md` do pacote que ele já passa no lint de destino. Aviso de `react-refresh/only-export-components` em arquivo da UI se resolve na origem (função utilitária sai do arquivo de componente), não no pacote.
+**Formatar o pacote com o lint do dev (mecânico, depois do alias):** copie a pasta da UI e a demo para dentro do repo do dev (um clone ou worktree descartável), rode o `eslint --fix` **deles** sobre ela e traga os arquivos de volta. Medido em 2026-09-18: o sandbox indenta com 2 espaços e o `smart-gov-next` exige 4; sem este passo o dev recebe 591 erros de lint num pacote que compila e renderiza igual, e o primeiro reflexo dele é "reescrever". Confira com `diff -w` que só espaço em branco mudou, e cole no `README.md` do pacote que ele já passa no lint de destino. Aviso de `react-refresh/only-export-components` em arquivo da UI se resolve na origem (função utilitária sai do arquivo de componente), não no pacote.
 
 > ⛔ **O build compilado NÃO entra dentro do pacote, mas viaja junto, ao lado dele.** No caminho do fonte a entrega leva **dois artefatos com papéis opostos**: `handoff-ux/` é o código (copiar) e `preview/proto.html` é a **referência visual e navegável** (só olhar). O preview é um bundle single-file gerado por `npm run build:standalone` no sandbox: custa zero token, um arquivo cobre todas as telas da entrega (rota por hash, `#/proto/<slug>`) e a demo dá acesso a todos os estados. Fica **fora** de `handoff-ux/`, na raiz da branch, com um `preview/README.md` que diz, nesta ordem: abre com dois cliques; é a referência do que comparar; **não é código para reaproveitar**, porque entregar HTML no lugar do fonte foi o que quebrou a paridade. Sem essa separação e sem esse aviso, o dev trata o HTML como entrega. `px-preview` continua existindo para o PO (e-mail, URL pública); aqui o build é passo do fechamento (BLOCO 6).
 
 - **Por que:** a `px-proto` constrói o protótipo com os componentes reais e os mesmos aliases (`@/components/ui/...`). No repo do dev esses caminhos resolvem sem tradução. Entregar só o build obriga a rededuzir espaçamento, sombra, elevação e troca de estado a partir de screenshot — trabalho já feito uma vez, e a principal fonte de divergência visual.
-- **Documente no README** de onde vem cada import do proto (registry, boilerplate, interno ao pacote) e que **não há dependência nova a instalar**.
+- **Documente no README** de onde vem cada import do proto (registry `@cit`, base do sandbox, interno ao pacote) e que **não há dependência nova a instalar**.
 - **`mapa-de-telas.md` (obrigatório neste caminho):** uma linha por tela, com `# | ID | Fluxo | Tela | Rota | Arquivo da UI | História | Depende de`. Resolve quatro coisas de uma vez: dá a visão geral que um repo não dá de graça, aponta onde cada tela vive, carrega a rastreabilidade história ↔ componente **em arquivo separado**, e **expressa a ordem de implementação**.
   - A coluna `#` é a ordem, **com o motivo escrito em prosa logo abaixo da tabela**. Ordem sem motivo o dev ignora na primeira pressão de prazo.
   - A coluna `ID` é um identificador **estável por tela** — uma linha, um ID, uma história —, repetido no cabeçalho da história. Formato `<PROD>-<FLUXO>-<TELA>` (ex: `VIT-CAT-LISTA`, `VIT-CAT-DET`); quando a iniciativa tem um fluxo só, o segmento do meio cai (`VIT-LISTA`). Estável significa: sobrevive a reordenação e a inserção de história no meio — o ID nasce com a tela, nunca é renumerado nem reaproveitado.
@@ -83,7 +83,7 @@ Registre a regra de tradução em `pre-requisitos.md` item 5 e no `handoff.md`. 
 
 **Não → entregue referência visual + anatomia.** HTML unificado single-file (com âncoras `#view-*`/`data-story`) ou o build em `prototipo/`, **mais** o `anatomia-visual.md` e o `mapa-de-consumo.md` (ver a seção da Definition of Done).
 
-- **Quando isto acontece:** protótipo em stack diferente da implementação (típico de projeto que começou **antes de existir boilerplate**, ou de produto legado). Aqui nenhum componente atravessa a fronteira — só imagem e texto — e o visual **precisa** virar documento.
+- **Quando isto acontece:** protótipo em stack diferente da implementação (típico de projeto que começou **antes de existir o sandbox padrão**, ou de produto legado). Aqui nenhum componente atravessa a fronteira — só imagem e texto — e o visual **precisa** virar documento.
 - Diga no pacote, com franqueza, que documentação **reduz** divergência mas não elimina; 1:1 estrutural só vem de componente compartilhado.
 
 > ⛔ **Nunca entregue apenas o build quando o fonte serviria.** Um bundle compilado é tão impossível de importar quanto HTML vanilla: ninguém faz `import` de `assets/index-abc123.js`. É o erro mais caro e mais silencioso deste passo, porque o pacote *parece* completo.
@@ -268,7 +268,7 @@ Apresente ao PX: as branches `ux/*` encontradas (órfãs ou do tronco), o padrã
 
 ### Procedência — `procedencia.md` (obrigatório em todo pacote)
 
-**Por que importa:** este portão tem mais de 40 itens e, até a 1.14.0, **nenhum** verificava de onde a base veio. Todos conferem a coerência *interna* do pacote — refs mortas, IDs de RN, lint de copy, nomes de arquivo. Um pacote construído inteiramente fora do padrão passa em todos eles. Foi assim que meses de entrega saíram sobre componentes do shadcn público em vez do registry `@centralit`, sem que nada apitasse: o dev recebia regra de negócio correta, visual divergente e uma `anatomia-visual.md` que afirmava a procedência errada de cada valor.
+**Por que importa:** este portão tem mais de 40 itens e, até a 1.14.0, **nenhum** verificava de onde a base veio. Todos conferem a coerência *interna* do pacote — refs mortas, IDs de RN, lint de copy, nomes de arquivo. Um pacote construído inteiramente fora do padrão passa em todos eles. Foi assim que meses de entrega saíram sobre componentes do shadcn público em vez do registry da casa, sem que nada apitasse: o dev recebia regra de negócio correta, visual divergente e uma `anatomia-visual.md` que afirmava a procedência errada de cada valor.
 
 O `procedencia.md` é a linha que torna isso **detectável na entrega** e **auditável depois**. Sem ele, quando um problema visual aparece três sprints à frente, não existe forma de saber sobre qual base aquele pacote foi construído.
 
@@ -278,16 +278,16 @@ O `procedencia.md` é a linha que torna isso **detectável na entrega** e **audi
 |---|---|---|
 | Commit da base | `git rev-parse --short HEAD` no sandbox | `a1b3f9c` |
 | Data da base | `git log -1 --format=%cd HEAD` | `2026-08-14` |
-| Distância do `main` | `git log --oneline HEAD..boilerplate-upstream/main | wc -l` | `7 commits atrás` |
-| Registry | Alcançado no `px-proto` Passo 3A? | `@centralit — alcançado` |
-| Componentes | Instalados via `@centralit/*`? Listar os que não | `todos via registry` |
+| Distância do `main` | `git log --oneline HEAD..ds-upstream/main | wc -l` | `7 commits atrás` |
+| Registry | Alcançado no `px-proto` Passo 3A? | `@cit — alcançado` |
+| Componentes | Instalados via `@cit/*`? Listar os que não | `todos via registry` |
 | Versão das skills | `.claude/skills/.px-skills-version` | `1.14.0` |
-| Tokens | `src/index.css` do UI Kit do projeto ou `@centralit/theme` | `UI Kit do projeto` |
+| Tokens | `src/index.css` do UI Kit do projeto ou o tema do registry `@cit` | `UI Kit do projeto` |
 
 **Origem dos dados:** o `px-proto` apura no Passo 3A e registra no `PX-PROGRESS`. Aqui você **transcreve e valida**, não investiga do zero.
 
 **Estados que bloqueiam a saída:**
-- ⛔ **Procedência indeterminável** (sandbox sem `boilerplate-upstream`) → declare `Procedência: NÃO AUDITÁVEL` **em destaque no `handoff.md`**, com dono, e avise o líder. Não omita: um pacote sem procedência que não se declara é indistinguível de um pacote conforme.
+- ⛔ **Procedência indeterminável** (sandbox sem `ds-upstream`, nem o nome antigo `boilerplate-upstream`) → declare `Procedência: NÃO AUDITÁVEL` **em destaque no `handoff.md`**, com dono, e avise o líder. Não omita: um pacote sem procedência que não se declara é indistinguível de um pacote conforme.
 - ⛔ **Componente instalado fora do registry** → listar quais. O dev precisa saber exatamente onde a anatomia não é confiável.
 - ⛔ **`anatomia-visual.md` com `Origem: NÃO APURADA`** em qualquer linha → resolver ou registrar como Pergunta em aberto com dono.
 
@@ -311,7 +311,7 @@ O `procedencia.md` é a linha que torna isso **detectável na entrega** e **audi
 
 ### Mapa de consumo — quando dev e PX usam a mesma biblioteca
 
-**Quando aplica:** o dev tem acesso à mesma biblioteca de componentes que nós (ex: ambos no `centralit-boilerplate`). Aí a pergunta que trava a implementação não é "qual o valor", é **"isto já existe ou eu preciso construir?"**.
+**Quando aplica:** o dev tem acesso à mesma biblioteca de componentes que nós (ex: ambos no `@cit`). Aí a pergunta que trava a implementação não é "qual o valor", é **"isto já existe ou eu preciso construir?"**.
 
 **Fazer:** cruzar as regiões da tela com o inventário real da biblioteca e classificar cada uma:
 
@@ -363,7 +363,7 @@ Incluir também: **fluxo de decisão** ("está 🟢 ou 🟡? então existe, não
 7. **Despachar (condicional ao repo do dev):**
    - **Sem repo do dev** → o pacote já está organizado em `handoff-ux/` na raiz do projeto; **não há push**. Mostrar a árvore final e registrar no `handoff.md` que o push fica pendente.
    - **Repo existe, sem acesso** → seguir "Sem acesso ao repo do dev" (impedimento com dono e data no `handoff.md`; pacote inteiro e compactado se não puder esperar; nunca arquivo solto). **Não** despachar por chat.
-   - **Com repo do dev, Handoff Tradicional (branch órfã)** → montar `handoff-ux/<label>/` e `preview/<label>-proto.html` **na raiz do repo do dev**, mostrar a árvore, e push numa branch órfã nova (sem herdar histórico do boilerplate):
+   - **Com repo do dev, Handoff Tradicional (branch órfã)** → montar `handoff-ux/<label>/` e `preview/<label>-proto.html` **na raiz do repo do dev**, mostrar a árvore, e push numa branch órfã nova (sem herdar histórico do sandbox):
      ```
      git checkout --orphan ux/<label>
      git rm -rf .
@@ -512,7 +512,7 @@ num terminal e precisa devolver código de saída sem derrubar a sessão de quem
 
 ### O `-p` não é detalhe
 
-`npx tsc --noEmit` **sem** o `-p` compila **zero arquivo** e sai com sucesso, porque o `tsconfig.json` da raiz do boilerplate tem `"files": []` e só `references`. Medido: com um erro de tipo plantado, o comando sem `-p` retorna exit 0 e nenhuma linha de saída; com `-p tsconfig.app.json` retorna exit 2 e a mensagem do erro.
+`npx tsc --noEmit` **sem** o `-p` compila **zero arquivo** e sai com sucesso, porque o `tsconfig.json` da raiz do sandbox tem `"files": []` e só `references`. Medido: com um erro de tipo plantado, o comando sem `-p` retorna exit 0 e nenhuma linha de saída; com `-p tsconfig.app.json` retorna exit 2 e a mensagem do erro.
 
 **Um gate que não pode falhar não é gate.** Ao introduzir um gate novo, rode-o uma vez contra um erro plantado e registre a mensagem. Sem essa prova, não conte o gate.
 
@@ -532,7 +532,7 @@ A tabela "o que o `proto/` depende, e de onde vem" **não é redigida à mão**.
 grep -rhoE 'from "@/(components|hooks|lib|assets)[^"]*"' src/<produto>/ src/proto/ | sort -u
 ```
 
-Toda linha da saída precisa aparecer na tabela, com a origem (registry, boilerplate, ou arquivo dentro do pacote). Asset importado por módulo **entra no pacote** e a tabela diz para onde copiar.
+Toda linha da saída precisa aparecer na tabela, com a origem (registry `@cit`, base do sandbox, ou arquivo dentro do pacote). Asset importado por módulo **entra no pacote** e a tabela diz para onde copiar.
 
 ## GATE — Barreira de saída (verificar antes do eco final)
 
@@ -541,7 +541,7 @@ Toda linha da saída precisa aparecer na tabela, com a origem (registry, boilerp
 **Procedência (novo na 1.14.0 — nenhum outro item deste portão verifica origem)**
 - [ ] `procedencia.md` na **raiz do pacote**, com os 7 campos preenchidos com valor real
 - [ ] Commit e data da base são valores concretos — `grep -E "atual|última|latest|TBD|<" procedencia.md` = **zero**
-- [ ] Registry `@centralit` declarado como alcançado **ou** a exceção listada componente a componente
+- [ ] Registry `@cit` declarado como alcançado **ou** a exceção listada componente a componente
 - [ ] Nenhuma linha da `anatomia-visual.md` com `Origem: NÃO APURADA` — ou pendência com dono registrada
 - [ ] Se a procedência é indeterminável: `Procedência: NÃO AUDITÁVEL` **em destaque no `handoff.md`**, com dono
 
@@ -589,7 +589,7 @@ Toda linha da saída precisa aparecer na tabela, com a origem (registry, boilerp
 
 **O que nunca deve sair como arquivo** (ver `templates/handoff-manifest.md`)
 - [ ] Nenhuma **config de build**: `vite.config`, `tsconfig`, `package.json`, `.env`
-- [ ] Nenhum código de componente **fora do caminho do fonte**. No caminho do fonte, `proto/**` e `index.css` entram — é o artefato principal, não exceção. Nos dois casos, nada de `src/components/ui/**`: esses vêm do registry `@centralit`, não do pacote.
+- [ ] Nenhum código de componente **fora do caminho do fonte**. No caminho do fonte, `proto/**` e `index.css` entram — é o artefato principal, não exceção. Nos dois casos, nada de `src/components/ui/**`: esses vêm do registry `@cit`, não do pacote.
 - [ ] Nenhum artefato interno: checkpoint (`PX-PROGRESS`), prompt de continuidade, discovery/auditoria, épicos, requests, scratchpad, memória
 - [ ] Nenhum **relatório de walkthrough** (`e2e/reports/*.md`) — diário e diagnóstico são internos. O que atravessa é a **persona** e a fricção já convertida em CA, no `personas/`
 

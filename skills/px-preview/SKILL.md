@@ -73,18 +73,18 @@ Se ambas ok, siga para o Passo 1 (detectar stack) e então o caminho do formato 
 Inspecione o projeto (não pergunte ao UX; descubra você):
 
 - **`package.json`** — tem `vite`? É o esperado. Tem `next`/`@remix-run`? → caso especial (Passo 4).
-- **Existe `index.html` na raiz + `src/main.tsx`** e o `vite build` gera `dist/index.html`? → **Vite SPA puro** (Passo 2). É o caso do **sandbox boilerplate**.
+- **Existe `index.html` na raiz + `src/main.tsx`** e o `vite build` gera `dist/index.html`? → **Vite SPA puro** (Passo 2). É o caso do **sandbox `@cit`**.
 - **Tem `@tanstack/react-start` (SSR)?** O `vite build` gera função de servidor e **não** gera `index.html`? → **SSR client-only bypass** (Passo 3).
 
 ## Passo 2 — Vite SPA puro (o sandbox padrão) — caminho simples
 
 O `vite build` já produz `dist/index.html` + assets; só falta inlinar tudo num arquivo.
 
-**O sandbox boilerplate já vem pronto:** tem `vite-plugin-singlefile`, o `vite.standalone.config.ts` e o script `build:standalone`. Nesse caso, só:
+**Se o sandbox já tem o suporte** (`vite-plugin-singlefile`, `vite.standalone.config.ts` e o script `build:standalone` no `package.json`; confira, não presuma), só:
 1. **Roteamento:** se o app usa React Router, garantir **hash history** (`createHashRouter` / `HashRouter`) — sem isso quebra ao abrir por `file://`. Página única (sem router): nada a fazer.
 2. Rodar `npm run build:standalone` → `dist-standalone/index.html` (arquivo único).
 
-**Se o projeto NÃO tem o suporte ainda** (não veio do boilerplate):
+**Se o projeto NÃO tem o suporte ainda** (falta qualquer um dos três):
 1. `npm install -D vite-plugin-singlefile`
 2. Criar `vite.standalone.config.ts` = config normal + `viteSingleFile()`, com `build.outDir: "dist-standalone"` e `build.assetsInlineLimit: 100_000_000` (inlina imagens). O `viteSingleFile` já força um chunk só — não precisa de `inlineDynamicImports`.
 3. Adicionar `"build:standalone": "vite build --config vite.standalone.config.ts"` no `package.json`.

@@ -5,9 +5,10 @@
 // pacote só distribui. Nunca edite assets/design-system/<ds>/*.md à mão: a mudança se perde no
 // próximo sync. Mude na fonte e rode este script antes de publicar uma versão das skills.
 //
-// Uso (na raiz do px-skills, com acesso git aos dois repositórios):
-//   node scripts/sync-ds.mjs                 traz os dois
-//   node scripts/sync-ds.mjs --so=cit        traz só um (cit | boilerplate)
+// Desde 2026-11-17 há um DS só, o @cit (o boilerplate-cit foi descontinuado).
+//
+// Uso (na raiz do px-skills, com acesso git ao centralit/shadcn):
+//   node scripts/sync-ds.mjs                 traz o @cit
 //   node scripts/sync-ds.mjs --verificar     só compara; sai com 1 se algum estiver atrás da fonte
 //
 // Não entra no pacote publicado (fica fora de "files" no package.json).
@@ -27,14 +28,6 @@ export const FONTES = {
     repo: "https://gitlab.cithyper.click/centralit/shadcn.git",
     ref: "main",
     caminho: "docs/design-system",
-  },
-  boilerplate: {
-    rotulo: "boilerplate-cit",
-    repo: "https://github.com/DiogoRother-it/centralit-boilerplate.git",
-    ref: "main",
-    caminho: "docs/design-system",
-    // Um DS pode declarar versaoMinima: fonte abaixo dela não é trazida (sem --forcar). O boilerplate
-    // já teve a 0.4.0 aqui, até se saber que ela se perdeu sem publicar (2026-11-09).
   },
 }
 
