@@ -80,7 +80,7 @@ Os **critérios de usabilidade** de cada história saíram destas rodadas. Ao mu
 - (ou) Nenhuma — opera sobre dados já mockados/carregados.
 
 ## 6. Definition of Done (resumo)
-- Biblioteca de componentes: `<@centralit obrigatória | dev adapta à stack>`.
+- Biblioteca de componentes: `<@cit obrigatória | dev adapta à stack>`.
 - Referência visual: `<preview/proto.html fora do pacote, com README (caminho do fonte) | HTML single-file com data-story | build em prototipo/ (single-file pendente)>`.
 - Pacote self-contained: 0 referência a caminho externo; RNs e specs referenciadas incluídas.
 - Personas e flows: `<P personas em personas/ e J jornadas em flows/ | nenhuma rodou nesta leva, motivo declarado>`.

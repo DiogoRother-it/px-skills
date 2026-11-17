@@ -3,6 +3,17 @@
 Todas as versões instaláveis via `npx github:DiogoRother-it/px-skills` / `npx @centralit/px-skills`.
 O instalador imprime só a versão mais recente no terminal — o histórico completo vive aqui.
 
+## 1.27.0 — 2026-11-17
+
+**Dois design systems em uso, e o token do registry tratado como pessoal.** A cadeia perguntava o DS a cada projeto e mantinha dois caminhos (`@cit` e `boilerplate-cit`) em todas as skills. E, em 2026-11-17, um token revogado no ambiente devolveu `403 Forbidden - Your account has been blocked`; o caminho sugerido foi "desbloquear a conta" ou "usar o token de outro usuário".
+
+- **Um DS só: `@cit`.** O `boilerplate-cit` (registry `@centralit`, GitHub `centralit-boilerplate`) foi descontinuado. A `px-setup` não pergunta mais o DS; clona sempre o `centralit/shadcn`. Todas as skills, templates e o `px-protocol.md` passam a falar só do `@cit`.
+- **Pasta no DS antigo é barrada, não adaptada:** `px-start`, `px-proto`, o hook de sessão e o instalador reconhecem o registry `@centralit` e mandam montar um sandbox novo.
+- **Instalador:** `--ds` removido; instala sempre os docs do `@cit`. `assets/design-system/boilerplate/` e a fonte `boilerplate` do `scripts/sync-ds.mjs` saem do pacote.
+- **Token compartilhado:** o `CIT_REGISTRY_TOKEN` passa a ser o Project Access Token `ds-registry-readonly` do `centralit/shadcn` (Reporter, só `read_api`), pedido ao Diogo Rother e colado pelo próprio PX no perfil do shell, nunca no chat nem no projeto. A `px-setup` explica o 403 de conta bloqueada (token revogado ou expirado), que o token não serve para o clone (que usa o login do GitLab da pessoa) e a validade.
+- **Remote de procedência renomeado para `ds-upstream`.** Sandboxes antigos com `boilerplate-upstream` apontando para o `centralit/shadcn` continuam aceitos pelo `px-proto`, pela `px-handoff` e pelo hook.
+- **Hook de sessão:** checa `CIT_REGISTRY_TOKEN` no lugar do `CENTRALIT_TOKEN`, reconhece sandbox pelo registry `@cit` e avisa quando a pasta está no DS antigo.
+
 ## 1.26.0 — 2026-11-11
 
 **A `px-draw` só sabia fazer um rascunho HTML estático e neutro.** Para comparar caminhos e levar para reunião, o time montava o quadro à mão.

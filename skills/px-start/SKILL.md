@@ -1,6 +1,6 @@
 ---
 name: px-start
-description: Porta de entrada de PROJETO NOVO neste design system. É o "comece aqui" da cadeia PX — orienta o líder UX em 3 linhas, confere o design system do projeto (`@cit` ou `boilerplate-cit`), delega o scaffold à px-setup, e roteia pro próximo passo (px-intake se o problema ainda é vago, px-kickoff se já é hora de definir identidade). Não produz spec nem código de tela: ele prepara o terreno e despacha. Use ao iniciar um projeto do zero — "vou começar um projeto novo", "comecei um repo novo do boilerplate", "por onde começo esse projeto", "setup inicial".
+description: Porta de entrada de PROJETO NOVO neste design system. É o "comece aqui" da cadeia PX — orienta o líder UX em 3 linhas, confere que o projeto está no design system `@cit`, delega o scaffold à px-setup, e roteia pro próximo passo (px-intake se o problema ainda é vago, px-kickoff se já é hora de definir identidade). Não produz spec nem código de tela: ele prepara o terreno e despacha. Use ao iniciar um projeto do zero — "vou começar um projeto novo", "comecei um sandbox novo", "por onde começo esse projeto", "setup inicial".
 compatibility: claude-code
 metadata:
   audience: px-ux
@@ -37,8 +37,8 @@ Se não é projeto novo, encaminhe e encerre — não force o fluxo de setup. Em
 **Por que importa:** a cadeia PX escreve artefatos em `planning/<iniciativa>/` e a identidade em `src/index.css`. Sem o esqueleto, os próximos passos não têm onde gravar. Mas a **mecânica de git/scaffold é da `px-setup`** — o `px-start` não repete comando de repositório.
 **Fazer:**
 - Confirme a raiz do projeto (o repo). Se ambíguo, pergunte antes de escrever qualquer coisa.
-- **Se o terreno ainda não está preparado** (sem sandbox) → encaminhe pra **`px-setup`**, que pergunta o design system (`@cit`, padrão para sistema novo, ou `boilerplate-cit`) e monta o sandbox a partir da base dele. O PX **sempre** trabalha no sandbox — nunca no repo do dev.
-- **Se o sandbox já existe, confira o design system dele:** leia `docs/design-system/ORIGEM.md` e o registry do `components.json` (`@cit` ou `@centralit`). Diga ao líder qual é (*"este projeto está no `@cit`"*) e confirme que é o pretendido. Se for sistema novo e estiver no `boilerplate-cit`, ⚠️ avise antes de seguir: provavelmente o sandbox nasceu do boilerplate por padrão, sem ninguém escolher. Se o `ORIGEM.md` e o registry discordarem, ⛔ pare e devolva pra `px-setup` reinstalar com o `--ds` certo. **A branch `ux/<funcionalidade>`** só nasce na entrega (quando o `px-handoff` executa o git no fechamento) — nunca no início do trabalho. O `px-start` não repete comando de git.
+- **Se o terreno ainda não está preparado** (sem sandbox) → encaminhe pra **`px-setup`**, que monta o sandbox a partir do `@cit` (`centralit/shadcn`). O PX **sempre** trabalha no sandbox — nunca no repo do dev.
+- **Se o sandbox já existe, confira que ele está no `@cit`:** o registry do `components.json` precisa ser `@cit` e o `docs/design-system/ORIGEM.md` precisa dizer `@cit`. Se a pasta estiver no DS antigo (registry `@centralit`, base `centralit-boilerplate`), ⛔ pare: o `boilerplate-cit` foi descontinuado; devolva pra `px-setup` montar um sandbox novo no `@cit`. **A branch `ux/<funcionalidade>`** só nasce na entrega (quando o `px-handoff` executa o git no fechamento) — nunca no início do trabalho. O `px-start` não repete comando de git.
 - **Alvo de build** (`AskUserQuestion`): *App React do produto no sandbox do DS (Recomendado)* × *Exploração visual (via `px-draw`: HTML único ou canvas de propostas)*. Muda onde a identidade é aplicada e o que "pronto" significa. O sandbox é o ambiente padrão; o `px-draw` é a exceção pra casos exploratórios muito iniciais. Essa decisão é de idealização e fica aqui.
 - Se for rascunho, aponte pro `px-draw` como referência — a decisão já vem registrada.
 
@@ -80,9 +80,9 @@ Registre a recomendação e confirme antes de disparar a próxima skill.
 
 ## Eco final
 
-Antes de encerrar, repita em 3–4 linhas: *"Então: projeto **X**, design system **`@cit` | `boilerplate-cit`**, alvo **Y**, terreno preparado em **Z**, próximo passo **`px-…`** — confirma?"*. Só então dispare a skill escolhida.
+Antes de encerrar, repita em 3–4 linhas: *"Então: projeto **X**, design system **`@cit`**, alvo **Y**, terreno preparado em **Z**, próximo passo **`px-…`** — confirma?"*. Só então dispare a skill escolhida.
 
-> Ao confirmar o eco, **crie o checkpoint** `planning/<projeto>/PX-PROGRESS.md` (ver "Checkpoint de progresso" no `px-protocol.md`) já semeado com o design system (`ds: cit | boilerplate`), o alvo de build e o próximo passo roteado. Se a `px-setup` já criou o arquivo com o `ds`, complete-o em vez de recriar. É o `px-start` que abre o arquivo que as skills seguintes vão atualizar — assim, um chat novo sempre tem de onde retomar.
+> Ao confirmar o eco, **crie o checkpoint** `planning/<projeto>/PX-PROGRESS.md` (ver "Checkpoint de progresso" no `px-protocol.md`) já semeado com o design system (`ds: cit`), o alvo de build e o próximo passo roteado. Se a `px-setup` já criou o arquivo com o `ds`, complete-o em vez de recriar. É o `px-start` que abre o arquivo que as skills seguintes vão atualizar — assim, um chat novo sempre tem de onde retomar.
 
 ## Regras
 

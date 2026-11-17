@@ -4,7 +4,7 @@
 > ("Protocolo de Interação UX", "Skill Prompting Conventions"). Mantenha-o no repo do produto
 > (ou aponte o `CLAUDE.md`/`AGENTS.md` do projeto para ele) para as skills operarem sem buraco.
 
-> **Origem canônica.** As **regras de uso de componente** (`docs/design-system/*`) são canônicas no **centralit-boilerplate** (a biblioteca de componentes). As **skills** e este **protocolo** são canônicos no **px-skills**. Regra de componente nova nasce no boilerplate; a skill a absorve. Não inverta a direção ao editar.
+> **Origem canônica.** As **regras de uso de componente** (`docs/design-system/*`) são canônicas no **`centralit/shadcn`** (o design system `@cit`). As **skills** e este **protocolo** são canônicos no **px-skills**. Regra de componente nova nasce no `centralit/shadcn`; a skill a absorve. Não inverta a direção ao editar.
 
 ## Hierarquia de documentos
 
@@ -37,7 +37,7 @@
 ## Regras não-negociáveis
 
 - Componentes sempre via `npx shadcn add [nome]`; nunca copiar de outra fonte manualmente.
-- **Protótipo de handoff nasce no boilerplate, em TSX, com os componentes reais. Nunca em HTML vanilla nem via CDN.** O que atravessa pro dev é o **fonte da UI**; HTML standalone é preview pra PO (`px-preview`), nunca referência de implementação. Medido em 2026-09-18: SmartCity semana-37 e CIT Contracts saíram como HTML de 3 mil a 34 mil linhas sem uma classe Tailwind, enquanto o dev usava a mesma biblioteca que nós componente por componente. A LLM do dev reinterpretou o HTML inteiro e cada dev obteve um resultado diferente.
+- **Protótipo de handoff nasce no sandbox `@cit`, em TSX, com os componentes reais. Nunca em HTML vanilla nem via CDN.** O que atravessa pro dev é o **fonte da UI**; HTML standalone é preview pra PO (`px-preview`), nunca referência de implementação. Medido em 2026-09-18: SmartCity semana-37 e CIT Contracts saíram como HTML de 3 mil a 34 mil linhas sem uma classe Tailwind, enquanto o dev usava a mesma biblioteca que nós componente por componente. A LLM do dev reinterpretou o HTML inteiro e cada dev obteve um resultado diferente.
 - Nunca aceitar o visual default do shadcn sem reestilizar para bater com o design system.
 - Espaçamento sempre em múltiplos de 8px (`lint:spacing` antes de dar por pronto).
 - Ícones via Lucide, tamanho por prop `size` (16/20/24).
@@ -89,9 +89,9 @@ A IA nunca desenha a partir de um prompt vago. Interroga o propósito e ancora n
 
 `px-start` (projeto novo) **ou** `px-audit` (redesign de produto existente) → `px-intake` (problema vago) → `px-kickoff` (personas + UI KIT) → `px-epic` (se iniciativa) → `px-request` (por tela) → **`px-proto`** (protótipo visual fiel → PX valida e aprova) → `px-story` (história + BDD) → `ux-flows` (jornada) → `px-tour` (onboarding guiado do fluxo) → [`px-preview` — opcional, revisão da equipe interna] → `px-handoff` (fecha: DoD + sprint + flows), que despacha pra até dois destinos independentes: `px-setup` Passo 4 (branch `ux/<funcionalidade>` + Merge Request) → dev valida com `ux-flows`/`ux-persona` + Playwright; **e/ou** `px-sync` → repo central do PX (espelho completo, pra outro PX continuar idealizando).
 
-**`px-proto` (obrigatório após cada `px-request`).** Constrói a tela **dentro do boilerplate** (Vite + localhost), em **duas pastas**: `src/<produto>/` (a UI, em TSX, com os componentes reais do `src/components/ui/` e os tokens reais do `src/index.css`) e `src/proto/` (a demo descartável: seletor de papel e estado, fixtures). O PX revisa no localhost com HMR, itera e só aprova quando está correto. Nenhuma tela vira `px-story` sem passar pelo proto aprovado. ⛔ **Nunca gera HTML standalone, vanilla ou via CDN**: a versão anterior deste parágrafo dizia o contrário e foi a porta por onde meses de entrega saíram como HTML sem componente. O fonte de `src/<produto>/` é o que a `px-handoff` entrega ao dev.
+**`px-proto` (obrigatório após cada `px-request`).** Constrói a tela **dentro do sandbox `@cit`** (Vite + localhost), em **duas pastas**: `src/<produto>/` (a UI, em TSX, com os componentes reais do `src/components/ui/` e os tokens reais do `src/index.css`) e `src/proto/` (a demo descartável: seletor de papel e estado, fixtures). O PX revisa no localhost com HMR, itera e só aprova quando está correto. Nenhuma tela vira `px-story` sem passar pelo proto aprovado. ⛔ **Nunca gera HTML standalone, vanilla ou via CDN**: a versão anterior deste parágrafo dizia o contrário e foi a porta por onde meses de entrega saíram como HTML sem componente. O fonte de `src/<produto>/` é o que a `px-handoff` entrega ao dev.
 
-**`px-preview` (opcional, para revisão interna).** Empacota o app React do produto (boilerplate já construído) num HTML standalone para a equipe interna revisar o conjunto de telas antes de fechar o handoff para os devs. Posiciona-se depois do `px-story` e antes do `px-handoff`. Diferente do `px-proto`: requer o app funcionando; diferente do `px-handoff`: é revisão, não entrega.
+**`px-preview` (opcional, para revisão interna).** Empacota o app React do produto (sandbox `@cit` já construído) num HTML standalone para a equipe interna revisar o conjunto de telas antes de fechar o handoff para os devs. Posiciona-se depois do `px-story` e antes do `px-handoff`. Diferente do `px-proto`: requer o app funcionando; diferente do `px-handoff`: é revisão, não entrega.
 
 **`px-tour` (ao fechar cada fluxo lógico, antes da `px-handoff`).** Gera o onboarding guiado sobre o componente Onboarding Guiado do DS: um tour acionável por fluxo lógico (= um flow do `ux-flows`) e um tour global que encadeia todos, filtrados em runtime pelas permissões do usuário (RBAC granular, nunca tour por perfil). Compila de artefatos prontos (flow, histórias, requests, relatórios do `ux-persona`); não inventa passo, âncora nem permissão. A `px-handoff` leva `tours/` no pacote e o GATE confere as âncoras.
 
@@ -119,7 +119,7 @@ A cadeia PX é longa e roda em várias sessões de chat. Quando o contexto de um
 
 **Etapa atual:** <skill · foco>
 **Última atualização:** <AAAA-MM-DD>
-**Alvo de build:** App React (boilerplate)
+**Alvo de build:** App React (sandbox `@cit`)
 **Stack do dev (verificada):** <shadcn + Tailwind sobre <Radix | Base UI>, alias `<prefixo>` · repo <URL/branch> em <data> | sem shadcn: referência visual, evidência no handoff.md | ainda não verificada>
 **Branch:** ux/<funcionalidade>
 **Sprint:** <Sprint NN · AAAA-Www | a definir na px-handoff>

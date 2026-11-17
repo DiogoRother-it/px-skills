@@ -70,27 +70,18 @@ if (faltando.length) {
 ok(`${nSkills} skills instaladas em ${relative(TARGET, skillsDest) || ".claude/skills"}`)
 writeFileSync(stampPath, VERSION + "\n")
 
-// 2. Docs de design system → <target>/docs/design-system/, os do DS QUE ESTE PROJETO USA.
+// 2. Docs de design system → <target>/docs/design-system/, sempre os do @cit.
 //
-// Há dois DS em uso (2026-11-09): o @cit (GitLab, centralit/shadcn) nos sistemas novos e o
-// boilerplate-cit (o primeiro, GitHub, centralit-boilerplate) nos antigos, que ainda não viraram a
-// chave. Cada um tem o próprio documento, e a fonte é o repositório dele: o pacote traz os dois em
-// assets/design-system/<ds>/, atualizados por scripts/sync-ds.mjs a cada versão.
+// Desde 2026-11-17 há um DS só: o @cit (GitLab, centralit/shadcn). O boilerplate-cit (GitHub,
+// centralit-boilerplate, registry @centralit) foi descontinuado. O pacote traz os docs do @cit em
+// assets/design-system/cit/, atualizados por scripts/sync-ds.mjs a cada versão.
 //
-// O DS sai do registry do components.json do projeto (raiz ou até dois níveis abaixo):
-// "@cit" ou cithyper → @cit; "@centralit" ou centralit-boilerplate → boilerplate-cit. --ds=cit|boilerplate
-// manda sobre a detecção. Sem registry conhecido, vale o boilerplate-cit (protótipo HTML e projetos
-// antigos). Com os dois DS no mesmo repo (um monorepo de projetos), nada é instalado: rode com --ds
-// dentro da pasta do projeto.
+// Pasta com components.json no registry @centralit recebe um aviso: está no DS antigo e precisa de
+// um sandbox novo (px-setup). Os docs instalados continuam sendo os do @cit.
 //
-// SOBRESCREVE, ao contrário de antes: a cópia que nunca era atualizada é o que fez cada projeto ter
-// uma versão diferente do mesmo documento. A pasta passa a ser gerada, como .claude/skills/, e o
-// ORIGEM.md diz de onde veio. Cópia antiga feita à mão (sem ORIGEM.md) e diferente vai para
-// .anterior-<data>/ antes de ser trocada, e o instalador avisa.
-const DS = {
-  cit: { rotulo: "@cit", sinais: ["@cit", "cithyper"] },
-  boilerplate: { rotulo: "boilerplate-cit", sinais: ["@centralit", "centralit-boilerplate"] },
-}
+// SOBRESCREVE: a cópia que nunca era atualizada é o que fez cada projeto ter uma versão diferente do
+// mesmo documento. A pasta é gerada, como .claude/skills/, e o ORIGEM.md diz de onde veio. Cópia
+// antiga feita à mão (sem ORIGEM.md) e diferente vai para .anterior-<data>/ antes de ser trocada.
 const acharComponentsJson = (dir, nivel = 0) => {
   const achados = []
   let entradas = []
@@ -102,26 +93,20 @@ const acharComponentsJson = (dir, nivel = 0) => {
   }
   return achados
 }
-const dsDoComponentsJson = (arquivo) => {
-  let regs = {}
-  try { regs = JSON.parse(readFileSync(arquivo, "utf8")).registries || {} } catch { return null }
-  const texto = Object.entries(regs).map(([k, v]) => `${k} ${typeof v === "string" ? v : v?.url || ""}`).join(" ")
-  return Object.keys(DS).find((ds) => DS[ds].sinais.some((s) => texto.includes(s))) || null
+const usaDsAntigo = (arquivo) => {
+  try {
+    const regs = JSON.parse(readFileSync(arquivo, "utf8")).registries || {}
+    return "@centralit" in regs && !("@cit" in regs)
+  } catch { return false }
 }
-const argDS = process.argv.find((a) => a.startsWith("--ds="))?.slice(5)
-if (argDS && !DS[argDS]) fail(`--ds=${argDS} não existe. Use --ds=cit ou --ds=boilerplate`)
-let dsEscolhido = argDS, motivoDS = "pedido com --ds"
-if (!dsEscolhido) {
-  const porArquivo = acharComponentsJson(TARGET).map((a) => [relative(TARGET, a), dsDoComponentsJson(a)]).filter(([, ds]) => ds)
-  const distintos = [...new Set(porArquivo.map(([, ds]) => ds))]
-  if (distintos.length === 1) { dsEscolhido = distintos[0]; motivoDS = `pelo ${porArquivo[0][0]}` }
-  else if (distintos.length === 0) { dsEscolhido = "boilerplate"; motivoDS = "sem components.json com registry conhecido" }
-  else {
-    warn("Este repositório usa os dois design systems; os docs de design system NÃO foram instalados:")
-    for (const [a, ds] of porArquivo) warn(`  ${a} → ${DS[ds].rotulo}`)
-    warn("  rode o instalador dentro da pasta do projeto, ou com --ds=cit | --ds=boilerplate")
-  }
+if (process.argv.some((a) => a.startsWith("--ds="))) info("--ds foi removido: o design system é sempre o @cit")
+const antigos = acharComponentsJson(TARGET).filter(usaDsAntigo)
+if (antigos.length) {
+  warn("Pasta(s) no design system antigo (registry @centralit), descontinuado:")
+  for (const a of antigos) warn(`  ${relative(TARGET, a)}`)
+  warn("  o PX usa só o @cit: monte um sandbox novo com a px-setup")
 }
+const dsEscolhido = "cit", motivoDS = "único design system"
 if (dsEscolhido) {
   const dsSrc = join(PKG, "assets", "design-system", dsEscolhido)
   const dsDest = join(TARGET, "docs", "design-system")
@@ -160,7 +145,7 @@ if (dsEscolhido) {
 
 // 2b. Hook de sessão → <target>/.claude/hooks/ + SessionStart no settings.json
 // Avisa o UX quando as skills estão atrás, o sandbox não tem procedência ou falta
-// o CENTRALIT_TOKEN. O hook é o que faz o aviso chegar sem ninguém precisar lembrar
+// o CIT_REGISTRY_TOKEN, ou se a pasta está no DS antigo. O hook é o que faz o aviso chegar sem ninguém precisar lembrar
 // de rodar o instalador.
 const hooksDest = join(TARGET, ".claude", "hooks")
 mkdirSync(hooksDest, { recursive: true })
@@ -236,6 +221,11 @@ log(`${c.d}  estar no repo — ela vem no bundle do design system, não neste pa
 // Ao publicar uma versão nova: acrescente a chave aqui, 1 a 3 linhas de ~74 colunas.
 // Isto é o resumo de leitura rápida; a íntegra vive no CHANGELOG.md.
 const HIGHLIGHTS = {
+  "1.27.0": [
+    "Um design system so: @cit. O boilerplate-cit foi descontinuado; pasta",
+    "  no registry @centralit recebe aviso para montar sandbox novo. Token do",
+    "  registry e o compartilhado ds-registry-readonly (CIT_REGISTRY_TOKEN).",
+  ],
   "1.26.0": [
     "px-draw com dois formatos: HTML unico (problema, proposta e painel de",
     "  testes) ou canvas de propostas no Artifacts, com linhas lado a lado,",

@@ -103,7 +103,7 @@ Segue `Skill Prompting Conventions` do `CLAUDE.md`. Estruturada para decisões e
 **Perguntar (mastigar campo a campo):**
 - "Liste os dados que aparecem. Para uma lista/tabela: quais colunas?" — *ex: Nome, E-mail, Papel, Status.*
 - Para cada campo: "Que tipo é (texto, número, data, status, dinheiro)? Tem formato?" — *ex: Status = etiqueta colorida; Data = dd/mm/aaaa.*
-- "De onde vêm esses dados: API real, ou mock por enquanto?" — *default no boilerplate: mock realista.*
+- "De onde vêm esses dados: API real, ou mock por enquanto?" — *default no sandbox: mock realista.*
 - "Quantos itens, na vida real? 10 ou 10 mil?" — decide paginação, busca, virtualização.
 - "Como vem ordenado por padrão? Dá pra reordenar? Precisa de busca/filtro?" — *default: ordenado pelo campo mais óbvio, com busca se >~15 itens.*
 
@@ -138,7 +138,7 @@ Segue `Skill Prompting Conventions` do `CLAUDE.md`. Estruturada para decisões e
 4. **Gate "Outro":** se nada serve, proponha "Outro", marque **⚠️ REQUER VALIDAÇÃO UX/PX** e **pare** — não avança sem aprovação explícita do líder. Nunca invente componente em silêncio.
 
 **Componente de rastreabilidade disponível na biblioteca:**
-- **`internal-control`** — modal de controle interno com abas Atualizações, Backlog PX e Backlog Arquitetura. Visível só em homologação; em produção exibe apenas a Nota de Atualização. Já integrado à Navbar do boilerplate. Usar quando a tela precisar expor rastreabilidade de entrega — **não criar componente customizado** para esse fim.
+- **`internal-control`** — modal de controle interno com abas Atualizações, Backlog PX e Backlog Arquitetura. Visível só em homologação; em produção exibe apenas a Nota de Atualização. Integrado à Navbar do design system (confira no `src/components/ui/` do sandbox). Usar quando a tela precisar expor rastreabilidade de entrega — **não criar componente customizado** para esse fim.
 
 **Alertas obrigatórios ao ancorar a variação (dispare quando a família for a do caso):**
 - **Tabela → alerte sobre rolagem horizontal.** Ao recomendar qualquer variação de Table, avise o UX: *uma tabela idealmente não tem scroll horizontal*. Se as colunas levantadas no Bloco 4 sugerem que não cabem, a **sugestão é sempre reduzir colunas** — priorizar as essenciais e realocar o secundário (Table com Expansão, tooltip, ou Drawer de detalhe ao clicar na linha), nunca ativar `overflow-x`. Registre no artefato quais colunas são essenciais × secundárias. Ver Table família em `ds-components_v4.md`.
@@ -335,8 +335,8 @@ bloco protege contra o que existe e é usado divergente.
   repetir.
 - Divergência que na verdade é **defeito do design system** (a spec se contradiz, o
   componente não faz o que a doc diz) não se resolve aqui: vira **débito externo** no
-  `PX-PROGRESS`, com o caminho do arquivo no boilerplate. Regra de componente nasce no
-  boilerplate; a skill e a spec absorvem.
+  `PX-PROGRESS`, com o caminho do arquivo no `centralit/shadcn`. Regra de componente nasce no
+  repositório do DS; a skill e a spec absorvem.
 
 ## BLOCO 12 — Definition of Ready (eco final + trava)
 **Fazer:** revise o artefato inteiro e confirme com o líder que **nenhum campo está vazio**. Cada item abaixo é `[x]` (respondido) ou `N/A com motivo`:

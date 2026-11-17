@@ -7,7 +7,8 @@
 // Três checagens, todas baratas:
 //   1. Skills desatualizadas   → rede (px-skills é público), cache de 6h
 //   2. Sandbox sem procedência → local, instantâneo
-//   3. CENTRALIT_TOKEN ausente → local, instantâneo
+//   3. CIT_REGISTRY_TOKEN ausente → local, instantâneo
+//   4. Sandbox no DS antigo (@centralit, descontinuado) → local, instantâneo
 //
 // Regras de ouro deste arquivo:
 //   - SILÊNCIO QUANDO ESTÁ TUDO CERTO. Aviso que aparece toda sessão vira ruído
@@ -64,16 +65,20 @@ async function versaoRemota() {
   }
 }
 
-// É um sandbox do PX? A marca é o registry @centralit no components.json.
-function ehSandboxPx() {
+// Registries declarados no components.json da raiz ({} se não houver).
+function registries() {
   try {
     const cj = join(RAIZ, "components.json")
-    if (!existsSync(cj)) return false
-    return JSON.parse(readFileSync(cj, "utf8"))?.registries?.["@centralit"] != null
+    if (!existsSync(cj)) return {}
+    return JSON.parse(readFileSync(cj, "utf8"))?.registries ?? {}
   } catch {
-    return false
+    return {}
   }
 }
+// É um sandbox do PX? A marca é o registry @cit no components.json.
+const ehSandboxPx = () => registries()["@cit"] != null
+// Sandbox no DS antigo (boilerplate-cit, registry @centralit), descontinuado em 2026-11-17.
+const ehDsAntigo = () => registries()["@centralit"] != null && registries()["@cit"] == null
 
 function temProcedencia() {
   try {
@@ -83,7 +88,9 @@ function temProcedencia() {
       timeout: 2000,
       stdio: ["ignore", "pipe", "ignore"],
     })
-    return out.split(/\r?\n/).includes("boilerplate-upstream")
+    const remotes = out.split(/\r?\n/)
+    // ds-upstream desde a 1.27.0; boilerplate-upstream nos sandboxes montados antes
+    return remotes.includes("ds-upstream") || remotes.includes("boilerplate-upstream")
   } catch {
     return false
   }
@@ -111,29 +118,42 @@ async function main() {
     }
   }
 
+  // 4. DS antigo — avisa e não faz as outras checagens, que são do @cit
+  if (ehDsAntigo()) {
+    avisos.push(
+      `Esta pasta está no design system antigo (registry @centralit), descontinuado.`,
+      `O PX usa só o @cit agora: monte um sandbox novo pelo px-setup.`,
+    )
+    contexto.push(
+      `O \`components.json\` desta pasta declara o registry \`@centralit\` (boilerplate-cit), ` +
+        `descontinuado em 2026-11-17. O PX trabalha só no \`@cit\`. ⛔ Não gere spec, proto nem ` +
+        `handoff aqui: ofereça montar um sandbox novo pelo px-setup e trazer só o conteúdo do projeto.`,
+    )
+  }
+
   // 2 e 3 — só fazem sentido num sandbox do PX
   if (ehSandboxPx()) {
     if (!temProcedencia()) {
       avisos.push(
-        `Sandbox sem procedência: o remote 'boilerplate-upstream' não existe.`,
-        `A base não é auditável — não dá para medir o quanto ela divergiu do boilerplate.`,
+        `Sandbox sem procedência: o remote 'ds-upstream' não existe.`,
+        `A base não é auditável — não dá para medir o quanto ela divergiu do centralit/shadcn.`,
       )
       contexto.push(
-        `Este sandbox não tem o remote \`boilerplate-upstream\`, então a procedência da base ` +
+        `Este sandbox não tem o remote \`ds-upstream\`, então a procedência da base ` +
           `é indeterminável (provavelmente montado antes da 1.14.0, quando o px-setup fazia ` +
           `\`rm -rf .git\`). Se o trabalho for virar handoff, o \`procedencia.md\` terá que ` +
           `sair como NÃO AUDITÁVEL. Ofereça remontar o sandbox pelo px-setup.`,
       )
     }
-    if (!process.env.CENTRALIT_TOKEN) {
+    if (!process.env.CIT_REGISTRY_TOKEN) {
       avisos.push(
-        `CENTRALIT_TOKEN ausente: o registry @centralit não responde sem ele.`,
+        `CIT_REGISTRY_TOKEN ausente: o registry @cit não responde sem ele.`,
         `Componente instalado agora cai no shadcn público, que funciona e entrega o default errado.`,
       )
       contexto.push(
-        `\`CENTRALIT_TOKEN\` não está no ambiente. Todo \`npx shadcn add @centralit/...\` vai ` +
+        `\`CIT_REGISTRY_TOKEN\` não está no ambiente. Todo \`npx shadcn add @cit/...\` vai ` +
           `falhar por autenticação, e a forma sem prefixo cairia no shadcn público em silêncio. ` +
-          `⛔ Não instale componente por esse caminho: resolva o token primeiro (px-setup Passo 2b).`,
+          `⛔ Não instale componente por esse caminho: resolva o token primeiro (px-setup Passo 2b: pedir o ds-registry-readonly para o Diogo Rother).`,
       )
     }
   }
