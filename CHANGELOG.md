@@ -3,6 +3,14 @@
 Todas as versões instaláveis via `npx github:DiogoRother-it/px-skills` / `npx @centralit/px-skills`.
 O instalador imprime só a versão mais recente no terminal — o histórico completo vive aqui.
 
+## 1.28.0 — 2026-11-24
+
+**Produto que chegava de outra área não tinha caminho para o `@cit`.** A adequação ao DS e a identidade do produto (logo, cores, fonte, ícones) eram feitas à mão, sem régua de regressão e sem método para a marca.
+
+- **Nova skill `px-migrar-ds`:** migra o produto para o `@cit` sem redesenhar e sem mudar comportamento. Etapas com ok do UX entre cada uma: diagnóstico (com baseline visual de todas as telas e estados, desktop e celular, por `scripts/baseline.mjs`), identidade (chama a `styleguide-de-produto`), plano em passos pequenos e implementação passo a passo comparada com a baseline. Conflito entre "preservar" e regra inegociável do DS vira decisão do UX, não correção automática. Profundidade à escolha: só tokens, tokens + componentes, ou reescrita pela `px-audit`. Não roda git (fica com a `px-setup`). A captura da baseline usa o `playwright` do projeto do produto.
+- **Nova skill `styleguide-de-produto`:** identidade do produto em qualquer estilo (geométrico, contorno, arredondado, gradiente, monograma, desenho livre ou SVG feito no Figma). Briefing próprio para o logo (manter, refinar ou criar), 4 a 6 regras de linguagem tiradas da referência, 2 ou 3 opções do logo e de cada módulo num canvas, cores conferidas por contraste, tipografia e ícones de marca, banners e animações dentro das faixas do DS. Entrega SVGs (logo em três arranjos, marcas em 4 versões), `tokens.css`, `produtos.json` e a página do styleguide. Roda sozinha ou chamada pela `px-migrar-ds`; os scripts precisam de `python3`.
+- **Instalador mostra sempre as novidades das 2 últimas versões**, no mínimo, além do que o repo ainda não tinha. Antes, quem já estava em dia ou instalava pela primeira vez via uma versão só, ou nenhuma.
+
 ## 1.27.0 — 2026-11-17
 
 **Dois design systems em uso, e o token do registry tratado como pessoal.** A cadeia perguntava o DS a cada projeto e mantinha dois caminhos (`@cit` e `boilerplate-cit`) em todas as skills. E, em 2026-11-17, um token revogado no ambiente devolveu `403 Forbidden - Your account has been blocked`; o caminho sugerido foi "desbloquear a conta" ou "usar o token de outro usuário".
