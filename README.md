@@ -8,6 +8,7 @@ traz só a stack de componentes; as skills não vêm com ela).
 
 - **13 skills de entrevista** (`px-*`) em `.claude/skills/`: `px-setup`, `px-start`, `px-audit`, `px-intake`, `px-kickoff`, `px-epic`, `px-proto`, `px-request`, `px-story`, `px-tour`, `px-handoff`, `px-preview`, `px-sync`
 - **2 skills de execução** (`ux-*`): `ux-flows` (registra uma jornada real como flow executável) e `ux-persona` (percorre o flow simulando uma persona — sente e depois diagnostica pela rubrica de usabilidade). Diferente das `px-*`, não são entrevista: rodam sobre o produto ao vivo (repo local ou URL), dentro do `px-audit` ou depois do handoff, junto do Playwright do dev.
+- **2 skills de migração e identidade:** `px-migrar-ds` (leva um produto de outra área para o `@cit` sem redesenhar, com baseline visual e passos validados) e `styleguide-de-produto` (logo, marcas dos módulos, cores, tipografia e ícones de marca, banners e animações, em qualquer estilo; também roda sozinha). Os scripts precisam de `python3`; a baseline usa o `playwright` do projeto.
 - **Docs de design system** em `docs/design-system/` (foundations, components, patterns, engineering), **do design system `@cit`**, com um `ORIGEM.md` dizendo de onde vieram
 - **Protocolo** em `docs/px-protocol.md` (Protocolo de Interação UX + Skill Prompting Conventions)
 - Um ponteiro pro protocolo no `CLAUDE.md` do repo (cria se não existir)
@@ -19,8 +20,9 @@ não quebra se rodado num repo que ainda não tem o design system.
 Toda atualização de skill é descrita no terminal ao instalar **e** fica registrada no
 [`CHANGELOG.md`](CHANGELOG.md). O terminal mostra **só o delta deste repo**: o instalador grava
 a versão em `.claude/skills/.px-skills-version` e, na próxima instalação, resume apenas as
-versões que aquele repo ainda não tinha (`1.11.1 → 1.13.0` lista as duas que faltavam). Quem já
-está na versão atual não recebe resumo nenhum. O changelog guarda a íntegra.
+versões que aquele repo ainda não tinha (`1.11.1 → 1.13.0` lista as duas que faltavam), e mostra
+**sempre, no mínimo, as 2 versões mais recentes**, mesmo para quem já está em dia ou instala pela
+primeira vez. O changelog guarda a íntegra.
 
 ## O hook de sessão
 
@@ -65,6 +67,7 @@ npx @centralit/px-skills
 
 Depois, abra o Claude Code nesse repo — as skills aparecem no menu `/`:
 `/px-setup · /px-start · /px-audit · /px-intake · /px-kickoff · /px-epic · /px-proto · /px-request · /px-story · /px-tour · /px-handoff · /px-preview · /px-sync`
+`/px-migrar-ds · /styleguide-de-produto`
 `/ux-flows · /ux-persona`
 
 ## Pré-requisito

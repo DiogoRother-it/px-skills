@@ -1,0 +1,487 @@
+{
+  "familia": {
+    "nome": "Família Anel e ponto",
+    "sistema": "Sala Viva (exemplo fictício)",
+    "status": "proposta",
+    "intro": "Exemplo fictício para testar a skill. A marca-mãe da Sala Viva é um anel aberto com um ponto: a turma em volta do aluno. Cada módulo ganha uma forma própria, ligada ao verbo, desenhada com as mesmas regras.",
+    "marca_mae": {
+      "nome": "Sala Viva",
+      "descricao": "anel aberto de espessura 8 com um ponto na abertura",
+      "pecas": [
+        {
+          "tipo": "anel",
+          "cx": 32,
+          "cy": 32,
+          "r": 26,
+          "espessura": 8,
+          "de": 35,
+          "ate": 325
+        },
+        {
+          "tipo": "circulo",
+          "cx": 52,
+          "cy": 32,
+          "r": 6,
+          "agente": true
+        }
+      ]
+    },
+    "logo": {
+      "decisao": "criar",
+      "nome": "Sala Viva",
+      "porque": "o anel aberto é a turma; o ponto é o aluno chegando.",
+      "briefing": {
+        "transmitir": [
+          "acolhimento",
+          "escola pública, sem cara de banco"
+        ],
+        "evitar": [
+          "chapéu de formatura",
+          "lápis",
+          "livro aberto"
+        ],
+        "referencias": [
+          "a marca da secretaria de educação"
+        ]
+      },
+      "cor": "#1F5FA8",
+      "cor_texto": "#101828",
+      "arranjos": [
+        "simbolo",
+        "horizontal",
+        "vertical"
+      ],
+      "protecao": 0.25,
+      "minimo_px": 24,
+      "proibidos": [
+        "Mudar a cor do ponto para outra que não o amarelo-giz.",
+        "Fechar o anel.",
+        "Usar o nome sem o símbolo em fundo colorido.",
+        "Aplicar sombra, contorno ou gradiente."
+      ],
+      "escolhida": "A",
+      "opcoes": [
+        {
+          "id": "A",
+          "porque": "Anel aberto com o ponto na abertura (a marca-mãe).",
+          "pecas": [
+            {
+              "tipo": "anel",
+              "cx": 32,
+              "cy": 32,
+              "r": 26,
+              "espessura": 8,
+              "de": 35,
+              "ate": 325
+            },
+            {
+              "tipo": "circulo",
+              "cx": 52,
+              "cy": 32,
+              "r": 6,
+              "agente": true
+            }
+          ]
+        },
+        {
+          "id": "B",
+          "porque": "Monograma SV dentro do anel.",
+          "pecas": [
+            {
+              "tipo": "anel",
+              "cx": 32,
+              "cy": 32,
+              "r": 28,
+              "espessura": 6
+            },
+            {
+              "tipo": "texto",
+              "texto": "SV",
+              "x": 32,
+              "y": 41,
+              "tamanho": 24,
+              "peso": 800
+            }
+          ]
+        }
+      ]
+    },
+    "regras": [
+      "**Mesma grade de 64**, com a marca ocupando de 6 a 58 nos dois eixos.",
+      "**Traço único de 8.** Toda peça tem 8 de espessura, como o anel da marca-mãe.",
+      "**Curva só em arco de círculo,** com centro em ponto inteiro da grade. Nada de curva livre.",
+      "**Sem diagonal.** Retas só na horizontal ou na vertical.",
+      "**O ponto é o aluno,** um círculo de raio 6, na cor de acento nas versões com acento."
+    ],
+    "acento": {
+      "nome": "amarelo-giz",
+      "cor": "#F5B700",
+      "papel": "o ponto, que é o aluno"
+    },
+    "fundo_app": "#F2F4F7",
+    "fundo_escuro": "#101828",
+    "cor_escuro": "#FFFFFF",
+    "minimo_contraste": 3.0,
+    "distancia_minima": 20,
+    "cores_reservadas": [
+      {
+        "cor": "#D92D20",
+        "motivo": "erro e crítico"
+      },
+      {
+        "cor": "#079455",
+        "motivo": "sucesso"
+      },
+      {
+        "cor": "#DC6803",
+        "motivo": "atenção"
+      }
+    ],
+    "campos": [
+      "acento",
+      "textura",
+      "frase_home",
+      "marca_animada",
+      "movimento"
+    ],
+    "comum_aos_modulos": [
+      "**O acento aparece sempre nos mesmos lugares:** item ativo do menu e a faixa de 3 px colada no header."
+    ],
+    "pendencias": [
+      "**Uma cor por módulo ou uma só** para todos, deixando a identidade só para a forma.",
+      "**Validar a marca-mãe** com quem cuida da marca da Sala Viva."
+    ],
+    "tipografia": {
+      "interface": "Inter, pela escala do DS @cit",
+      "marca": {
+        "familia": "Nunito",
+        "fonte_url": "https://fonts.googleapis.com/css2?family=Nunito:wght@700;800&display=swap",
+        "pesos": [
+          700,
+          800
+        ],
+        "origem": "a mesma da marca-mãe",
+        "uso": [
+          "nome do sistema e dos módulos no login e no header",
+          "título de banner e de material de divulgação",
+          "número grande de destaque na home (até um por tela)"
+        ]
+      },
+      "regras": [
+        "**Fonte de marca nunca em texto corrido,** botão, rótulo ou tabela: ali é a Inter do DS.",
+        "**Só dois pesos** da fonte de marca (700 e 800)."
+      ]
+    },
+    "cor_icone": "#101828",
+    "icones": {
+      "interface": "Lucide em 16, 20 e 24 px, pelo DS @cit.",
+      "de_marca": [
+        {
+          "id": "turma-vazia",
+          "nome": "Turma vazia",
+          "uso": "Estado vazio de listas de alunos.",
+          "pecas": [
+            {
+              "tipo": "anel",
+              "cx": 32,
+              "cy": 32,
+              "r": 26,
+              "espessura": 8,
+              "de": 35,
+              "ate": 325
+            }
+          ]
+        },
+        {
+          "id": "turma",
+          "nome": "Turma",
+          "uso": "Abertura do ano letivo, banners de boas-vindas.",
+          "pecas": [
+            {
+              "tipo": "anel",
+              "cx": 32,
+              "cy": 32,
+              "r": 26,
+              "espessura": 8
+            },
+            {
+              "tipo": "circulo",
+              "cx": 32,
+              "cy": 23,
+              "r": 5,
+              "agente": true,
+              "repetir": {
+                "vezes": 3,
+                "girar": 120
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "banners": [
+      {
+        "id": "boas-vindas",
+        "titulo": "Bem-vindo à Sala Viva",
+        "subtitulo": "Matrícula, diário e avisos num lugar só.",
+        "formato": [
+          1200,
+          400
+        ],
+        "fundo": "escuro",
+        "uso": "Login e e-mail de boas-vindas."
+      },
+      {
+        "id": "diario-novo",
+        "modulo": "diario",
+        "titulo": "Chamada em dois toques",
+        "subtitulo": "O novo Diário já está no ar.",
+        "formato": [
+          1200,
+          400
+        ],
+        "fundo": "cor",
+        "textura": true,
+        "uso": "Novidade no topo da home."
+      }
+    ],
+    "movimento": {
+      "duracoes": {
+        "micro": "120ms",
+        "padrao": "200ms",
+        "entrada": "360ms"
+      },
+      "curva": "cubic-bezier(.2,.8,.2,1)",
+      "regras": [
+        "**A marca só anima em carregamento e abertura,** nunca em loop na tela de trabalho.",
+        "**O ponto anima primeiro;** o resto da marca segue."
+      ]
+    }
+  },
+  "modulos": [
+    {
+      "id": "matricula",
+      "nome": "Matrícula",
+      "verbo": "Acolhe",
+      "cor": "#1F5FA8",
+      "porque": "O anel da marca-mãe, com o aluno chegando pela abertura.",
+      "pecas": [
+        {
+          "tipo": "anel",
+          "cx": 32,
+          "cy": 32,
+          "r": 26,
+          "espessura": 8,
+          "de": 35,
+          "ate": 325
+        },
+        {
+          "tipo": "circulo",
+          "cx": 52,
+          "cy": 32,
+          "r": 6,
+          "agente": true
+        }
+      ],
+      "campos": {
+        "acento": {
+          "cor": "#1F5FA8",
+          "onde": [
+            "item ativo do menu (12% no fundo)",
+            "faixa de 3 px no header"
+          ]
+        },
+        "frase_home": {
+          "texto": "Quantas vagas ainda estão abertas para o próximo ano?",
+          "fonte": "Exemplo."
+        },
+        "marca_animada": {
+          "tipo": "pulsar-agente",
+          "descricao": "O ponto pulsa enquanto a matrícula carrega."
+        }
+      }
+    },
+    {
+      "id": "diario",
+      "nome": "Diário",
+      "verbo": "Registra",
+      "cor": "#5B3DB5",
+      "porque": "Três linhas do diário de classe, com o aluno no fim da última.",
+      "pecas": [
+        {
+          "tipo": "retangulo",
+          "x": 6,
+          "y": 10,
+          "largura": 52,
+          "altura": 8
+        },
+        {
+          "tipo": "retangulo",
+          "x": 6,
+          "y": 28,
+          "largura": 40,
+          "altura": 8
+        },
+        {
+          "tipo": "retangulo",
+          "x": 6,
+          "y": 46,
+          "largura": 28,
+          "altura": 8
+        },
+        {
+          "tipo": "circulo",
+          "cx": 48,
+          "cy": 50,
+          "r": 6,
+          "agente": true
+        }
+      ],
+      "campos": {
+        "frase_home": {
+          "texto": "Quais turmas ainda estão sem chamada hoje?"
+        },
+        "marca_animada": {
+          "tipo": "montar",
+          "descricao": "As linhas entram uma a uma, como uma chamada sendo feita."
+        },
+        "textura": {
+          "nome": "Linhas",
+          "descricao": "as linhas do caderno",
+          "svg": "<svg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48' fill='none' stroke='white' stroke-width='2'><path d='M4 12h40M4 24h40M4 36h40'/></svg>"
+        },
+        "movimento": {
+          "descricao": "As linhas entram de cima para baixo.",
+          "duracao": "200ms",
+          "curva": "cubic-bezier(.2,.8,.2,1)"
+        }
+      }
+    },
+    {
+      "id": "avaliacao",
+      "nome": "Avaliação",
+      "verbo": "Mede",
+      "cor": "#0B6E7F",
+      "porque": "Um medidor em dois arcos, com o aluno no centro.",
+      "escolhida": "A",
+      "opcoes": [
+        {
+          "id": "A",
+          "porque": "Medidor: dois arcos concêntricos abertos para baixo, o aluno no centro.",
+          "pecas": [
+            {
+              "tipo": "anel",
+              "cx": 32,
+              "cy": 38,
+              "r": 26,
+              "espessura": 8,
+              "de": 180,
+              "ate": 360
+            },
+            {
+              "tipo": "anel",
+              "cx": 32,
+              "cy": 38,
+              "r": 14,
+              "espessura": 8,
+              "de": 180,
+              "ate": 360
+            },
+            {
+              "tipo": "circulo",
+              "cx": 32,
+              "cy": 46,
+              "r": 6,
+              "agente": true
+            }
+          ]
+        },
+        {
+          "id": "B",
+          "porque": "Barras crescentes, como notas subindo; o aluno em cima da maior.",
+          "pecas": [
+            {
+              "tipo": "retangulo",
+              "x": 8,
+              "y": 38,
+              "largura": 8,
+              "altura": 18
+            },
+            {
+              "tipo": "retangulo",
+              "x": 24,
+              "y": 28,
+              "largura": 8,
+              "altura": 28
+            },
+            {
+              "tipo": "retangulo",
+              "x": 40,
+              "y": 18,
+              "largura": 8,
+              "altura": 38
+            },
+            {
+              "tipo": "circulo",
+              "cx": 44,
+              "cy": 8,
+              "r": 6,
+              "agente": true
+            }
+          ]
+        }
+      ],
+      "campos": {
+        "acento": {
+          "cor": "#0B6E7F",
+          "onde": [
+            "item ativo do menu",
+            "faixa de 3 px no header"
+          ]
+        }
+      },
+      "pendencias": [
+        "Opção A escolhida; a B fica como alternativa se o medidor ler pequeno a 16 px."
+      ]
+    },
+    {
+      "id": "comunicados",
+      "nome": "Comunicados",
+      "verbo": "Avisa",
+      "cor": "#9C2F6E",
+      "porque": "O aluno e duas ondas saindo dele: o aviso chegando em casa.",
+      "pecas": [
+        {
+          "tipo": "circulo",
+          "cx": 14,
+          "cy": 32,
+          "r": 6,
+          "agente": true
+        },
+        {
+          "tipo": "anel",
+          "cx": 14,
+          "cy": 32,
+          "r": 26,
+          "espessura": 8,
+          "de": -50,
+          "ate": 50
+        },
+        {
+          "tipo": "anel",
+          "cx": 14,
+          "cy": 32,
+          "r": 44,
+          "espessura": 8,
+          "de": -34,
+          "ate": 34
+        }
+      ],
+      "campos": {
+        "frase_home": {
+          "texto": "Quantas famílias leram o aviso de ontem?"
+        }
+      }
+    }
+  ]
+}

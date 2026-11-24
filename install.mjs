@@ -214,6 +214,7 @@ if (existsSync(claudeMd)) {
 log(`\n${c.g}Pronto.${c.x} Abra o Claude Code neste repo e as skills aparecem no menu \`/\`:`)
 log(`${c.d}  /px-setup · /px-start · /px-audit · /px-intake · /px-kickoff · /px-epic · /px-proto${c.x}`)
 log(`${c.d}  /px-request · /px-change · /px-story · /px-tour · /px-handoff · /px-preview · /px-sync${c.x}`)
+log(`${c.d}  /px-migrar-ds · /styleguide-de-produto${c.x} ${c.y}(produto de outra área: DS @cit + identidade)${c.x}`)
 log(`${c.d}  /ux-flows · /ux-persona${c.x} ${c.y}(execução — rodam sobre o produto ao vivo)${c.x}`)
 log(`\n${c.y}Pré-requisito de UI:${c.x} a biblioteca de componentes (src/components/ui + tokens) precisa`)
 log(`${c.d}  estar no repo — ela vem no bundle do design system, não neste pacote de skills.${c.x}`)
@@ -221,6 +222,12 @@ log(`${c.d}  estar no repo — ela vem no bundle do design system, não neste pa
 // Ao publicar uma versão nova: acrescente a chave aqui, 1 a 3 linhas de ~74 colunas.
 // Isto é o resumo de leitura rápida; a íntegra vive no CHANGELOG.md.
 const HIGHLIGHTS = {
+  "1.28.0": [
+    "Novas: px-migrar-ds leva um produto de outra area para o @cit sem",
+    "  redesenhar (baseline das telas, plano e passos com ok do UX) e chama a",
+    "  styleguide-de-produto (logo, marcas, cores, fonte, icones, banners).",
+    "Instalador mostra sempre as novidades das 2 ultimas versoes, no minimo.",
+  ],
   "1.27.0": [
     "Um design system so: @cit. O boilerplate-cit foi descontinuado; pasta",
     "  no registry @centralit recebe aviso para montar sandbox novo. Token do",
@@ -343,21 +350,30 @@ const cmp = (a, b) => {
 }
 const rule = (title) => title + " " + "─".repeat(Math.max(4, 64 - title.length))
 
+// Sempre mostra pelo menos as 2 versões mais recentes (até a instalada), mais o delta
+// que este repo ainda não tinha. Downgrade não mostra nada.
+const MINIMO_DE_VERSOES = 2
+const ultimas = Object.keys(HIGHLIGHTS)
+  .filter((v) => cmp(v, VERSION) <= 0)
+  .sort((a, b) => cmp(b, a))
+  .slice(0, MINIMO_DE_VERSOES)
+const comAsUltimas = (lista) => [...new Set([...lista, ...ultimas])].sort((a, b) => cmp(b, a))
+
 let titulo, versoes
 if (!prev) {
   titulo = `── px-skills ${VERSION}`
-  versoes = HIGHLIGHTS[VERSION] ? [VERSION] : []      // 1ª instalação: só a atual
+  versoes = comAsUltimas([])
 } else if (cmp(prev, VERSION) === 0) {
   titulo = `── px-skills ${VERSION} — já era a versão deste repo`
-  versoes = []
+  versoes = comAsUltimas([])
 } else if (cmp(prev, VERSION) > 0) {
   titulo = `── px-skills ${prev} → ${VERSION} (downgrade)`
   versoes = []
 } else {
   titulo = `── px-skills ${prev} → ${VERSION}`
-  versoes = Object.keys(HIGHLIGHTS)
-    .filter((v) => cmp(v, prev) > 0 && cmp(v, VERSION) <= 0)
-    .sort((a, b) => cmp(b, a))
+  versoes = comAsUltimas(
+    Object.keys(HIGHLIGHTS).filter((v) => cmp(v, prev) > 0 && cmp(v, VERSION) <= 0),
+  )
 }
 
 log(`\n${c.b}${rule(titulo)}${c.x}`)
